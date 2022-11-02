@@ -9,9 +9,11 @@ include_directories("${CMAKE_CURRENT_LIST_DIR}/3rdparty/SFML/include")
 
 set(LINK_FLAGS "${LINK_FLAGS} -DSFML_STATIC")
 
-set(SOURCE_FILES "src/main.cpp")
+include_directories("${CMAKE_CURRENT_LIST_DIR}/include")
+set(SRC "src/main.cpp"
+        "src/settings.cpp")
 
-add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+add_executable(${PROJECT_NAME} ${SRC})
 
 target_link_libraries(${PROJECT_NAME} sfml-system sfml-graphics sfml-audio sfml-window sfml-main )
 target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES})
