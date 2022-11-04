@@ -1,9 +1,12 @@
 #include "settings.hpp"
+#include "resources.hpp"
 
 #include <SFML/Graphics.hpp>
 
 int main() 
 {
+    Resources::load();
+
     sf::RenderWindow window(sf::VideoMode(sf::Vector2u(Settings::Window::width,
                                                        Settings::Window::height)), 
                             Settings::Window::title);

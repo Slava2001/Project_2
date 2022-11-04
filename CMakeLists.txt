@@ -15,7 +15,8 @@ set(LINK_FLAGS "${LINK_FLAGS} -DSFML_STATIC")
 
 include_directories("${CMAKE_CURRENT_LIST_DIR}/include")
 set(SRC "src/main.cpp"
-        "src/settings.cpp")
+        "src/settings.cpp"
+        "src/resources.cpp")
 
 add_executable(${PROJECT_NAME} ${SRC})
 
