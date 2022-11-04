@@ -4,8 +4,8 @@ namespace Settings
 {
     namespace Window
     {
-        int height = 200;
-        int width = 200;
+        int height = 400;
+        int width = 400;
         int fps_limit = 65;
         const char *title = "Project 2";
     }

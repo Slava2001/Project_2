@@ -1,6 +1,7 @@
 #include "settings.hpp"
 #include "resources.hpp"
 #include "debug-drawer.hpp"
+#include "gui-manager.hpp"
 
 #include "SFML/Graphics.hpp"
 #include "SFML/System.hpp"
@@ -19,6 +20,9 @@ int main()
     sf::Clock clock;
     int frame_counter = 0;
     int current_fps = 0;
+
+    GUI::Manager gui;
+
     while (window.isOpen())
     {
         sf::Event event;
@@ -41,11 +45,12 @@ int main()
         sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
         Debug_drawer::add_rect(sf::FloatRect(sf::Vector2f(mouse_pos.x, mouse_pos.y),
                                              sf::Vector2f(5, 5)));
-        Debug_drawer::add_string("Mouse position:");
-        Debug_drawer::add_string("Mouse X: ", mouse_pos.x);
-        Debug_drawer::add_string("Mouse Y: ", mouse_pos.y);
+        Debug_drawer::add_string("Mouse position: ", mouse_pos);
+
+        gui.update(mouse_pos);
 
         window.clear();
+        window.draw(gui);
         window.draw(debug_drawer);
         window.display();
     }
