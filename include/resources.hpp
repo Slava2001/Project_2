@@ -3,10 +3,12 @@
 
 #include "SFML/Graphics.hpp"
 
-namespace Resources {
-namespace Fonts {
-    extern sf::Font arial;
-}
+namespace Resources
+{
+    namespace Fonts
+    {
+        extern sf::Font arial;
+    }
 
     /// @brief Load resources.
     void load();
