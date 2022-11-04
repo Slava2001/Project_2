@@ -21,20 +21,20 @@ void Manager::add(Base *ctrl)
 
 void Manager::update_hover(sf::Vector2i mouse_pos)
 {
-    for (Base *c : _controls)
+    for (int i = _controls.size() - 1; i >= 0; i--)
     {
-        if (c->getGlobalBounds().contains((sf::Vector2f)mouse_pos))
+        if (_controls[i]->contains((sf::Vector2f)mouse_pos))
         {
             if (_hover)
             {
                 _hover->on_leave();
                 _hover = nullptr;
             }
-            _hover = c;
-            c->on_enter();
+            _hover = _controls[i];
+            _controls[i]->on_enter();
             break;
         }
-        else if (_hover == c)
+        else if (_hover == _controls[i])
         {
             _hover->on_leave();
             _hover = nullptr;
@@ -44,6 +44,16 @@ void Manager::update_hover(sf::Vector2i mouse_pos)
 
 void Manager::update(sf::Vector2i mouse_pos)
 {
+    if (_drag)
+    {
+        _drag->setPosition((sf::Vector2f)(mouse_pos + _drag_offset));
+    }
+
+    for (Base *c : _controls)
+    {
+        c->update(mouse_pos - (sf::Vector2i)c->getPosition());
+    }
+
     update_hover(mouse_pos);
 
     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
@@ -99,16 +109,8 @@ void Manager::update(sf::Vector2i mouse_pos)
         _drag = _presed;
         _drag_offset = (sf::Vector2i)_drag->getPosition() - mouse_pos;
         _presed = nullptr;
-    }
-
-    if (_drag)
-    {
-        _drag->setPosition((sf::Vector2f)(mouse_pos + _drag_offset));
-    }
-
-    for (Base *c : _controls)
-    {
-        c->update(mouse_pos - (sf::Vector2i)c->getPosition());
+        _controls.erase(std::find(_controls.begin(), _controls.end(), _drag));
+        _controls.push_back(_drag);
     }
 }
 

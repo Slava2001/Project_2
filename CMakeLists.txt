@@ -14,7 +14,8 @@ set(LINK_FLAGS "${LINK_FLAGS} -DSFML_STATIC")
 
 include_directories("${CMAKE_CURRENT_LIST_DIR}/include/gui")
 set(GUI_SRC "src/gui/gui-base.cpp"
-            "src/gui/gui-manager.cpp")
+            "src/gui/gui-manager.cpp"
+            "src/gui/gui-panel.cpp")
 add_library(GUI_LIB STATIC ${GUI_SRC})
 
 include_directories("${CMAKE_CURRENT_LIST_DIR}/include")

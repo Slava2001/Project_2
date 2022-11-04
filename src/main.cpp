@@ -22,6 +22,12 @@ int main()
     int current_fps = 0;
 
     GUI::Manager gui;
+    GUI::Panel panel1;
+    gui.add(&panel1);
+    GUI::Panel panel2;
+    gui.add(&panel2);
+    GUI::Panel panel3;
+    gui.add(&panel3);
 
     while (window.isOpen())
     {
@@ -49,7 +55,7 @@ int main()
 
         gui.update(mouse_pos);
 
-        window.clear();
+        window.clear(sf::Color(0x87cefa));
         window.draw(gui);
         window.draw(debug_drawer);
         window.display();

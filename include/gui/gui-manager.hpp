@@ -3,6 +3,8 @@
 
 #include "gui-base.hpp"
 
+#include "gui-panel.hpp"
+
 #include "SFML/System.hpp"
 
 namespace GUI

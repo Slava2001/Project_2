@@ -4,10 +4,16 @@
 
 using namespace GUI;
 
-Base::Base(bool is_fixed) : _is_fixed(is_fixed)
+Base::Base(sf::Vector2f hitbox, bool is_fixed) : _bounds(sf::Vector2f(0, 0), hitbox),
+                                                 _is_fixed(is_fixed)
 {
     _is_mouse_left_button_click = false;
     _is_mouse_hover = false;
+}
+
+bool Base::contains(sf::Vector2f point) const
+{
+    return getTransform().transformRect(_bounds).contains(point);
 }
 
 void Base::update(sf::Vector2i mose_pos)
@@ -44,5 +50,9 @@ void Base::on_press()
 }
 
 void Base::on_release()
+{
+}
+
+void Base::draw(sf::RenderTarget &target, const sf::RenderStates &states) const
 {
 }
