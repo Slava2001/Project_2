@@ -5,6 +5,6 @@
 ### Windows
 ```
 cmake -G "MinGW Makefiles" -S .\ -B.\bin
-cd bin
-make
+cmake --build .\bin 
+cmake --install .\bin --prefix .\Project2 
 ```
