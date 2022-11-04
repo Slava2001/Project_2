@@ -8,9 +8,9 @@
 #include <sstream>
 
 /// @brief Static class for show debug info
-class Debug_drawer: public sf::Drawable {
+class Debug_drawer : public sf::Drawable
+{
 public:
-
     /// @brief Add string to debug output.
     /// @param str string to add.
     static void add_string(const std::string &str);
@@ -23,16 +23,16 @@ public:
     /// @brief Add transparent rectangle to debug output.
     /// @param rec rectangle to add.
     static void add_rect(const sf::FloatRect &rec);
-    
-    void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override; 
-private:
 
+    void draw(sf::RenderTarget &target, const sf::RenderStates &states) const override;
+
+private:
     static std::vector<std::string> _text_lines;
     static std::vector<sf::FloatRect> _rects;
 };
 
 template <typename T>
-void Debug_drawer::add_string(const std::string &str, T val) 
+void Debug_drawer::add_string(const std::string &str, T val)
 {
     std::stringstream _sstr;
     _sstr << str;
