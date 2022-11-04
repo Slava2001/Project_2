@@ -8,7 +8,7 @@ namespace GUI
     {
     public:
         Base(sf::Vector2f hitbox = sf::Vector2f(0, 0), bool is_fixed = true);
-        void update(sf::Vector2i mose_pos);
+        virtual void update(sf::Vector2i mose_pos);
 
         bool is_fixed() const;
         virtual bool contains(sf::Vector2f point) const;

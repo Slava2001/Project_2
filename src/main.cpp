@@ -28,6 +28,9 @@ int main()
     gui.add(&panel2);
     GUI::Panel panel3;
     gui.add(&panel3);
+    GUI::Textbox textbox1;
+    gui.add(&textbox1);
+    textbox1.setPosition(sf::Vector2f(100, 100));
 
     while (window.isOpen())
     {

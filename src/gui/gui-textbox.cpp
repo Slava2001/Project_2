@@ -1,0 +1,105 @@
+#include "gui-textbox.hpp"
+#include "resources.hpp"
+
+#include "SFML/Window.hpp"
+
+using namespace GUI;
+
+Textbox::Textbox() : Base(sf::Vector2f(100, 16))
+{
+    _text_render.setFont(Resources::Fonts::arial);
+    _text_render.setFillColor(sf::Color::Black);
+    _text_render.setCharacterSize(12);
+    _text_render.setPosition(sf::Vector2f(2, 2));
+    _body.setSize(sf::Vector2f(100, 16));
+    _body.setFillColor(sf::Color(200, 200, 200));
+    _in_focus = false;
+    _is_presed = false;
+}
+
+static const char key_to_char[2][sf::Keyboard::Escape] = {
+    {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+     'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+     'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'},
+    {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+     'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
+     'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}};
+
+void Textbox::update(sf::Vector2i mose_pos)
+{
+    if (!_in_focus)
+    {
+        return;
+    }
+    if (_is_presed)
+    {
+        if (sf::Keyboard::isKeyPressed(_presed_key))
+        {
+            return;
+        }
+        _is_presed = false;
+    }
+
+    int upper = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) ? 0 : 1;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Backspace))
+    {
+        if (_text.size() > 0)
+        {
+            _text.pop_back();
+        }
+        _is_presed = true;
+        _presed_key = sf::Keyboard::Key::Backspace;
+    }
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+    {
+        _text += " ";
+        _is_presed = true;
+        _presed_key = sf::Keyboard::Key::Space;
+    }
+    else
+    {
+        for (int i = 0; i < sf::Keyboard::Escape; i++)
+        {
+            if (sf::Keyboard::isKeyPressed((sf::Keyboard::Key)i))
+            {
+                _text += key_to_char[upper][i];
+                _is_presed = true;
+                _presed_key = (sf::Keyboard::Key)i;
+                break;
+            }
+        }
+    }
+    _text_render.setString(_text);
+    if (_text_render.getLocalBounds().getSize().x >= 98)
+    {
+        if (_text.size() > 0)
+        {
+            _text.pop_back();
+        }
+        _text_render.setString(_text);
+    }
+}
+
+void Textbox::on_focus()
+{
+    _in_focus = true;
+    _body.setFillColor(sf::Color(255, 255, 255));
+}
+
+void Textbox::on_defocus()
+{
+    _in_focus = false;
+    _body.setFillColor(sf::Color(200, 200, 200));
+}
+
+std::string Textbox::text()
+{
+    return _text;
+}
+
+void Textbox::draw(sf::RenderTarget &target, const sf::RenderStates &states) const
+{
+    sf::RenderStates states_copy(states.transform * getTransform());
+    target.draw(_body, states_copy);
+    target.draw(_text_render, states_copy);
+}

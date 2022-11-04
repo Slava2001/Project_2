@@ -4,6 +4,7 @@
 #include "gui-base.hpp"
 
 #include "gui-panel.hpp"
+#include "gui-textbox.hpp"
 
 #include "SFML/System.hpp"
 
