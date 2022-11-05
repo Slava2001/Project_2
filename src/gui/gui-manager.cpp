@@ -3,126 +3,93 @@
 
 using namespace GUI;
 
-Manager::Manager()
+Manager::Manager() : _controls()
 {
-    _focus = nullptr;
     _hover = nullptr;
     _drag = nullptr;
-    _presed = nullptr;
 }
 
 void Manager::add(Base *ctrl)
 {
     if (ctrl)
     {
-        _controls.push_back(ctrl);
+        _controls.add(ctrl);
     }
 }
 
 void Manager::update_hover(sf::Vector2i mouse_pos)
 {
-    for (int i = _controls.size() - 1; i >= 0; i--)
+    Base *hover = _hover;
+    if (_controls.update_hover(mouse_pos, hover))
     {
-        if (_controls[i]->contains((sf::Vector2f)mouse_pos))
+        if (hover != _hover)
         {
+            hover->on_enter();
             if (_hover)
             {
                 _hover->on_leave();
-                _hover = nullptr;
             }
-            _hover = _controls[i];
-            _controls[i]->on_enter();
-            break;
+            _hover = hover;
         }
-        else if (_hover == _controls[i])
+    }
+    else
+    {
+        if (_hover)
         {
             _hover->on_leave();
-            _hover = nullptr;
+        }
+        _hover = nullptr;
+    }
+}
+
+void Manager::update_drag(sf::Vector2i mouse_pos)
+{
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+    {
+        if (_drag)
+        {
+            _drag->setPosition((sf::Vector2f)(mouse_pos + _drag_offset));
+        }
+        else
+        {
+            if (_hover && !_hover->is_fixed())
+            {
+                _drag = _hover;
+                _drag_offset = _drag->get_global_position() - mouse_pos;
+                _hover->detach();
+            }
+        }
+    }
+    else
+    {
+        if (_drag)
+        {
+            if (_hover)
+            {
+                _hover->add(_drag);
+            }
+            else
+            {
+                _drag->retach();
+            }
+            _drag = nullptr;
         }
     }
 }
 
 void Manager::update(sf::Vector2i mouse_pos)
 {
-    if (_drag)
-    {
-        _drag->setPosition((sf::Vector2f)(mouse_pos + _drag_offset));
-    }
-
-    for (Base *c : _controls)
-    {
-        c->update(mouse_pos - (sf::Vector2i)c->getPosition());
-    }
+    _controls.update(mouse_pos);
 
     update_hover(mouse_pos);
-
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
-    {
-        if (!_is_mouse_left_buttun_presed)
-        {
-            _presed = _hover;
-            if (_presed)
-            {
-                _presed->on_press();
-            }
-
-            if (_focus != _presed)
-            {
-                if (_focus)
-                {
-                    _focus->on_defocus();
-                }
-                if (_presed)
-                {
-                    _presed->on_focus();
-                }
-            }
-            _focus = _presed;
-        }
-        _is_mouse_left_buttun_presed = true;
-    }
-    else
-    {
-        if (_is_mouse_left_buttun_presed)
-        {
-            if (_presed)
-            {
-                _presed->on_release();
-                if (_hover == _presed)
-                {
-                    _presed->on_click();
-                }
-            }
-            if (_drag)
-            {
-                _drag->on_release();
-            }
-        }
-
-        _presed = nullptr;
-        _drag = nullptr;
-        _is_mouse_left_buttun_presed = false;
-    }
-
-    if (_presed && !_presed->is_fixed())
-    {
-        _drag = _presed;
-        _drag_offset = (sf::Vector2i)_drag->getPosition() - mouse_pos;
-        _presed = nullptr;
-        _controls.erase(std::find(_controls.begin(), _controls.end(), _drag));
-        _controls.push_back(_drag);
-    }
+    update_drag(mouse_pos);
+    Debug_drawer::add_string("_hover:  ", _hover);
+    Debug_drawer::add_string("_drag:   ", _drag);
 }
 
 void Manager::draw(sf::RenderTarget &target, const sf::RenderStates &states) const
 {
-    for (Base *c : _controls)
-    {
-        if (_drag != c)
-        {
-            target.draw(*c, states);
-        }
-    }
+    target.draw(_controls, states);
     if (_drag)
     {
         target.draw(*_drag, states);

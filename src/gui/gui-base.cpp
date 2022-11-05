@@ -4,16 +4,83 @@
 
 using namespace GUI;
 
-Base::Base(sf::Vector2f hitbox, bool is_fixed) : _bounds(sf::Vector2f(0, 0), hitbox),
+Base::Base(sf::Vector2f hitbox, bool is_fixed) : _parent(nullptr),
+                                                 _bounds(sf::Vector2f(0, 0), hitbox),
                                                  _is_fixed(is_fixed)
 {
-    _is_mouse_left_button_click = false;
-    _is_mouse_hover = false;
 }
 
-bool Base::contains(sf::Vector2f point) const
+bool Base::update_hover(sf::Vector2i mouse_pos, Base *&hover)
 {
-    return getTransform().transformRect(_bounds).contains(point);
+    Debug_drawer::add_string("mouse: ", mouse_pos);
+    Debug_drawer::add_string("me_ctrl:   ", this);
+    for (int i = _childes.size() - 1; i >= 0; i--)
+    {
+        Debug_drawer::add_string("c_ctrl:   ", _childes[i]);
+
+        if (_childes[i]->update_hover(mouse_pos - (sf::Vector2i)getPosition(), hover))
+        {
+            return true;
+        }
+    }
+
+    if (getTransform().transformRect(_bounds).contains((sf::Vector2f)mouse_pos))
+    {
+        hover = this;
+        return true;
+    }
+    return false;
+}
+
+bool Base::add(Base *ctrl)
+{
+    if (ctrl)
+    {
+        ctrl->_parent = this;
+        _childes.push_back(ctrl);
+        ctrl->setPosition(ctrl->getPosition() - (sf::Vector2f)get_global_position());
+        return true;
+    }
+    return false;
+}
+
+void Base::remove(Base *ctrl)
+{
+    _childes.erase(std::find(_childes.begin(), _childes.end(), ctrl));
+}
+
+void Base::detach()
+{
+    _old_parent = _parent;
+    _old_position = getPosition();
+
+    if (_parent)
+    {
+        _parent->remove(this);
+    }
+    _parent = nullptr;
+}
+
+void Base::retach()
+{
+    _parent = _old_parent;
+    if (_parent)
+    {
+        _parent->add(this);
+    }
+    setPosition(_old_position);
+}
+
+sf::Vector2i Base::get_global_position()
+{
+    if (_parent)
+    {
+        return (sf::Vector2i)getPosition() + _parent->get_global_position();
+    }
+    else
+    {
+        return (sf::Vector2i)getPosition();
+    }
 }
 
 void Base::update(sf::Vector2i mose_pos)
@@ -55,4 +122,13 @@ void Base::on_release()
 
 void Base::draw(sf::RenderTarget &target, const sf::RenderStates &states) const
 {
+    sf::RenderStates states_copy(states.transform * getTransform());
+    for (Base *c : _childes)
+    {
+        sf::Vertex line[] = {
+            sf::Vertex(sf::Vector2f(0, 0)),
+            sf::Vertex(c->getPosition())};
+        target.draw(*c, states_copy);
+        target.draw(line, 2, sf::Lines, states_copy);
+    }
 }

@@ -22,15 +22,17 @@ int main()
     int current_fps = 0;
 
     GUI::Manager gui;
-    GUI::Panel panel1;
-    gui.add(&panel1);
-    GUI::Panel panel2;
-    gui.add(&panel2);
-    GUI::Panel panel3;
-    gui.add(&panel3);
-    GUI::Textbox textbox1;
-    gui.add(&textbox1);
-    textbox1.setPosition(sf::Vector2f(100, 100));
+    GUI::Panel panel_1;
+    gui.add(&panel_1);
+    panel_1.setPosition(sf::Vector2f(100, 100));
+
+    GUI::Panel panel_11;
+    panel_1.add(&panel_11);
+    panel_11.setPosition(sf::Vector2f(-100, 100));
+
+    GUI::Panel panel_12;
+    panel_1.add(&panel_12);
+    panel_12.setPosition(sf::Vector2f(100, 100));
 
     while (window.isOpen())
     {

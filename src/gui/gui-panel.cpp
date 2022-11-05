@@ -27,4 +27,5 @@ void Panel::draw(sf::RenderTarget &target, const sf::RenderStates &states) const
     sf::RenderStates states_copy(states.transform * getTransform());
     target.draw(_head, states_copy);
     target.draw(_body, states_copy);
+    Base::draw(target, states);
 }
