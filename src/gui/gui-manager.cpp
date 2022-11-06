@@ -5,9 +5,10 @@ using namespace GUI;
 
 Manager::Manager() : _controls()
 {
-    _hover = nullptr;
+    _hover = &_controls;
     _drag = nullptr;
     _pressed = nullptr;
+    _focus = nullptr;
     _mouse_left_button_pressed = false;
 }
 
@@ -36,11 +37,11 @@ void Manager::update_hover(sf::Vector2i mouse_pos)
     }
     else
     {
-        if (_hover)
+        if (_hover != &_controls)
         {
             _hover->on_leave();
         }
-        _hover = nullptr;
+        _hover = &_controls;
     }
 }
 
@@ -54,7 +55,7 @@ void Manager::update_drag(sf::Vector2i mouse_pos)
         }
         else if (!_mouse_left_button_pressed)
         {
-            if (_hover)
+            if (_hover != &_controls)
             {
                 _pressed = _hover;
                 _pressed->on_press();
@@ -66,6 +67,18 @@ void Manager::update_drag(sf::Vector2i mouse_pos)
                     _drag->setPosition((sf::Vector2f)(mouse_pos + _drag_offset));
                 }
             }
+            if (_pressed != _focus)
+            {
+                if (_focus)
+                {
+                    _focus->on_defocus();
+                }
+                _focus = _pressed;
+                if (_focus)
+                {
+                    _focus->on_focus();
+                }
+            }
             _mouse_left_button_pressed = true;
         }
     }
@@ -73,7 +86,7 @@ void Manager::update_drag(sf::Vector2i mouse_pos)
     {
         if (_drag)
         {
-            if (!_hover || !_hover->add(_drag))
+            if (!_hover->add(_drag))
             {
                 _drag->retach();
             }
@@ -81,7 +94,7 @@ void Manager::update_drag(sf::Vector2i mouse_pos)
         }
         if (_pressed)
         {
-            if (_pressed == _hover || _pressed == _drag)
+            if (_pressed == _hover)
             {
                 _pressed->on_click();
             }
@@ -94,8 +107,7 @@ void Manager::update_drag(sf::Vector2i mouse_pos)
 
 void Manager::update(sf::Vector2i mouse_pos)
 {
-    _controls.update(mouse_pos);
-
+    _controls.update();
     update_hover(mouse_pos);
     update_drag(mouse_pos);
     Debug_drawer::add_string("_hover:  ", _hover);

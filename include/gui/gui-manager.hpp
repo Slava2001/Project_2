@@ -26,6 +26,7 @@ namespace GUI
         sf::Vector2i _drag_offset;
         Base *_pressed;
         bool _mouse_left_button_pressed;
+        Base *_focus;
 
         void update_hover(sf::Vector2i mouse_pos);
         void update_drag(sf::Vector2i mouse_pos);

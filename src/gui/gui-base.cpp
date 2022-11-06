@@ -80,8 +80,12 @@ sf::Vector2i Base::get_global_position()
     }
 }
 
-void Base::update(sf::Vector2i mose_pos)
+void Base::update()
 {
+    for (Base *ctrl : _childes)
+    {
+        ctrl->update();
+    }
 }
 
 bool Base::is_fixed() const

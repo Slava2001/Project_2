@@ -5,14 +5,15 @@
 
 using namespace GUI;
 
-Textbox::Textbox() : Base(sf::Vector2f(100, 16))
+Textbox::Textbox(sf::Vector2f size) : Base(size)
 {
     _text_render.setFont(Resources::Fonts::arial);
     _text_render.setFillColor(sf::Color::Black);
-    _text_render.setCharacterSize(12);
-    _text_render.setPosition(sf::Vector2f(2, 2));
-    _body.setSize(sf::Vector2f(100, 16));
-    _body.setFillColor(sf::Color(200, 200, 200));
+    _text_render.setCharacterSize(size.y);
+    _body.setSize(size);
+    _body.setFillColor(_defocus_color);
+    _body.setOutlineThickness(_outline_thickness);
+    _body.setOutlineColor(_outline_thickness_color);
     _in_focus = false;
     _is_presed = false;
 }
@@ -25,7 +26,7 @@ static const char key_to_char[2][sf::Keyboard::Escape] = {
      'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
      'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}};
 
-void Textbox::update(sf::Vector2i mose_pos)
+void Textbox::update()
 {
     if (!_in_focus)
     {
@@ -70,7 +71,7 @@ void Textbox::update(sf::Vector2i mose_pos)
         }
     }
     _text_render.setString(_text);
-    if (_text_render.getLocalBounds().getSize().x >= 98)
+    if (_text_render.getLocalBounds().getSize().x >= _body.getSize().x)
     {
         if (_text.size() > 0)
         {
@@ -83,13 +84,18 @@ void Textbox::update(sf::Vector2i mose_pos)
 void Textbox::on_focus()
 {
     _in_focus = true;
-    _body.setFillColor(sf::Color(255, 255, 255));
+    _body.setFillColor(_focus_color);
 }
 
 void Textbox::on_defocus()
 {
     _in_focus = false;
-    _body.setFillColor(sf::Color(200, 200, 200));
+    _body.setFillColor(_defocus_color);
+}
+
+bool Textbox::add(Base *ctrl)
+{
+    return false;
 }
 
 std::string Textbox::text()

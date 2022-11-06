@@ -28,6 +28,15 @@ int main()
 
     GUI::Panel panel_11;
     panel_1.add(&panel_11);
+
+    GUI::Textbox tb1(sf::Vector2f(90, 16));
+    panel_11.add(&tb1);
+    GUI::Textbox tb2(sf::Vector2f(90, 16));
+    panel_11.add(&tb2);
+
+    tb1.setPosition(sf::Vector2f(5, 30));
+    tb2.setPosition(sf::Vector2f(5, 60));
+
     panel_11.setPosition(sf::Vector2f(-100, 100));
 
     GUI::Panel panel_12;
