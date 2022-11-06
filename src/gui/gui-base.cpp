@@ -12,12 +12,9 @@ Base::Base(sf::Vector2f hitbox, bool is_fixed) : _parent(nullptr),
 
 bool Base::update_hover(sf::Vector2i mouse_pos, Base *&hover)
 {
-    Debug_drawer::add_string("mouse: ", mouse_pos);
-    Debug_drawer::add_string("me_ctrl:   ", this);
+    Debug_drawer::add_string("pos: ", get_global_position());
     for (int i = _childes.size() - 1; i >= 0; i--)
     {
-        Debug_drawer::add_string("c_ctrl:   ", _childes[i]);
-
         if (_childes[i]->update_hover(mouse_pos - (sf::Vector2i)getPosition(), hover))
         {
             return true;

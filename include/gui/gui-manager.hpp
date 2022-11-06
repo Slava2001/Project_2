@@ -5,6 +5,7 @@
 
 #include "gui-panel.hpp"
 #include "gui-textbox.hpp"
+#include "gui-button.hpp"
 
 #include "SFML/System.hpp"
 
@@ -23,6 +24,8 @@ namespace GUI
         Base *_hover;
         Base *_drag;
         sf::Vector2i _drag_offset;
+        Base *_pressed;
+        bool _mouse_left_button_pressed;
 
         void update_hover(sf::Vector2i mouse_pos);
         void update_drag(sf::Vector2i mouse_pos);

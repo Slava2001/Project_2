@@ -11,19 +11,19 @@ namespace GUI
         virtual void update(sf::Vector2i mose_pos);
 
         bool is_fixed() const;
-        virtual bool update_hover(sf::Vector2i mouse_pos, Base *&hover);
-        bool add(Base *ctrl);
+        virtual bool add(Base *ctrl);
         void remove(Base *ctrl);
         void detach();
         void retach();
         sf::Vector2i get_global_position();
 
+        virtual bool update_hover(sf::Vector2i mouse_pos, Base *&hover);
         virtual void on_click();
         virtual void on_enter();
         virtual void on_leave();
-        virtual void on_press();
         virtual void on_focus();
         virtual void on_defocus();
+        virtual void on_press();
         virtual void on_release();
 
         virtual void draw(sf::RenderTarget &target, const sf::RenderStates &states) const;

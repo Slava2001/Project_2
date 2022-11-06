@@ -16,7 +16,8 @@ include_directories("${CMAKE_CURRENT_LIST_DIR}/include/gui")
 set(GUI_SRC "src/gui/gui-base.cpp"
             "src/gui/gui-manager.cpp"
             "src/gui/gui-panel.cpp"
-            "src/gui/gui-textbox.cpp")
+            "src/gui/gui-textbox.cpp"
+            "src/gui/gui-button.cpp")
 add_library(GUI_LIB STATIC ${GUI_SRC})
 
 include_directories("${CMAKE_CURRENT_LIST_DIR}/include")

@@ -32,6 +32,17 @@ int main()
 
     GUI::Panel panel_12;
     panel_1.add(&panel_12);
+    GUI::Button bt1;
+    panel_12.add(&bt1);
+    GUI::Button bt2;
+    panel_12.add(&bt2);
+    GUI::Button bt3;
+    panel_12.add(&bt3);
+
+    bt1.setPosition(sf::Vector2f(20, 20));
+    bt2.setPosition(sf::Vector2f(20, 50));
+    bt3.setPosition(sf::Vector2f(20, 80));
+
     panel_12.setPosition(sf::Vector2f(100, 100));
 
     while (window.isOpen())

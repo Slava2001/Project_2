@@ -7,6 +7,8 @@ Manager::Manager() : _controls()
 {
     _hover = nullptr;
     _drag = nullptr;
+    _pressed = nullptr;
+    _mouse_left_button_pressed = false;
 }
 
 void Manager::add(Base *ctrl)
@@ -50,30 +52,43 @@ void Manager::update_drag(sf::Vector2i mouse_pos)
         {
             _drag->setPosition((sf::Vector2f)(mouse_pos + _drag_offset));
         }
-        else
+        else if (!_mouse_left_button_pressed)
         {
-            if (_hover && !_hover->is_fixed())
+            if (_hover)
             {
-                _drag = _hover;
-                _drag_offset = _drag->get_global_position() - mouse_pos;
-                _hover->detach();
+                _pressed = _hover;
+                _pressed->on_press();
+                if (!_hover->is_fixed())
+                {
+                    _drag = _hover;
+                    _drag_offset = _drag->get_global_position() - mouse_pos;
+                    _hover->detach();
+                    _drag->setPosition((sf::Vector2f)(mouse_pos + _drag_offset));
+                }
             }
+            _mouse_left_button_pressed = true;
         }
     }
     else
     {
         if (_drag)
         {
-            if (_hover)
-            {
-                _hover->add(_drag);
-            }
-            else
+            if (!_hover || !_hover->add(_drag))
             {
                 _drag->retach();
             }
             _drag = nullptr;
         }
+        if (_pressed)
+        {
+            if (_pressed == _hover || _pressed == _drag)
+            {
+                _pressed->on_click();
+            }
+            _pressed->on_release();
+            _pressed = nullptr;
+        }
+        _mouse_left_button_pressed = false;
     }
 }
 
