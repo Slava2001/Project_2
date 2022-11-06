@@ -36,7 +36,8 @@ int main()
     panel_12.add(&bt1);
     GUI::Button bt2;
     panel_12.add(&bt2);
-    GUI::Button bt3;
+    GUI::Button bt3([](GUI::Button &b)
+                    { b.set_text("Click again!"); });
     panel_12.add(&bt3);
 
     bt1.setPosition(sf::Vector2f(20, 20));

@@ -4,8 +4,9 @@
 
 using namespace GUI;
 
-Button::Button() : Base(sf::Vector2f(65, 15), true),
-                   _body(sf::Vector2f(65, 15))
+Button::Button(std::function<void(Button &)> callback) : Base(sf::Vector2f(65, 15), true),
+                                                         _body(sf::Vector2f(65, 15)),
+                                                         _on_click_callback(callback)
 {
     _body.setFillColor(sf::Color::White);
     _text.setFillColor(sf::Color::Black);
@@ -41,7 +42,7 @@ void Button::on_leave()
 
 void Button::on_click()
 {
-    set_text("Click again!");
+    _on_click_callback(*this);
 }
 
 void Button::set_text(std::string str)
@@ -55,4 +56,8 @@ void Button::draw(sf::RenderTarget &target, const sf::RenderStates &states) cons
     target.draw(_body, states.transform * getTransform());
     target.draw(_text, states.transform * getTransform());
     Base::draw(target, states);
+}
+
+void Button::defult_on_click_callback(Button &btn)
+{
 }

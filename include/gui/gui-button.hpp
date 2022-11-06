@@ -6,10 +6,11 @@
 
 namespace GUI
 {
+
     class Button : public Base
     {
     public:
-        Button();
+        Button(std::function<void(Button &)> callback = defult_on_click_callback);
         bool add(Base *ctrl);
         void on_press();
         void on_release();
@@ -24,7 +25,11 @@ namespace GUI
     private:
         sf::RectangleShape _body;
         sf::Text _text;
+        std::function<void(Button &)> _on_click_callback;
+
+        static void defult_on_click_callback(Button &btn);
     };
+
 };
 
 #endif // INCLUDE_GUI_GUI_BUTTON_HPP
