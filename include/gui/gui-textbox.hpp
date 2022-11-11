@@ -10,10 +10,10 @@ namespace GUI
     {
     public:
         Textbox(sf::Vector2f size = sf::Vector2f(100, 20));
-        void update();
         void on_focus();
         void on_defocus();
         bool add(Base *ctrl);
+        void on_key_press(sf::Event::KeyEvent &e);
         std::string text();
         void draw(sf::RenderTarget &target, const sf::RenderStates &states) const;
 
@@ -27,9 +27,6 @@ namespace GUI
         sf::RectangleShape _body;
         sf::Text _text_render;
         std::string _text;
-        bool _in_focus;
-        bool _is_presed;
-        sf::Keyboard::Key _presed_key;
     };
 };
 #endif // INCLUDE_GUI_GUI_TEXTBOX_HPP

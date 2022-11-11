@@ -80,14 +80,6 @@ sf::Vector2i Base::get_global_position()
     }
 }
 
-void Base::update()
-{
-    for (Base *ctrl : _childes)
-    {
-        ctrl->update();
-    }
-}
-
 bool Base::is_fixed() const
 {
     return _is_fixed;
@@ -119,6 +111,25 @@ void Base::on_press()
 
 void Base::on_release()
 {
+}
+
+void Base::on_key_press(sf::Event::KeyEvent &e)
+{
+}
+
+void Base::on_drag(Base *&drag)
+{
+    drag = this;
+    detach();
+}
+
+void Base::on_drop(Base *hover)
+{
+    _parent = _old_parent;
+    if (_parent)
+    {
+        _parent->add(this);
+    }
 }
 
 void Base::draw(sf::RenderTarget &target, const sf::RenderStates &states) const

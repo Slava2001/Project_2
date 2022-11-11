@@ -17,6 +17,8 @@ namespace GUI
         Manager();
         void update(sf::Vector2i mouse_pos);
         void add(Base *focus);
+        void on_key_presed(sf::Event::KeyEvent &e);
+
         void draw(sf::RenderTarget &target, const sf::RenderStates &states) const;
 
     private:

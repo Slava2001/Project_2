@@ -61,9 +61,8 @@ void Manager::update_drag(sf::Vector2i mouse_pos)
                 _pressed->on_press();
                 if (!_hover->is_fixed())
                 {
-                    _drag = _hover;
-                    _drag_offset = _drag->get_global_position() - mouse_pos;
-                    _hover->detach();
+                    _drag_offset = _hover->get_global_position() - mouse_pos;
+                    _hover->on_drag(_drag);
                     _drag->setPosition((sf::Vector2f)(mouse_pos + _drag_offset));
                 }
             }
@@ -86,10 +85,7 @@ void Manager::update_drag(sf::Vector2i mouse_pos)
     {
         if (_drag)
         {
-            if (!_hover->add(_drag))
-            {
-                _drag->retach();
-            }
+            _drag->on_drop(_hover);
             _drag = nullptr;
         }
         if (_pressed)
@@ -107,11 +103,19 @@ void Manager::update_drag(sf::Vector2i mouse_pos)
 
 void Manager::update(sf::Vector2i mouse_pos)
 {
-    _controls.update();
     update_hover(mouse_pos);
     update_drag(mouse_pos);
     Debug_drawer::add_string("_hover:  ", _hover);
     Debug_drawer::add_string("_drag:   ", _drag);
+    Debug_drawer::add_string("_focus:  ", _focus);
+}
+
+void Manager::on_key_presed(sf::Event::KeyEvent &e)
+{
+    if (_focus)
+    {
+        _focus->on_key_press(e);
+    }
 }
 
 void Manager::draw(sf::RenderTarget &target, const sf::RenderStates &states) const

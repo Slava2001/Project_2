@@ -8,7 +8,6 @@ namespace GUI
     {
     public:
         Base(sf::Vector2f hitbox = sf::Vector2f(0, 0), bool is_fixed = true);
-        virtual void update();
 
         bool is_fixed() const;
         virtual bool add(Base *ctrl);
@@ -25,6 +24,9 @@ namespace GUI
         virtual void on_defocus();
         virtual void on_press();
         virtual void on_release();
+        virtual void on_key_press(sf::Event::KeyEvent &e);
+        virtual void on_drag(Base *&drag);
+        virtual void on_drop(Base *hover);
 
         virtual void draw(sf::RenderTarget &target, const sf::RenderStates &states) const;
 

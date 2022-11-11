@@ -24,10 +24,10 @@ int main()
     GUI::Manager gui;
     GUI::Panel panel_1;
     gui.add(&panel_1);
-    panel_1.setPosition(sf::Vector2f(100, 100));
+    panel_1.setPosition(sf::Vector2f(110, 100));
 
     GUI::Panel panel_11;
-    panel_1.add(&panel_11);
+    gui.add(&panel_11);
 
     GUI::Textbox tb1(sf::Vector2f(90, 16));
     panel_11.add(&tb1);
@@ -37,10 +37,10 @@ int main()
     tb1.setPosition(sf::Vector2f(5, 30));
     tb2.setPosition(sf::Vector2f(5, 60));
 
-    panel_11.setPosition(sf::Vector2f(-100, 100));
+    panel_11.setPosition(sf::Vector2f(220, 100));
 
     GUI::Panel panel_12;
-    panel_1.add(&panel_12);
+    gui.add(&panel_12);
     GUI::Button bt1;
     panel_12.add(&bt1);
     GUI::Button bt2;
@@ -53,7 +53,7 @@ int main()
     bt2.setPosition(sf::Vector2f(20, 50));
     bt3.setPosition(sf::Vector2f(20, 80));
 
-    panel_12.setPosition(sf::Vector2f(100, 100));
+    panel_12.setPosition(sf::Vector2f(0, 100));
 
     while (window.isOpen())
     {
@@ -63,6 +63,10 @@ int main()
             if (event.type == sf::Event::Closed)
             {
                 window.close();
+            }
+            if (event.type == sf::Event::KeyPressed)
+            {
+                gui.on_key_presed(event.key);
             }
         }
 
