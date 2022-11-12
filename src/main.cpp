@@ -22,38 +22,17 @@ int main()
     int current_fps = 0;
 
     GUI::Manager gui;
-    GUI::Panel panel_1;
-    gui.add(&panel_1);
-    panel_1.setPosition(sf::Vector2f(110, 100));
 
-    GUI::Panel panel_11;
-    gui.add(&panel_11);
-
-    GUI::Textbox tb1(sf::Vector2f(90, 16));
-    panel_11.add(&tb1);
-    GUI::Textbox tb2(sf::Vector2f(90, 16));
-    panel_11.add(&tb2);
-
-    tb1.setPosition(sf::Vector2f(5, 30));
-    tb2.setPosition(sf::Vector2f(5, 60));
-
-    panel_11.setPosition(sf::Vector2f(220, 100));
-
-    GUI::Panel panel_12;
-    gui.add(&panel_12);
-    GUI::Button bt1;
-    panel_12.add(&bt1);
-    GUI::Button bt2;
-    panel_12.add(&bt2);
-    GUI::Button bt3([](GUI::Button &b)
-                    { b.set_text("Click again!"); });
-    panel_12.add(&bt3);
-
-    bt1.setPosition(sf::Vector2f(20, 20));
-    bt2.setPosition(sf::Vector2f(20, 50));
-    bt3.setPosition(sf::Vector2f(20, 80));
-
-    panel_12.setPosition(sf::Vector2f(0, 100));
+    GUI::Panel panel;
+    gui.add(&panel);
+    panel.setPosition(sf::Vector2f(100, 100));
+    GUI::Textbox tb(sf::Vector2f(90, 16));
+    panel.add(&tb);
+    tb.setPosition(sf::Vector2f(5, 30));
+    GUI::Button btn([&](GUI::Button &b)
+                    { window.setTitle(tb.get_text()); });
+    panel.add(&btn);
+    btn.setPosition(sf::Vector2f(20, 60));
 
     while (window.isOpen())
     {
@@ -79,9 +58,6 @@ int main()
 
         Debug_drawer::add_string("FPS: ", current_fps);
         sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
-        Debug_drawer::add_rect(sf::FloatRect(sf::Vector2f(mouse_pos.x, mouse_pos.y),
-                                             sf::Vector2f(5, 5)));
-        Debug_drawer::add_string("Mouse position: ", mouse_pos);
 
         gui.update(mouse_pos);
 

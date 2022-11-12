@@ -12,7 +12,6 @@ Base::Base(sf::Vector2f hitbox, bool is_fixed) : _parent(nullptr),
 
 bool Base::update_hover(sf::Vector2i mouse_pos, Base *&hover)
 {
-    Debug_drawer::add_string("pos: ", get_global_position());
     for (int i = _childes.size() - 1; i >= 0; i--)
     {
         if (_childes[i]->update_hover(mouse_pos - (sf::Vector2i)getPosition(), hover))
@@ -41,7 +40,7 @@ bool Base::add(Base *ctrl)
     return false;
 }
 
-void Base::remove(Base *ctrl)
+void Base::erase(Base *ctrl)
 {
     _childes.erase(std::find(_childes.begin(), _childes.end(), ctrl));
 }
@@ -53,7 +52,7 @@ void Base::detach()
 
     if (_parent)
     {
-        _parent->remove(this);
+        _parent->erase(this);
     }
     _parent = nullptr;
 }
@@ -125,10 +124,9 @@ void Base::on_drag(Base *&drag)
 
 void Base::on_drop(Base *hover)
 {
-    _parent = _old_parent;
-    if (_parent)
+    if (!hover || !hover->add(this))
     {
-        _parent->add(this);
+        retach();
     }
 }
 
@@ -137,10 +135,6 @@ void Base::draw(sf::RenderTarget &target, const sf::RenderStates &states) const
     sf::RenderStates states_copy(states.transform * getTransform());
     for (Base *c : _childes)
     {
-        sf::Vertex line[] = {
-            sf::Vertex(sf::Vector2f(0, 0)),
-            sf::Vertex(c->getPosition())};
         target.draw(*c, states_copy);
-        target.draw(line, 2, sf::Lines, states_copy);
     }
 }

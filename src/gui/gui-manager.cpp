@@ -105,9 +105,6 @@ void Manager::update(sf::Vector2i mouse_pos)
 {
     update_hover(mouse_pos);
     update_drag(mouse_pos);
-    Debug_drawer::add_string("_hover:  ", _hover);
-    Debug_drawer::add_string("_drag:   ", _drag);
-    Debug_drawer::add_string("_focus:  ", _focus);
 }
 
 void Manager::on_key_presed(sf::Event::KeyEvent &e)

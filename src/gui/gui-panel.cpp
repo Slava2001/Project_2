@@ -2,24 +2,48 @@
 
 using namespace GUI;
 
-Panel::Panel() : Base(sf::Vector2f(100, 100), false)
+constexpr sf::Color Panel::_body_enter_color(100, 100, 100, 200);
+constexpr sf::Color Panel::_head_enter_color(100, 100, 100, 250);
+constexpr sf::Color Panel::_body_leave_color(0, 0, 0, 200);
+constexpr sf::Color Panel::_head_leave_color(0, 0, 0, 250);
+constexpr sf::Vector2f Panel::_panel_size(100, 100);
+constexpr int Panel::_head_size = 15;
+
+Panel::Panel() : Base(_panel_size, false)
 {
-    _head.setSize(sf::Vector2f(100, 15));
-    _head.setFillColor(sf::Color(0, 0, 0, 250));
-    _body.setPosition(sf::Vector2f(0, 15));
-    _body.setSize(sf::Vector2f(100, 85));
-    _body.setFillColor(sf::Color(0, 0, 0, 200));
+    _head.setFillColor(_head_leave_color);
+    _body.setFillColor(_body_leave_color);
+
+    _head.setSize(sf::Vector2f(_panel_size.x, _head_size));
+    _body.setPosition(sf::Vector2f(0, _head_size));
+    _body.setSize(sf::Vector2f(_panel_size.x, _panel_size.y - _head_size));
 }
 
 void Panel::on_enter()
 {
-    _head.setFillColor(sf::Color(100, 100, 100, 250));
-    _body.setFillColor(sf::Color(100, 100, 100, 200));
+    _head.setFillColor(_head_enter_color);
+    _body.setFillColor(_body_enter_color);
 }
+
 void Panel::on_leave()
 {
-    _head.setFillColor(sf::Color(0, 0, 0, 250));
-    _body.setFillColor(sf::Color(0, 0, 0, 200));
+    _head.setFillColor(_head_leave_color);
+    _body.setFillColor(_body_leave_color);
+}
+
+void Panel::on_drag(Base *&drag)
+{
+    drag = this;
+    detach();
+}
+
+void Panel::on_drop(Base *hover)
+{
+    _parent = _old_parent;
+    if (_parent)
+    {
+        _parent->add(this);
+    }
 }
 
 void Panel::draw(sf::RenderTarget &target, const sf::RenderStates &states) const

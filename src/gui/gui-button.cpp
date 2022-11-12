@@ -53,8 +53,9 @@ void Button::set_text(std::string str)
 
 void Button::draw(sf::RenderTarget &target, const sf::RenderStates &states) const
 {
-    target.draw(_body, states.transform * getTransform());
-    target.draw(_text, states.transform * getTransform());
+    sf::RenderStates states_copy(states.transform * getTransform());
+    target.draw(_body, states_copy);
+    target.draw(_text, states_copy);
     Base::draw(target, states);
 }
 

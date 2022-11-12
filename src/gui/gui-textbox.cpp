@@ -5,6 +5,12 @@
 
 using namespace GUI;
 
+constexpr sf::Color Textbox::_defocus_color = sf::Color(200, 200, 200);
+constexpr sf::Color Textbox::_focus_color = sf::Color::White;
+constexpr sf::Color Textbox::_text_color = sf::Color::Black;
+constexpr int Textbox::_outline_thickness = 2;
+constexpr sf::Color Textbox::_outline_thickness_color = sf::Color(100, 100, 100);
+
 Textbox::Textbox(sf::Vector2f size) : Base(size)
 {
     _text_render.setString(_text);
@@ -75,7 +81,7 @@ bool Textbox::add(Base *ctrl)
     return false;
 }
 
-std::string Textbox::text()
+std::string Textbox::get_text()
 {
     return _text;
 }
