@@ -1,6 +1,7 @@
 #include "settings.hpp"
 #include "resources.hpp"
 #include "debug-drawer.hpp"
+#include "gui-manager.hpp"
 
 #include "SFML/Graphics.hpp"
 #include "SFML/System.hpp"
@@ -19,6 +20,20 @@ int main()
     sf::Clock clock;
     int frame_counter = 0;
     int current_fps = 0;
+
+    GUI::Manager gui;
+
+    GUI::Panel panel;
+    gui.add(&panel);
+    panel.setPosition(sf::Vector2f(100, 100));
+    GUI::Textbox tb(sf::Vector2f(90, 16));
+    panel.add(&tb);
+    tb.setPosition(sf::Vector2f(5, 30));
+    GUI::Button btn([&](GUI::Button &b)
+                    { window.setTitle(tb.get_text()); });
+    panel.add(&btn);
+    btn.setPosition(sf::Vector2f(20, 60));
+
     while (window.isOpen())
     {
         sf::Event event;
@@ -27,6 +42,10 @@ int main()
             if (event.type == sf::Event::Closed)
             {
                 window.close();
+            }
+            if (event.type == sf::Event::KeyPressed)
+            {
+                gui.on_key_presed(event.key);
             }
         }
 
@@ -39,13 +58,11 @@ int main()
 
         Debug_drawer::add_string("FPS: ", current_fps);
         sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
-        Debug_drawer::add_rect(sf::FloatRect(sf::Vector2f(mouse_pos.x, mouse_pos.y),
-                                             sf::Vector2f(5, 5)));
-        Debug_drawer::add_string("Mouse position:");
-        Debug_drawer::add_string("Mouse X: ", mouse_pos.x);
-        Debug_drawer::add_string("Mouse Y: ", mouse_pos.y);
 
-        window.clear();
+        gui.update(mouse_pos);
+
+        window.clear(sf::Color(0x87cefa));
+        window.draw(gui);
         window.draw(debug_drawer);
         window.display();
     }

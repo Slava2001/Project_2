@@ -31,6 +31,10 @@ private:
     static std::vector<sf::FloatRect> _rects;
 };
 
+template <>
+void Debug_drawer::add_string(const std::string &str, sf::Vector2i val);
+template <>
+void Debug_drawer::add_string(const std::string &str, sf::Vector2f val);
 template <typename T>
 void Debug_drawer::add_string(const std::string &str, T val)
 {
@@ -40,5 +44,4 @@ void Debug_drawer::add_string(const std::string &str, T val)
     _text_lines.push_back(_sstr.str());
     _sstr.clear();
 }
-
 #endif // INCLUDE_DEBUG_DRAWER_HPP
