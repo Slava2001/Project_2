@@ -4,8 +4,10 @@
 
 using namespace GUI;
 
-Button::Button(std::function<void(Button &)> callback) : Base(sf::Vector2f(65, 15), true),
-                                                         _body(sf::Vector2f(65, 15)),
+constexpr sf::Vector2f Button::_size(65, 15);
+
+Button::Button(std::function<void(Button &)> callback) : Base(_size, true),
+                                                         _body(_size),
                                                          _on_click_callback(callback)
 {
     _body.setFillColor(sf::Color::White);
@@ -59,6 +61,6 @@ void Button::draw(sf::RenderTarget &target, const sf::RenderStates &states) cons
     Base::draw(target, states);
 }
 
-void Button::defult_on_click_callback(Button &btn)
+void Button::default_on_click_callback(Button &btn)
 {
 }

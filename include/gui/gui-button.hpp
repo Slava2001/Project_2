@@ -12,7 +12,7 @@ namespace GUI
     public:
         /// @brief Constructor
         /// @param callback click callback
-        Button(std::function<void(Button &)> callback = defult_on_click_callback);
+        Button(std::function<void(Button &)> callback = default_on_click_callback);
         /// @brief Set button label
         /// @param str label text
         void set_text(std::string str);
@@ -35,13 +35,15 @@ namespace GUI
         void draw(sf::RenderTarget &target, const sf::RenderStates &states) const;
 
     private:
+        static const sf::Vector2f _size;
+
         sf::RectangleShape _body;
         sf::Text _text;
         std::function<void(Button &)> _on_click_callback;
 
         /// @brief default click callback, do nothing
         /// @param btn buttun
-        static void defult_on_click_callback(Button &btn);
+        static void default_on_click_callback(Button &btn);
     };
 
 };
