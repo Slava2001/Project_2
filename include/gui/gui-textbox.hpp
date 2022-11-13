@@ -4,6 +4,9 @@
 #include "gui-base.hpp"
 #include "SFML/System.hpp"
 
+#include <string>
+#include <sstream>
+
 namespace GUI
 {
     class Textbox : public Base
@@ -15,6 +18,8 @@ namespace GUI
         /// @brief Get text from textbox
         /// @return textbox text
         std::string get_text();
+        /// @brief Clear textbox.
+        void clear();
         /// @brief Set the scroll flag. If the flag is set and there is not enough space to add
         /// characters, the first line will be deleted
         /// @param flag flag
@@ -56,6 +61,21 @@ namespace GUI
         void push_char(char c);
         void pop_char();
         void scroll();
+
+        template <typename T>
+        friend Textbox &operator<<(Textbox &t, T d);
     };
-};
+
+    template <typename T>
+    Textbox &operator<<(Textbox &t, T d)
+    {
+        std::stringstream _sstr;
+        _sstr << d;
+        for (char &c : _sstr.str())
+        {
+            t.push_char(c);
+        }
+        return t;
+    }
+}
 #endif // INCLUDE_GUI_GUI_TEXTBOX_HPP

@@ -140,6 +140,12 @@ std::string Textbox::get_text()
     return _text;
 }
 
+void Textbox::clear()
+{
+    _text.clear();
+    _text_render.setString(_text);
+}
+
 void Textbox::set_scroling(bool flag)
 {
     _is_scroling = flag;

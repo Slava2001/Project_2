@@ -23,15 +23,26 @@ int main()
 
     GUI::Manager gui;
 
-    GUI::Panel panel;
-    gui.add(&panel);
-    panel.setPosition(sf::Vector2f(100, 100));
+    GUI::Panel panel_1;
+    gui.add(&panel_1);
+    panel_1.setPosition(sf::Vector2f(210, 100));
+
+    GUI::Textbox tb_output(96, 16, 5);
+    panel_1.add(&tb_output);
+    tb_output.setPosition(sf::Vector2f(2, 15));
+    tb_output.set_changeable(false);
+    tb_output.set_scroling(true);
+
+    GUI::Panel panel_2;
+    gui.add(&panel_2);
+    panel_2.setPosition(sf::Vector2f(100, 100));
     GUI::Textbox tb(90);
-    panel.add(&tb);
+    panel_2.add(&tb);
     tb.setPosition(sf::Vector2f(5, 30));
     GUI::Button btn([&](GUI::Button &b)
-                    { window.setTitle(tb.get_text()); });
-    panel.add(&btn);
+                    { tb_output << tb.get_text() << "\n";
+                      tb.clear(); });
+    panel_2.add(&btn);
     btn.setPosition(sf::Vector2f(20, 60));
 
     while (window.isOpen())
