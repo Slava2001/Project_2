@@ -15,6 +15,14 @@ namespace GUI
         /// @brief Get text from textbox
         /// @return textbox text
         std::string get_text();
+        /// @brief Set the scroll flag. If the flag is set and there is not enough space to add
+        /// characters, the first line will be deleted
+        /// @param flag flag
+        void set_scroling(bool flag);
+        /// @brief Set the changeable flag. If the flag is set, the user can change the contents of
+        /// the textbox
+        /// @param flag flag
+        void set_changeable(bool flag);
 
         /// @brief Add GUI element
         /// @param ctrl pointer to GUI element
@@ -42,9 +50,12 @@ namespace GUI
         std::string _text;
 
         float _line_spasing;
+        bool _is_scroling;
+        bool _is_changeable;
 
         void push_char(char c);
         void pop_char();
+        void scroll();
     };
 };
 #endif // INCLUDE_GUI_GUI_TEXTBOX_HPP

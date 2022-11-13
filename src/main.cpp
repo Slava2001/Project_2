@@ -26,13 +26,13 @@ int main()
     GUI::Panel panel;
     gui.add(&panel);
     panel.setPosition(sf::Vector2f(100, 100));
-    GUI::Textbox tb(90, 20, 5);
+    GUI::Textbox tb(90);
     panel.add(&tb);
-    tb.setPosition(sf::Vector2f(100, 30));
+    tb.setPosition(sf::Vector2f(5, 30));
     GUI::Button btn([&](GUI::Button &b)
                     { window.setTitle(tb.get_text()); });
     panel.add(&btn);
-    btn.setPosition(sf::Vector2f(20, 80));
+    btn.setPosition(sf::Vector2f(20, 60));
 
     while (window.isOpen())
     {

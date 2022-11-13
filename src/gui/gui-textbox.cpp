@@ -14,6 +14,8 @@ constexpr sf::Color Textbox::_outline_thickness_color = sf::Color(100, 100, 100)
 
 Textbox::Textbox(float len, int char_size, int line_count)
 {
+    _is_scroling = false;
+    _is_changeable = true;
     _text_render.setFont(Resources::Fonts::main);
     _text_render.setFillColor(sf::Color::Black);
     _text_render.setCharacterSize(char_size);
@@ -51,15 +53,17 @@ static const char key_to_char[2][sf::Keyboard::KeyCount] = {
 
 void Textbox::on_key_press(sf::Event::KeyEvent &e)
 {
-
-    int upper = e.shift ? 0 : 1;
-    if (e.code == sf::Keyboard::Backspace)
+    if (_is_changeable)
     {
-        pop_char();
-    }
-    else if (e.code >= 0 && key_to_char[upper][e.code])
-    {
-        push_char(key_to_char[upper][e.code]);
+        int upper = e.shift ? 0 : 1;
+        if (e.code == sf::Keyboard::Backspace)
+        {
+            pop_char();
+        }
+        else if (e.code >= 0 && key_to_char[upper][e.code])
+        {
+            push_char(key_to_char[upper][e.code]);
+        }
     }
 }
 
@@ -68,17 +72,29 @@ void Textbox::push_char(char c)
     _text.push_back(c);
     _text_render.setString(_text);
 
-    if (_text_render.getLocalBounds().getSize().x > _body.getSize().x ||
-        _text_render.getLocalBounds().getSize().y > _body.getSize().y)
+    if (_text_render.getLocalBounds().width > _body.getSize().x)
     {
-        float hight = _text_render.getLocalBounds().getSize().y;
-        bool exist_next_line = (hight + _line_spasing) <= _body.getSize().y;
-
         _text.pop_back();
-        if (exist_next_line)
+        _text.push_back('\n');
+        _text.push_back(c);
+        _text_render.setString(_text);
+    }
+
+    float hight = _text_render.getLocalBounds().height;
+    if (_text.size() > 0 && _text[0] == '\n')
+    {
+        hight += _text_render.getCharacterSize();
+    }
+
+    if (hight > _body.getSize().y)
+    {
+        if (_is_scroling)
         {
-            _text.push_back('\n');
-            _text.push_back(c);
+            scroll();
+        }
+        else
+        {
+            _text.erase(_text.find_last_of('\n'), _text.size() - 1);
         }
         _text_render.setString(_text);
     }
@@ -93,14 +109,25 @@ void Textbox::pop_char()
     }
 }
 
+void Textbox::scroll()
+{
+    _text.erase(0, _text.find('\n') + 1);
+}
+
 void Textbox::on_focus()
 {
-    _body.setFillColor(_focus_color);
+    if (_is_changeable)
+    {
+        _body.setFillColor(_focus_color);
+    }
 }
 
 void Textbox::on_defocus()
 {
-    _body.setFillColor(_defocus_color);
+    if (_is_changeable)
+    {
+        _body.setFillColor(_defocus_color);
+    }
 }
 
 bool Textbox::add(Base *ctrl)
@@ -111,6 +138,16 @@ bool Textbox::add(Base *ctrl)
 std::string Textbox::get_text()
 {
     return _text;
+}
+
+void Textbox::set_scroling(bool flag)
+{
+    _is_scroling = flag;
+}
+
+void Textbox::set_changeable(bool flag)
+{
+    _is_changeable = flag;
 }
 
 void Textbox::draw(sf::RenderTarget &target, const sf::RenderStates &states) const
