@@ -29,6 +29,9 @@ namespace GUI
         /// @brief Get element global position (regarding the window)
         /// @return
         sf::Vector2i get_global_position();
+        /// @brief Set element hitbox
+        /// @param hitbox new hitbox
+        void set_hitbox(sf::Vector2f hitbox);
 
         /// @brief Update hower
         /// @param mouse_pos relative cursor position

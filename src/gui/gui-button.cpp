@@ -12,7 +12,7 @@ Button::Button(std::function<void(Button &)> callback) : Base(_size, true),
 {
     _body.setFillColor(sf::Color::White);
     _text.setFillColor(sf::Color::Black);
-    _text.setFont(Resources::Fonts::arial);
+    _text.setFont(Resources::Fonts::main);
     _text.setCharacterSize(Settings::Text::debug_text_size);
     set_text("Click me!");
 }

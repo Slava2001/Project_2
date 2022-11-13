@@ -7,7 +7,7 @@ namespace Resources
 {
     namespace Fonts
     {
-        extern sf::Font arial;
+        extern sf::Font main;
     }
 
     /// @brief Load resources.

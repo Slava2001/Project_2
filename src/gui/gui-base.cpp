@@ -79,6 +79,11 @@ sf::Vector2i Base::get_global_position()
     }
 }
 
+void Base::set_hitbox(sf::Vector2f hitbox)
+{
+    _bounds = sf::FloatRect(sf::Vector2f(0, 0), hitbox);
+}
+
 bool Base::is_fixed() const
 {
     return _is_fixed;

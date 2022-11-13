@@ -6,7 +6,7 @@ namespace Resources
 {
     namespace Fonts
     {
-        sf::Font arial;
+        sf::Font main;
     }
 }
 
@@ -14,7 +14,7 @@ namespace Resources
 
 void Resources::load()
 {
-    if (!Resources::Fonts::arial.loadFromFile(RESOURCES_PATH "/arial.ttf"))
+    if (!Resources::Fonts::main.loadFromFile(RESOURCES_PATH "/UbuntuMono-R.ttf"))
     {
         throw std::runtime_error("Failed to load font");
     }

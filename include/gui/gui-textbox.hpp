@@ -10,8 +10,8 @@ namespace GUI
     {
     public:
         /// @brief Constructor
-        /// @param size textbox size
-        Textbox(sf::Vector2f size = sf::Vector2f(100, 20));
+        /// @param size line size
+        Textbox(float len = 100, int char_size = 16, int line_count = 1);
         /// @brief Get text from textbox
         /// @return textbox text
         std::string get_text();
@@ -40,6 +40,11 @@ namespace GUI
         sf::RectangleShape _body;
         sf::Text _text_render;
         std::string _text;
+
+        float _line_spasing;
+
+        void push_char(char c);
+        void pop_char();
     };
 };
 #endif // INCLUDE_GUI_GUI_TEXTBOX_HPP

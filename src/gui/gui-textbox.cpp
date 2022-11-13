@@ -1,5 +1,6 @@
 #include "gui-textbox.hpp"
 #include "resources.hpp"
+#include "debug-drawer.hpp"
 
 #include "SFML/Window.hpp"
 
@@ -11,13 +12,18 @@ constexpr sf::Color Textbox::_text_color = sf::Color::Black;
 constexpr int Textbox::_outline_thickness = 2;
 constexpr sf::Color Textbox::_outline_thickness_color = sf::Color(100, 100, 100);
 
-Textbox::Textbox(sf::Vector2f size) : Base(size)
+Textbox::Textbox(float len, int char_size, int line_count)
 {
-    _text_render.setString(_text);
-    _text_render.setFont(Resources::Fonts::arial);
+    _text_render.setFont(Resources::Fonts::main);
     _text_render.setFillColor(sf::Color::Black);
-    _text_render.setCharacterSize(size.y);
-    _body.setSize(size);
+    _text_render.setCharacterSize(char_size);
+
+    _line_spasing = _text_render.getFont()->getLineSpacing(char_size) *
+                    _text_render.getLineSpacing();
+
+    sf::Vector2f textbox_size(len, _line_spasing * line_count);
+    set_hitbox(textbox_size);
+    _body.setSize(textbox_size);
     _body.setFillColor(_defocus_color);
     _body.setOutlineThickness(_outline_thickness);
     _body.setOutlineColor(_outline_thickness_color);
@@ -28,7 +34,7 @@ static const char key_to_char[2][sf::Keyboard::KeyCount] = {
      'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
      'Y', 'Z', ')', '!', '@', '#', '$', '%', '^', '&', '*', '(',
      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '{', '}',
-     ':', '<', '>', '\"', '?', '|', '~', '+', '_', ' ', 0, 0,
+     ':', '<', '>', '\"', '?', '|', '~', '+', '_', ' ', '\n', 0,
      0, 0, 0, 0, 0, 0, 0, '+', '-', '*', '/', 0,
      0, 0, 0, '0', '1', '2', '3', '4', '5', '6', '7', '8',
      '9', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -37,7 +43,7 @@ static const char key_to_char[2][sf::Keyboard::KeyCount] = {
      'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
      'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '[', ']',
-     ';', ',', '.', '\'', '/', '\\', '~', '=', '-', ' ', 0, 0,
+     ';', ',', '.', '\'', '/', '\\', '~', '=', '-', ' ', '\n', 0,
      0, 0, 0, 0, 0, 0, 0, '+', '-', '*', '/', 0,
      0, 0, 0, '0', '1', '2', '3', '4', '5', '6', '7', '8',
      '9', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -45,23 +51,44 @@ static const char key_to_char[2][sf::Keyboard::KeyCount] = {
 
 void Textbox::on_key_press(sf::Event::KeyEvent &e)
 {
+
     int upper = e.shift ? 0 : 1;
-    if (e.code == sf::Keyboard::Backspace && _text.size() > 0)
+    if (e.code == sf::Keyboard::Backspace)
     {
-        _text.pop_back();
+        pop_char();
     }
     else if (e.code >= 0 && key_to_char[upper][e.code])
     {
-        _text += key_to_char[upper][e.code];
+        push_char(key_to_char[upper][e.code]);
     }
+}
 
+void Textbox::push_char(char c)
+{
+    _text.push_back(c);
     _text_render.setString(_text);
-    if (_text_render.getLocalBounds().getSize().x >= _body.getSize().x)
+
+    if (_text_render.getLocalBounds().getSize().x > _body.getSize().x ||
+        _text_render.getLocalBounds().getSize().y > _body.getSize().y)
     {
-        if (_text.size() > 0)
+        float hight = _text_render.getLocalBounds().getSize().y;
+        bool exist_next_line = (hight + _line_spasing) <= _body.getSize().y;
+
+        _text.pop_back();
+        if (exist_next_line)
         {
-            _text.pop_back();
+            _text.push_back('\n');
+            _text.push_back(c);
         }
+        _text_render.setString(_text);
+    }
+}
+
+void Textbox::pop_char()
+{
+    if (_text.size() > 0)
+    {
+        _text.pop_back();
         _text_render.setString(_text);
     }
 }
