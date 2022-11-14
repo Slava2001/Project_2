@@ -39,11 +39,12 @@ int main()
     GUI::Textbox tb(90);
     panel_2.add(&tb);
     tb.setPosition(sf::Vector2f(5, 30));
-    GUI::Button btn([&](GUI::Button &b)
-                    { tb_output << tb.get_text() << "\n";
-                      tb.clear(); });
+    tb.set_enter_callback([&](GUI::Textbox &t)
+                          { tb_output << "\n" << ">" << t.get_text();
+                            t.clear(); });
+    GUI::Button btn;
     panel_2.add(&btn);
-    btn.setPosition(sf::Vector2f(20, 60));
+    btn.setPosition(sf::Vector2f(20, 80));
 
     while (window.isOpen())
     {

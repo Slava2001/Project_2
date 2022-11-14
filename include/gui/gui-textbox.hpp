@@ -28,6 +28,7 @@ namespace GUI
         /// the textbox
         /// @param flag flag
         void set_changeable(bool flag);
+        void set_enter_callback(std::function<void(Textbox &)> callback);
 
         /// @brief Add GUI element
         /// @param ctrl pointer to GUI element
@@ -53,10 +54,11 @@ namespace GUI
         sf::RectangleShape _body;
         sf::Text _text_render;
         std::string _text;
-
         float _line_spasing;
         bool _is_scroling;
         bool _is_changeable;
+        bool _is_multiline;
+        std::function<void(Textbox &)> _enter_callback;
 
         void push_char(char c);
         void pop_char();

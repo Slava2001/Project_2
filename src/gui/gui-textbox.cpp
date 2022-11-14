@@ -16,6 +16,7 @@ Textbox::Textbox(float len, int char_size, int line_count)
 {
     _is_scroling = false;
     _is_changeable = true;
+    _is_multiline = line_count > 1;
     _text_render.setFont(Resources::Fonts::main);
     _text_render.setFillColor(sf::Color::Black);
     _text_render.setCharacterSize(char_size);
@@ -56,7 +57,14 @@ void Textbox::on_key_press(sf::Event::KeyEvent &e)
     if (_is_changeable)
     {
         int upper = e.shift ? 0 : 1;
-        if (e.code == sf::Keyboard::Backspace)
+        if (e.code == sf::Keyboard::Enter && ((e.shift && _is_multiline) || !_is_multiline))
+        {
+            if (_enter_callback)
+            {
+                _enter_callback(*this);
+            }
+        }
+        else if (e.code == sf::Keyboard::Backspace)
         {
             pop_char();
         }
@@ -154,6 +162,11 @@ void Textbox::set_scroling(bool flag)
 void Textbox::set_changeable(bool flag)
 {
     _is_changeable = flag;
+}
+
+void Textbox::set_enter_callback(std::function<void(Textbox &)> callback)
+{
+    _enter_callback = callback;
 }
 
 void Textbox::draw(sf::RenderTarget &target, const sf::RenderStates &states) const
