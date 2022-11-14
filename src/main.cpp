@@ -43,7 +43,9 @@ int main()
                           { tb_output << "\n" << ">" << t.get_text();
                             t.clear(); });
     GUI::Button btn([&](GUI::Button &b)
-                    { static char c = 0; tb_output << (int)c << ": [" << (char)c << "]\n"; c++; });
+                    { static int c = 0;
+                      tb_output << c << ": [" << (char)c << "]\n";
+                      c++; });
     panel_2.add(&btn);
     btn.setPosition(sf::Vector2f(20, 80));
 
