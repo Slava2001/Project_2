@@ -42,7 +42,8 @@ int main()
     tb.set_enter_callback([&](GUI::Textbox &t)
                           { tb_output << "\n" << ">" << t.get_text();
                             t.clear(); });
-    GUI::Button btn;
+    GUI::Button btn([&](GUI::Button &b)
+                    { static char c = 0; tb_output << (int)c << ": [" << (char)c << "]\n"; c++; });
     panel_2.add(&btn);
     btn.setPosition(sf::Vector2f(20, 80));
 

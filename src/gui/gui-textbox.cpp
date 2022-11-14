@@ -11,6 +11,7 @@ constexpr sf::Color Textbox::_focus_color = sf::Color::White;
 constexpr sf::Color Textbox::_text_color = sf::Color::Black;
 constexpr int Textbox::_outline_thickness = 2;
 constexpr sf::Color Textbox::_outline_thickness_color = sf::Color(100, 100, 100);
+constexpr char Textbox::_fake_newline_marker = 13;
 
 Textbox::Textbox(float len, int char_size, int line_count)
 {
@@ -83,6 +84,7 @@ void Textbox::push_char(char c)
     if (_text_render.getLocalBounds().width > _body.getSize().x)
     {
         _text.pop_back();
+        _text.push_back(_fake_newline_marker);
         _text.push_back('\n');
         _text.push_back(c);
         _text_render.setString(_text);
@@ -102,7 +104,7 @@ void Textbox::push_char(char c)
         }
         else
         {
-            _text.erase(_text.find_last_of('\n'), _text.size() - 1);
+            pop_char();
         }
         _text_render.setString(_text);
     }
@@ -110,9 +112,16 @@ void Textbox::push_char(char c)
 
 void Textbox::pop_char()
 {
-    if (_text.size() > 0)
+    std::size_t size = _text.size();
+    if (size > 0)
     {
         _text.pop_back();
+        size--;
+        if (size >= 2 && _text[size - 2] == _fake_newline_marker) // remove fake newline
+        {
+            _text.pop_back();
+            _text.pop_back();
+        }
         _text_render.setString(_text);
     }
 }
@@ -145,7 +154,15 @@ bool Textbox::add(Base *ctrl)
 
 std::string Textbox::get_text()
 {
-    return _text;
+    std::string text(_text);
+    // erase all fake newlines
+    std::string::size_type i = text.find(_fake_newline_marker);
+    while (i != std::string::npos)
+    {
+        text.erase(i, 2);
+        i = text.find(_fake_newline_marker, i);
+    }
+    return text;
 }
 
 void Textbox::clear()

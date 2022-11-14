@@ -50,6 +50,7 @@ namespace GUI
         static const sf::Color _text_color;
         static const int _outline_thickness;
         static const sf::Color _outline_thickness_color;
+        static const char _fake_newline_marker;
 
         sf::RectangleShape _body;
         sf::Text _text_render;
