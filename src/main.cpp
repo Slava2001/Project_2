@@ -6,6 +6,8 @@
 #include "SFML/Graphics.hpp"
 #include "SFML/System.hpp"
 
+#include <sstream>
+
 int main()
 {
     Resources::load();
@@ -40,12 +42,26 @@ int main()
     panel_2.add(&tb);
     tb.setPosition(sf::Vector2f(5, 30));
     tb.set_enter_callback([&](GUI::Textbox &t)
-                          { tb_output << "\n" << ">" << t.get_text();
+                          { std::stringstream input(t.get_text());
+                            tb_output << "\n" << ">" << input.str();
+                            std::string cmd;
+                            input >> cmd;
+                            if (cmd == "add") {
+                                int a,b;
+                                input >> a >> b;
+                                if (input.fail()) {
+                                    tb_output << "\n Error! \n add [a] [b]";
+                                } else {
+                                    tb_output << "\n Sum: " << (a + b);
+                                }
+                            } else {
+                                tb_output << "\nUnknown \ncommand: \n" << cmd;
+                            }
                             t.clear(); });
     GUI::Button btn([&](GUI::Button &b)
                     { static int c = 0;
-                      tb_output << c << ": [" << (char)c << "]\n";
-                      c++; });
+                      tb_output << "\n" << c << ": [" << (char)c << "]";
+                      c = (c + 1) % 256; });
     panel_2.add(&btn);
     btn.setPosition(sf::Vector2f(20, 80));
 
