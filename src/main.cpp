@@ -22,7 +22,7 @@ int main()
     int current_fps = 0;
 
     GUI::Manager gui;
-
+    // Hello :)))))) I'm supper hacker 
     GUI::Panel panel;
     gui.add(&panel);
     panel.setPosition(sf::Vector2f(100, 100));
