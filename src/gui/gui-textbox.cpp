@@ -128,7 +128,11 @@ void Textbox::pop_char()
 
 void Textbox::scroll()
 {
-    _text.erase(0, _text.find('\n') + 1);
+    auto ptr = _text.find('\n');
+    if (ptr != std::string::npos)
+    {
+        _text.erase(0, _text.find('\n') + 1);
+    }
 }
 
 void Textbox::on_focus()

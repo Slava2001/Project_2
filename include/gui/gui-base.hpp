@@ -8,7 +8,7 @@ namespace GUI
     {
     public:
         /// @brief Constructor
-        /// @param hitbox element hitbox
+        /// @param hitbox element hitbox size
         /// @param is_fixed is fixed flag
         Base(sf::Vector2f hitbox = sf::Vector2f(0, 0), bool is_fixed = true);
 
@@ -66,8 +66,8 @@ namespace GUI
         Base *_old_parent;
         sf::Vector2f _old_position;
 
-        /// @brief Set element hitbox
-        /// @param hitbox new hitbox
+        /// @brief Set element hitbox size
+        /// @param hitbox new hitbox size
         void set_hitbox(sf::Vector2f hitbox);
 
     private:

@@ -28,6 +28,9 @@ namespace GUI
         /// the textbox
         /// @param flag flag
         void set_changeable(bool flag);
+        /// @brief Set Enter callback. Сalled when the user presses Enter or Enter+Shift (for a
+        /// multiline textbox)
+        /// @param callback callback function
         void set_enter_callback(std::function<void(Textbox &)> callback);
 
         /// @brief Add GUI element
@@ -61,8 +64,12 @@ namespace GUI
         bool _is_multiline;
         std::function<void(Textbox &)> _enter_callback;
 
+        /// @brief Put char (doesn't do anything if the place is over)
+        /// @param c char
         void push_char(char c);
+        /// @brief Pop char (does nothing if the textbox is empty)
         void pop_char();
+        /// @brief Deletes the first row by shifting all the others up
         void scroll();
 
         template <typename T>
