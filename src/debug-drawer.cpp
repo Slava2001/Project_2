@@ -50,7 +50,7 @@ void Debug_drawer::draw(sf::RenderTarget &target, const sf::RenderStates &states
     _rects.clear();
 
     sf::Text tx;
-    tx.setFont(Resources::Fonts::arial);
+    tx.setFont(Resources::Fonts::main);
     tx.setCharacterSize(Settings::Text::debug_text_size);
 
     for (std::size_t i = 0; i < _text_lines.size(); i++)
