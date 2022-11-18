@@ -33,31 +33,10 @@ Textbox::Textbox(float len, int char_size, int line_count)
     _body.setOutlineColor(_outline_thickness_color);
 }
 
-static const char key_to_char[2][sf::Keyboard::KeyCount] = {
-    {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-     'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
-     'Y', 'Z', ')', '!', '@', '#', '$', '%', '^', '&', '*', '(',
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '{', '}',
-     ':', '<', '>', '\"', '?', '|', '~', '+', '_', ' ', '\n', 0,
-     0, 0, 0, 0, 0, 0, 0, '+', '-', '*', '/', 0,
-     0, 0, 0, '0', '1', '2', '3', '4', '5', '6', '7', '8',
-     '9', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0},
-    {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
-     'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
-     'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '[', ']',
-     ';', ',', '.', '\'', '/', '\\', '~', '=', '-', ' ', '\n', 0,
-     0, 0, 0, 0, 0, 0, 0, '+', '-', '*', '/', 0,
-     0, 0, 0, '0', '1', '2', '3', '4', '5', '6', '7', '8',
-     '9', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0}};
-
-void Textbox::on_key_press(sf::Event::KeyEvent &e)
+void Textbox::on_key_press(const sf::Event::KeyEvent &e)
 {
     if (_is_changeable)
     {
-        int upper = e.shift ? 0 : 1;
         if (e.code == sf::Keyboard::Enter && ((e.shift && _is_multiline) || !_is_multiline))
         {
             if (_enter_callback)
@@ -65,14 +44,23 @@ void Textbox::on_key_press(sf::Event::KeyEvent &e)
                 _enter_callback(*this);
             }
         }
+        else if (e.code == sf::Keyboard::Enter)
+        {
+            push_char('\n');
+        }
         else if (e.code == sf::Keyboard::Backspace)
         {
             pop_char();
         }
-        else if (e.code >= 0 && key_to_char[upper][e.code])
-        {
-            push_char(key_to_char[upper][e.code]);
-        }
+    }
+}
+
+void Textbox::on_input_text(const sf::Event::TextEvent &e)
+{
+    char c = e.unicode < 127 ? e.unicode : '#';
+    if (_is_changeable && isprint(c))
+    {
+        push_char(c);
     }
 }
 
@@ -119,8 +107,7 @@ void Textbox::pop_char()
         size--;
         if (size >= 2 && _text[size - 2] == _fake_newline_marker) // remove fake newline
         {
-            _text.pop_back();
-            _text.pop_back();
+            _text.erase(_text.size() - 2, 2);
         }
         _text_render.setString(_text);
     }
@@ -160,7 +147,7 @@ std::string Textbox::get_text()
 {
     std::string text(_text);
     // erase all fake newlines
-    std::string::size_type i = text.find(_fake_newline_marker);
+    std::size_t i = text.find(_fake_newline_marker);
     while (i != std::string::npos)
     {
         text.erase(i, 2);

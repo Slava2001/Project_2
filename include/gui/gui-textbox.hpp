@@ -43,7 +43,10 @@ namespace GUI
         void on_defocus() override;
         /// @brief keyboard key press callback
         /// @param e key event
-        void on_key_press(sf::Event::KeyEvent &e) override;
+        void on_key_press(const sf::Event::KeyEvent &e) override;
+        /// @brief on text input callback
+        /// @param e text event
+        void on_input_text(const sf::Event::TextEvent &e) override;
 
         void draw(sf::RenderTarget &target, const sf::RenderStates &states) const;
 
@@ -81,7 +84,7 @@ namespace GUI
     {
         std::stringstream _sstr;
         _sstr << d;
-        for (char &c : _sstr.str())
+        for (const char &c : _sstr.str())
         {
             t.push_char(c);
         }

@@ -27,7 +27,7 @@ namespace GUI
         /// @brief Return element parent and positon
         void retach();
         /// @brief Get element global position (regarding the window)
-        /// @return
+        /// @return global position in pixel
         sf::Vector2i get_global_position();
 
         /// @brief Update hower
@@ -51,13 +51,16 @@ namespace GUI
         virtual void on_release();
         /// @brief keyboard key press callback
         /// @param e key event
-        virtual void on_key_press(sf::Event::KeyEvent &e);
+        virtual void on_key_press(const sf::Event::KeyEvent &e);
         /// @brief on drag callback
         /// @param[out] drag the pointer to the dragged element
         virtual void on_drag(Base *&drag);
         /// @brief on drop callback
         /// @param[in] hover current hovered element
         virtual void on_drop(Base *hover);
+        /// @brief on text input callback
+        /// @param e text event
+        virtual void on_input_text(const sf::Event::TextEvent &e);
 
         virtual void draw(sf::RenderTarget &target, const sf::RenderStates &states) const;
 

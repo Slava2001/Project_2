@@ -22,9 +22,9 @@ namespace GUI
         /// @brief Add GUI element
         /// @param focus poiter to GUI element
         void add(Base *focus);
-        /// @brief Update GUI elements waiting for the key to be pressed
-        /// @param e key event
-        void on_key_presed(sf::Event::KeyEvent &e);
+        /// @brief Handling event
+        /// @param e event
+        void event_handling(const sf::Event &e);
 
         void draw(sf::RenderTarget &target, const sf::RenderStates &states) const;
 

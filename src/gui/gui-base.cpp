@@ -117,7 +117,7 @@ void Base::on_release()
 {
 }
 
-void Base::on_key_press(sf::Event::KeyEvent &e)
+void Base::on_key_press(const sf::Event::KeyEvent &e)
 {
 }
 
@@ -133,6 +133,10 @@ void Base::on_drop(Base *hover)
     {
         retach();
     }
+}
+
+void Base::on_input_text(const sf::Event::TextEvent &e)
+{
 }
 
 void Base::draw(sf::RenderTarget &target, const sf::RenderStates &states) const
