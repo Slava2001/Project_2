@@ -74,10 +74,8 @@ int main()
             {
                 window.close();
             }
-            if (event.type == sf::Event::KeyPressed)
-            {
-                gui.on_key_presed(event.key);
-            }
+
+            gui.event_handling(event);
         }
 
         frame_counter++;

@@ -107,11 +107,18 @@ void Manager::update(sf::Vector2i mouse_pos)
     update_drag(mouse_pos);
 }
 
-void Manager::on_key_presed(sf::Event::KeyEvent &e)
+void Manager::event_handling(const sf::Event &e)
 {
     if (_focus)
     {
-        _focus->on_key_press(e);
+        if (e.type == sf::Event::KeyPressed)
+        {
+            _focus->on_key_press(e.key);
+        }
+        if (e.type == sf::Event::TextEntered)
+        {
+            _focus->on_input_text(e.text);
+        }
     }
 }
 
