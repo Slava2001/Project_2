@@ -25,9 +25,11 @@ namespace GUI
         void set_change_value_callback(std::function<void(Slider &s)> callback);
 
         /// @brief mouse press callback
-        void on_press() override;
+        /// @param e mouse button event
+        void on_press(const sf::Event::MouseButtonEvent &e) override;
         /// @brief mouse release callback
-        void on_release() override;
+        /// @param e mouse button event
+        void on_release(const sf::Event::MouseButtonEvent &e) override;
         /// @brief on mouse move callback
         /// @param e mouse move event
         void on_mouse_move(const sf::Event::MouseMoveEvent &e) override;
@@ -47,6 +49,10 @@ namespace GUI
         float _step;
         int _step_in_pixel;
         std::function<void(Slider &s)> _change_value_callback;
+
+        /// @brief Update slider arrow position
+        /// @param mouse_global_pos mouse global position
+        void update_arrow_pos(sf::Vector2i mouse_global_pos);
     };
 
 };

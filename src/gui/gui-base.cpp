@@ -89,7 +89,7 @@ bool Base::is_fixed() const
     return _is_fixed;
 }
 
-void Base::on_click()
+void Base::on_click(const sf::Event::MouseButtonEvent &e)
 {
 }
 
@@ -109,11 +109,11 @@ void Base::on_defocus()
 {
 }
 
-void Base::on_press()
+void Base::on_press(const sf::Event::MouseButtonEvent &e)
 {
 }
 
-void Base::on_release()
+void Base::on_release(const sf::Event::MouseButtonEvent &e)
 {
 }
 

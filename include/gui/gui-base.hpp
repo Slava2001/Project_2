@@ -36,7 +36,8 @@ namespace GUI
         /// @return true if cursor hover this or some children, else false
         virtual bool update_hover(sf::Vector2i mouse_pos, Base *&hover);
         /// @brief mouse click callback
-        virtual void on_click();
+        /// @param e mouse button event
+        virtual void on_click(const sf::Event::MouseButtonEvent &e);
         /// @brief cursor enter callback
         virtual void on_enter();
         /// @brief cursor leave callback
@@ -46,9 +47,11 @@ namespace GUI
         /// @brief on defocus callback
         virtual void on_defocus();
         /// @brief mouse press callback
-        virtual void on_press();
+        /// @param e mouse button event
+        virtual void on_press(const sf::Event::MouseButtonEvent &e);
         /// @brief mouse release callback
-        virtual void on_release();
+        /// @param e mouse button event
+        virtual void on_release(const sf::Event::MouseButtonEvent &e);
         /// @brief keyboard key press callback
         /// @param e key event
         virtual void on_key_press(const sf::Event::KeyEvent &e);

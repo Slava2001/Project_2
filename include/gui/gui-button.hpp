@@ -22,11 +22,14 @@ namespace GUI
         /// @return always false, because button cannot contain elements
         bool add(Base *ctrl) override;
         /// @brief mouse press callback
-        virtual void on_press() override;
+        /// @param e mouse button event
+        virtual void on_press(const sf::Event::MouseButtonEvent &e) override;
         /// @brief mouse release callback
-        virtual void on_release() override;
+        /// @param e mouse button event
+        virtual void on_release(const sf::Event::MouseButtonEvent &e) override;
         /// @brief mouse click callback
-        virtual void on_click() override;
+        /// @param e mouse button event
+        virtual void on_click(const sf::Event::MouseButtonEvent &e) override;
         /// @brief cursor enter callback
         virtual void on_enter() override;
         /// @brief cursor leave callback
