@@ -27,7 +27,7 @@ int main()
 
     GUI::Panel panel_1;
     gui.add(&panel_1);
-    panel_1.setPosition(sf::Vector2f(210, 100));
+    panel_1.setPosition(sf::Vector2f(210, 200));
 
     GUI::Textbox tb_output(96, 16, 5);
     panel_1.add(&tb_output);
@@ -37,7 +37,7 @@ int main()
 
     GUI::Panel panel_2;
     gui.add(&panel_2);
-    panel_2.setPosition(sf::Vector2f(100, 100));
+    panel_2.setPosition(sf::Vector2f(100, 200));
     GUI::Textbox tb(90);
     panel_2.add(&tb);
     tb.setPosition(sf::Vector2f(5, 30));
@@ -65,6 +65,25 @@ int main()
     panel_2.add(&btn);
     btn.setPosition(sf::Vector2f(20, 80));
 
+    GUI::Slider slider_r(sf::Vector2f(100, 20), 0, 255, 255 / 4.f);
+    gui.add(&slider_r);
+    slider_r.setPosition(sf::Vector2f(50, 50));
+    uint8_t color_r = 0;
+    slider_r.set_change_value_callback([&](GUI::Slider &s)
+                                       { color_r = s.get_value(); });
+    GUI::Slider slider_g(sf::Vector2f(100, 20), 0, 255, 255 / 4.f);
+    gui.add(&slider_g);
+    slider_g.setPosition(sf::Vector2f(50, 80));
+    uint8_t color_g = 0;
+    slider_g.set_change_value_callback([&](GUI::Slider &s)
+                                       { color_g = s.get_value(); });
+    GUI::Slider slider_b(sf::Vector2f(100, 20), 0, 255, 255 / 4.f);
+    gui.add(&slider_b);
+    slider_b.setPosition(sf::Vector2f(50, 110));
+    uint8_t color_b = 0;
+    slider_b.set_change_value_callback([&](GUI::Slider &s)
+                                       { color_b = s.get_value(); });
+
     while (window.isOpen())
     {
         sf::Event event;
@@ -86,11 +105,8 @@ int main()
         }
 
         Debug_drawer::add_string("FPS: ", current_fps);
-        sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
 
-        gui.update(mouse_pos);
-
-        window.clear(sf::Color(0x87cefa));
+        window.clear(sf::Color(color_r, color_g, color_b));
         window.draw(gui);
         window.draw(debug_drawer);
         window.display();

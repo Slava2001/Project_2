@@ -6,6 +6,7 @@
 #include "gui-panel.hpp"
 #include "gui-textbox.hpp"
 #include "gui-button.hpp"
+#include "gui-slider.hpp"
 
 #include "SFML/System.hpp"
 
@@ -16,12 +17,9 @@ namespace GUI
     public:
         /// @brief Constructor
         Manager();
-        /// @brief Update
-        /// @param mouse_pos mouse position
-        void update(sf::Vector2i mouse_pos);
         /// @brief Add GUI element
-        /// @param focus poiter to GUI element
-        void add(Base *focus);
+        /// @param ctrl poiter to GUI element
+        void add(Base *ctrl);
         /// @brief Handling event
         /// @param e event
         void event_handling(const sf::Event &e);
