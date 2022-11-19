@@ -36,11 +36,17 @@ namespace GUI
         Base *_focus;
 
         /// @brief Update hover
-        /// @param mouse_pos mouse position
-        void update_hover(sf::Vector2i mouse_pos);
-        /// @brief Update drag
-        /// @param mouse_pos mouse position
-        void update_drag(sf::Vector2i mouse_pos);
+        /// @param e mouse move event
+        void update_hover(const sf::Event::MouseMoveEvent &e);
+        /// @brief Try drag hovered element
+        /// @param e mouse button event
+        void drag(const sf::Event::MouseButtonEvent &e);
+        /// @brief Drop drageged element
+        /// @param e mouse button event
+        void drop(const sf::Event::MouseButtonEvent &e);
+        /// @brief Update dragged element
+        /// @param e mouse move event
+        void update_dragged(const sf::Event::MouseMoveEvent &e);
     };
 }
 #endif // INCLUDE_GUI_GUI_MANAGER_HPP

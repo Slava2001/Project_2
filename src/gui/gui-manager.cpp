@@ -20,9 +20,10 @@ void Manager::add(Base *ctrl)
     }
 }
 
-void Manager::update_hover(sf::Vector2i mouse_pos)
+void Manager::update_hover(const sf::Event::MouseMoveEvent &e)
 {
     Base *hover = _hover;
+    sf::Vector2i mouse_pos(e.x, e.y);
     if (_controls.update_hover(mouse_pos, hover))
     {
         if (hover != _hover)
@@ -45,43 +46,40 @@ void Manager::update_hover(sf::Vector2i mouse_pos)
     }
 }
 
-void Manager::update_drag(sf::Vector2i mouse_pos)
+void Manager::drag(const sf::Event::MouseButtonEvent &e)
 {
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+    if (e.button == sf::Mouse::Button::Left)
     {
-        if (_drag)
+        if (_hover != &_controls)
         {
-            _drag->setPosition((sf::Vector2f)(mouse_pos + _drag_offset));
+            _pressed = _hover;
+            _pressed->on_press(e);
+            if (!_hover->is_fixed())
+            {
+                sf::Vector2i mouse_pos(e.x, e.y);
+                _drag_offset = _hover->get_global_position() - mouse_pos;
+                _hover->on_drag(_drag);
+                _drag->setPosition((sf::Vector2f)(mouse_pos + _drag_offset));
+            }
         }
-        else if (!_mouse_left_button_pressed)
+        if (_pressed != _focus)
         {
-            if (_hover != &_controls)
+            if (_focus)
             {
-                _pressed = _hover;
-                _pressed->on_press();
-                if (!_hover->is_fixed())
-                {
-                    _drag_offset = _hover->get_global_position() - mouse_pos;
-                    _hover->on_drag(_drag);
-                    _drag->setPosition((sf::Vector2f)(mouse_pos + _drag_offset));
-                }
+                _focus->on_defocus();
             }
-            if (_pressed != _focus)
+            _focus = _pressed;
+            if (_focus)
             {
-                if (_focus)
-                {
-                    _focus->on_defocus();
-                }
-                _focus = _pressed;
-                if (_focus)
-                {
-                    _focus->on_focus();
-                }
+                _focus->on_focus();
             }
-            _mouse_left_button_pressed = true;
         }
     }
-    else
+}
+
+void Manager::drop(const sf::Event::MouseButtonEvent &e)
+{
+    if (e.button == sf::Mouse::Button::Left)
     {
         if (_drag)
         {
@@ -92,12 +90,20 @@ void Manager::update_drag(sf::Vector2i mouse_pos)
         {
             if (_pressed == _hover)
             {
-                _pressed->on_click();
+                _pressed->on_click(e);
             }
-            _pressed->on_release();
+            _pressed->on_release(e);
             _pressed = nullptr;
         }
-        _mouse_left_button_pressed = false;
+    }
+}
+
+void Manager::update_dragged(const sf::Event::MouseMoveEvent &e)
+{
+    if (_drag)
+    {
+        sf::Vector2i mouse_pos(e.x, e.y);
+        _drag->setPosition((sf::Vector2f)(mouse_pos + _drag_offset));
     }
 }
 
@@ -106,20 +112,15 @@ void Manager::event_handling(const sf::Event &e)
     switch (e.type)
     {
     case sf::Event::MouseButtonPressed:
+        drag(e.mouseButton);
+        break;
     case sf::Event::MouseButtonReleased:
-    {
-        sf::Vector2i mouse_pos(e.mouseButton.x, e.mouseButton.y);
-        update_hover(mouse_pos);
-        update_drag(mouse_pos);
-    }
-    break;
+        drop(e.mouseButton);
+        break;
     case sf::Event::MouseMoved:
-    {
-        sf::Vector2i mouse_pos(e.mouseMove.x, e.mouseMove.y);
-        update_hover(mouse_pos);
-        update_drag(mouse_pos);
-    }
-    break;
+        update_hover(e.mouseMove);
+        update_dragged(e.mouseMove);
+        break;
     default:
         break;
     }

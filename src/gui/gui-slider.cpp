@@ -36,12 +36,13 @@ void Slider::set_change_value_callback(std::function<void(Slider &s)> callback)
     _change_value_callback = callback;
 }
 
-void Slider::on_press()
+void Slider::on_press(const sf::Event::MouseButtonEvent &e)
 {
     _is_buttun_press = true;
+    update_arrow_pos(sf::Vector2i(e.x, e.y));
 }
 
-void Slider::on_release()
+void Slider::on_release(const sf::Event::MouseButtonEvent &e)
 {
     _is_buttun_press = false;
 }
@@ -50,16 +51,20 @@ void Slider::on_mouse_move(const sf::Event::MouseMoveEvent &e)
 {
     if (_is_buttun_press)
     {
-        sf::Vector2i mouse_pos(e.x, e.y);
-        sf::Vector2f arrow_pos(mouse_pos - get_global_position());
-        arrow_pos.x = std::max(0.f, std::min(arrow_pos.x - _size.y / 2, _size.x - _size.y));
-        arrow_pos.x = round(arrow_pos.x / _step_in_pixel) * _step_in_pixel;
-        arrow_pos.y = 0;
-        _arrow.setPosition((sf::Vector2f)arrow_pos);
-        if (_change_value_callback)
-        {
-            _change_value_callback(*this);
-        }
+        update_arrow_pos(sf::Vector2i(e.x, e.y));
+    }
+}
+
+void Slider::update_arrow_pos(sf::Vector2i mouse_global_pos)
+{
+    sf::Vector2f arrow_pos(mouse_global_pos - get_global_position());
+    arrow_pos.x = std::max(0.f, std::min(arrow_pos.x - _size.y / 2, _size.x - _size.y));
+    arrow_pos.x = round(arrow_pos.x / _step_in_pixel) * _step_in_pixel;
+    arrow_pos.y = 0;
+    _arrow.setPosition((sf::Vector2f)arrow_pos);
+    if (_change_value_callback)
+    {
+        _change_value_callback(*this);
     }
 }
 

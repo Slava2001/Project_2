@@ -22,12 +22,12 @@ bool Button::add(Base *ctrl)
     return false;
 }
 
-void Button::on_press()
+void Button::on_press(const sf::Event::MouseButtonEvent &e)
 {
     _body.setFillColor(sf::Color::Green);
 }
 
-void Button::on_release()
+void Button::on_release(const sf::Event::MouseButtonEvent &e)
 {
     _body.setFillColor(sf::Color::White);
 }
@@ -42,7 +42,7 @@ void Button::on_leave()
     _body.setOutlineThickness(0);
 }
 
-void Button::on_click()
+void Button::on_click(const sf::Event::MouseButtonEvent &e)
 {
     _on_click_callback(*this);
 }
