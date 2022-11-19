@@ -101,23 +101,44 @@ void Manager::update_drag(sf::Vector2i mouse_pos)
     }
 }
 
-void Manager::update(sf::Vector2i mouse_pos)
-{
-    update_hover(mouse_pos);
-    update_drag(mouse_pos);
-}
-
 void Manager::event_handling(const sf::Event &e)
 {
+    switch (e.type)
+    {
+    case sf::Event::MouseButtonPressed:
+    case sf::Event::MouseButtonReleased:
+    {
+        sf::Vector2i mouse_pos(e.mouseButton.x, e.mouseButton.y);
+        update_hover(mouse_pos);
+        update_drag(mouse_pos);
+    }
+    break;
+    case sf::Event::MouseMoved:
+    {
+        sf::Vector2i mouse_pos(e.mouseMove.x, e.mouseMove.y);
+        update_hover(mouse_pos);
+        update_drag(mouse_pos);
+    }
+    break;
+    default:
+        break;
+    }
+
     if (_focus)
     {
-        if (e.type == sf::Event::KeyPressed)
+        switch (e.type)
         {
+        case sf::Event::KeyPressed:
             _focus->on_key_press(e.key);
-        }
-        if (e.type == sf::Event::TextEntered)
-        {
+            break;
+        case sf::Event::TextEntered:
             _focus->on_input_text(e.text);
+            break;
+        case sf::Event::MouseMoved:
+            _focus->on_mouse_move(e.mouseMove);
+            break;
+        default:
+            break;
         }
     }
 }

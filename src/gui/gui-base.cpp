@@ -139,6 +139,10 @@ void Base::on_input_text(const sf::Event::TextEvent &e)
 {
 }
 
+void Base::on_mouse_move(const sf::Event::MouseMoveEvent &e)
+{
+}
+
 void Base::draw(sf::RenderTarget &target, const sf::RenderStates &states) const
 {
     sf::RenderStates states_copy(states.transform * getTransform());

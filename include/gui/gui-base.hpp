@@ -61,7 +61,9 @@ namespace GUI
         /// @brief on text input callback
         /// @param e text event
         virtual void on_input_text(const sf::Event::TextEvent &e);
-
+        /// @brief on mouse move callback
+        /// @param e mouse move event
+        virtual void on_mouse_move(const sf::Event::MouseMoveEvent &e);
         virtual void draw(sf::RenderTarget &target, const sf::RenderStates &states) const;
 
     protected:
