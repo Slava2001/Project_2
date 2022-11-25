@@ -95,7 +95,7 @@ sf::Vector2i Base::get_global_position()
     }
 }
 
-std::string Base::get_id() 
+std::string Base::get_id()
 {
     return _id;
 }

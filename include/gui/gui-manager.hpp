@@ -71,7 +71,7 @@ namespace GUI
         void drop(const sf::Event::MouseButtonEvent &e);
         /// @brief Update dragged element
         /// @param e mouse move event
-        void update_dragged(const sf::Event::MouseMoveEvent &e);        
+        void update_dragged(const sf::Event::MouseMoveEvent &e);
         /// @brief Create gui tree by config
         /// @param ctl root element
         /// @param cfg confg
