@@ -12,9 +12,15 @@ include_directories("${CMAKE_CURRENT_LIST_DIR}/3rdparty/SFML/include")
 
 set(LINK_FLAGS "${LINK_FLAGS} -DSFML_STATIC")
 
+include_directories("${CMAKE_CURRENT_LIST_DIR}/include/scene")
+set(SCENE_SRC "src/scene/scene-manager.cpp"
+              "src/scene/scene-base.cpp"
+              "src/scene/scene-debug.cpp")
+add_library(SCENE_LIB STATIC ${SCENE_SRC})
+
 include_directories("${CMAKE_CURRENT_LIST_DIR}/include/gui")
-set(GUI_SRC "src/gui/gui-base.cpp"
-            "src/gui/gui-manager.cpp"
+set(GUI_SRC "src/gui/gui-manager.cpp"
+            "src/gui/gui-base.cpp"
             "src/gui/gui-panel.cpp"
             "src/gui/gui-textbox.cpp"
             "src/gui/gui-button.cpp"
@@ -30,6 +36,7 @@ set(SRC "src/main.cpp"
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -Wno-unused-parameter")
 add_executable(${PROJECT_NAME} ${SRC})
 
+target_link_libraries(${PROJECT_NAME} SCENE_LIB)
 target_link_libraries(${PROJECT_NAME} GUI_LIB)
 target_link_libraries(${PROJECT_NAME} sfml-system sfml-graphics sfml-audio sfml-window sfml-main )
 target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES})
