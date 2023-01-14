@@ -9,6 +9,10 @@ namespace Settings
         int fps_limit = 65;
         const char *title = "Project 2";
     }
+    namespace Screen
+    {
+        uint32_t background_color = 0x000000ff;
+    }
     namespace Text
     {
         int debug_text_size = 12;

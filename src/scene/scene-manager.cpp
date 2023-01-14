@@ -1,6 +1,8 @@
 #include "scene-manager.hpp"
 #include "debug-drawer.hpp"
+
 #include "scene-debug.hpp"
+#include "scene-options.hpp"
 
 using namespace Scene;
 
@@ -10,6 +12,8 @@ std::unique_ptr<Base> Manager::create_scene(scene_ids id)
     {
     case scene_ids::DEBUG:
         return std::make_unique<Debug_scene>(*this);
+    case scene_ids::OPTIONS:
+        return std::make_unique<Options_scene>(*this);
     }
     throw std::out_of_range("Wrong scene id");
 }
@@ -26,10 +30,7 @@ void Manager::update()
     {
         _scene->update();
     }
-    if (_requaer_load_scene)
-    {
-        change_scene();
-    }
+    change_scene_if_need();
 }
 
 void Manager::event_handling(const sf::Event &e)
@@ -38,10 +39,7 @@ void Manager::event_handling(const sf::Event &e)
     {
         _scene->event_handling(e);
     }
-    if (_requaer_load_scene)
-    {
-        change_scene();
-    }
+    change_scene_if_need();
 }
 
 void Manager::load_scene(scene_ids id)
@@ -50,7 +48,7 @@ void Manager::load_scene(scene_ids id)
     _requaer_load_scene = true;
 }
 
-void Manager::change_scene()
+void Manager::change_scene_if_need()
 {
     if (_requaer_load_scene)
     {

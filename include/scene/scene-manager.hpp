@@ -36,7 +36,7 @@ namespace Scene
         /// @return pointer to new scene
         std::unique_ptr<Base> create_scene(scene_ids id);
         /// @brief Change current scerne if it requared.
-        void change_scene();
+        void change_scene_if_need();
     };
 }
 

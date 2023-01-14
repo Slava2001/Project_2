@@ -15,7 +15,8 @@ set(LINK_FLAGS "${LINK_FLAGS} -DSFML_STATIC")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/include/scene")
 set(SCENE_SRC "src/scene/scene-manager.cpp"
               "src/scene/scene-base.cpp"
-              "src/scene/scene-debug.cpp")
+              "src/scene/scene-debug.cpp"
+              "src/scene/scene-options.cpp")
 add_library(SCENE_LIB STATIC ${SCENE_SRC})
 
 include_directories("${CMAKE_CURRENT_LIST_DIR}/include/gui")

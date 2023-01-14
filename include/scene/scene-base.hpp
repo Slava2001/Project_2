@@ -9,13 +9,14 @@ namespace Scene
 
     enum class scene_ids
     {
-        DEBUG
+        DEBUG,
+        OPTIONS
     };
 
     class Base : public sf::Drawable
     {
     public:
-        /// @brief Scene
+        /// @brief Constructor
         /// @param mgr scene manager
         Base(Manager &mgr);
         /// @brief Update scene

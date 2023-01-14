@@ -1,6 +1,8 @@
 #ifndef INCLUDE_GLOBAL_SETTINGS_HPP
 #define INCLUDE_GLOBAL_SETTINGS_HPP
 
+#include <cstdint>
+
 namespace Settings
 {
     namespace Window
@@ -9,6 +11,10 @@ namespace Settings
         extern int width;
         extern int fps_limit;
         extern const char *title;
+    }
+    namespace Screen
+    {
+        extern uint32_t background_color;
     }
     namespace Text
     {

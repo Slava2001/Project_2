@@ -24,7 +24,7 @@ int main()
     int current_fps = 0;
 
     Scene::Manager mgr;
-    mgr.load_scene(Scene::scene_ids::DEBUG);
+    mgr.load_scene(Scene::scene_ids::OPTIONS);
     while (window.isOpen())
     {
         sf::Event event;
@@ -47,7 +47,7 @@ int main()
 
         mgr.update();
 
-        window.clear(sf::Color(0xaaaacc));
+        window.clear(sf::Color(Settings::Screen::background_color));
         window.draw(mgr);
         window.draw(debug_drawer);
         window.display();
