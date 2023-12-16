@@ -4,6 +4,8 @@
 #include "gui-base.hpp"
 #include "SFML/System.hpp"
 
+#include <functional>
+
 namespace GUI
 {
 
