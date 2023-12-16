@@ -6,7 +6,7 @@ namespace Settings
     {
         int height = 400;
         int width = 400;
-        int fps_limit = 65;
+        int fps_limit = 120;
         const char *title = "Project 2";
     }
     namespace Text

@@ -2,6 +2,8 @@
 #include "SFML/Window.hpp"
 #include "debug-drawer.hpp"
 
+#include <algorithm>
+
 using namespace GUI;
 
 Base::Base(sf::Vector2f hitbox, bool is_fixed) : _parent(nullptr),
