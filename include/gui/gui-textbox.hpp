@@ -8,14 +8,16 @@
 #include <sstream>
 #include <functional>
 
+#include "nlohmann/json.hpp"
+
 namespace GUI
 {
     class Textbox : public Base
     {
     public:
         /// @brief Constructor
-        /// @param size line size
-        Textbox(float len = 100, int char_size = 16, int line_count = 1);
+        /// @param cfg textbox config
+        Textbox(nlohmann::json &cfg);
         /// @brief Get text from textbox
         /// @return textbox text
         std::string get_text();
@@ -52,13 +54,13 @@ namespace GUI
         void draw(sf::RenderTarget &target, const sf::RenderStates &states) const;
 
     private:
-        static const sf::Color _defocus_color;
-        static const sf::Color _focus_color;
-        static const sf::Color _text_color;
-        static const int _outline_thickness;
-        static const sf::Color _outline_thickness_color;
         static const char _fake_newline_marker;
 
+        int _outline_thickness;
+        sf::Color _defocus_color;
+        sf::Color _focus_color;
+        sf::Color _text_color;
+        sf::Color _outline_thickness_color;
         sf::RectangleShape _body;
         sf::Text _text_render;
         std::string _text;

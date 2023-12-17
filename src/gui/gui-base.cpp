@@ -6,10 +6,24 @@
 
 using namespace GUI;
 
-Base::Base(sf::Vector2f hitbox, bool is_fixed) : _parent(nullptr),
-                                                 _bounds(sf::Vector2f(0, 0), hitbox),
-                                                 _is_fixed(is_fixed)
+Base::Base() : _parent(nullptr), _bounds()
 {
+    _is_fixed = true;
+    _id = "";
+}
+
+Base::Base(nlohmann::json &cfg) : _parent(nullptr)
+{
+    _bounds.top = 0;
+    _bounds.left = 0;
+    _bounds.width = cfg.value("width", 0);
+    _bounds.height = cfg.value("height", 0);
+    _is_fixed = cfg.value("is_fixed", false);
+    sf::Vector2f pos;
+    pos.x = cfg.value("left", 0);
+    pos.y = cfg.value("top", 0);
+    setPosition(pos);
+    _id = cfg.value("id", "");
 }
 
 bool Base::update_hover(sf::Vector2i mouse_pos, Base *&hover)
@@ -79,6 +93,11 @@ sf::Vector2i Base::get_global_position()
     {
         return (sf::Vector2i)getPosition();
     }
+}
+
+std::string Base::get_id() 
+{
+    return _id;
 }
 
 void Base::set_hitbox(sf::Vector2f hitbox)

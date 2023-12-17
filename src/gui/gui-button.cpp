@@ -1,20 +1,23 @@
 #include "gui-button.hpp"
 #include "resources.hpp"
 #include "settings.hpp"
+#include "util.hpp"
 
 using namespace GUI;
 
-constexpr sf::Vector2f Button::_size(65, 15);
-
-Button::Button(std::function<void(Button &)> callback) : Base(_size, true),
-                                                         _body(_size),
-                                                         _on_click_callback(callback)
+Button::Button(nlohmann::json &cfg): Base(cfg), _on_click_callback(default_on_click_callback)
 {
-    _body.setFillColor(sf::Color::White);
-    _text.setFillColor(sf::Color::Black);
-    _text.setFont(Resources::Fonts::main);
-    _text.setCharacterSize(Settings::Text::debug_text_size);
-    set_text("Click me!");
+    sf::Vector2f size;
+    size.x = cfg.value("width", 0);
+    size.y = cfg.value("height", 0);
+    _body.setSize(size);
+    _body_color = color_from_string(cfg.value("body_color", "#000000"));
+    _body.setFillColor(_body_color);
+    sf::Color text_color = color_from_string(cfg.value("text_color", "#000000"));
+    _text.setFillColor(text_color);
+    _text.setCharacterSize(cfg.value("font_size", 0));
+    _text.setFont(Resources.fonts.main);
+    set_text(cfg.value("text", ""));
 }
 
 bool Button::add(Base *ctrl)
@@ -29,7 +32,7 @@ void Button::on_press(const sf::Event::MouseButtonEvent &e)
 
 void Button::on_release(const sf::Event::MouseButtonEvent &e)
 {
-    _body.setFillColor(sf::Color::White);
+    _body.setFillColor(_body_color);
 }
 
 void Button::on_enter()
@@ -50,7 +53,7 @@ void Button::on_click(const sf::Event::MouseButtonEvent &e)
 void Button::set_text(std::string str)
 {
     _text.setString(str);
-    _text.setPosition(sf::Vector2f((_body.getSize().x - _text.getLocalBounds().getSize().x) / 2, 0));
+    _text.setPosition(sf::Vector2f((_body.getSize().x - _text.getLocalBounds().getSize().x)/2, 0));
 }
 
 void Button::draw(sf::RenderTarget &target, const sf::RenderStates &states) const
@@ -59,6 +62,11 @@ void Button::draw(sf::RenderTarget &target, const sf::RenderStates &states) cons
     target.draw(_body, states_copy);
     target.draw(_text, states_copy);
     Base::draw(target, states);
+}
+
+void Button::set_click_callback(std::function<void(Button &)> callback)
+{
+    _on_click_callback = callback;
 }
 
 void Button::default_on_click_callback(Button &btn)

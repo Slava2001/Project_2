@@ -1,19 +1,20 @@
 #include "gui-slider.hpp"
 #include "debug-drawer.hpp"
+#include "util.hpp"
 
 #include <cmath>
 
 using namespace GUI;
 
-constexpr sf::Color Slider::_body_color = sf::Color(50, 50, 50);
-constexpr sf::Color Slider::_arrow_color = sf::Color(250, 250, 250);
-
-Slider::Slider(sf::Vector2f size, float min, float max, float step) : _size(size),
-                                                                      _min(min),
-                                                                      _max(max),
-                                                                      _step(step)
+Slider::Slider(nlohmann::json &cfg) : Base(cfg)
 {
-    set_hitbox(_size);
+    _body_color = color_from_string(cfg.value("body_color", "#000000"));
+    _arrow_color = color_from_string(cfg.value("arrow_color", "#000000"));
+    _min = cfg.value("min", 0.f);
+    _max = cfg.value("max", 1.f);
+    _step = cfg.value("step", 0.f);
+    _size.x = cfg.value("width", 0);
+    _size.y = cfg.value("height", 0);
     _body.setSize(_size);
     _body.setFillColor(_body_color);
     _arrow.setSize(sf::Vector2f(_size.y, _size.y));
@@ -21,7 +22,7 @@ Slider::Slider(sf::Vector2f size, float min, float max, float step) : _size(size
     _arrow.setOutlineThickness(-3);
     _arrow.setOutlineColor(_arrow_color);
     _is_buttun_press = false;
-    _step_in_pixel = (_size.x - _size.y) / ((_max - _min) / _step);
+    _step_in_pixel = _step > 0?((_size.x - _arrow.getSize().x) / ((_max - _min) / _step)): 1;
     _step_in_pixel = _step_in_pixel >= 1 ? _step_in_pixel : 1;
 }
 
@@ -29,6 +30,23 @@ float Slider::get_value() const
 {
     float value = _min + ((_max - _min) * _arrow.getPosition().x / (_size.x - _size.y));
     return round(value / _step) * _step;
+}
+
+void Slider::set_value(float val) 
+{
+    if (val < _min) {
+        val = _min;
+    }
+    if (val > _max) {
+        val = _max;
+    }
+    sf::Vector2f pos(_arrow.getPosition());
+    pos.x = ((val - _min) / (_max - _min)) * (_size.x - _size.y);
+    _arrow.setPosition(pos);
+    if (_change_value_callback)
+    {
+        _change_value_callback(*this);
+    }
 }
 
 void Slider::set_change_value_callback(std::function<void(Slider &s)> callback)

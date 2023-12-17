@@ -1,6 +1,10 @@
 #include "gui-manager.hpp"
 #include "debug-drawer.hpp"
 
+#include "nlohmann/json.hpp"
+
+#include <fstream>
+
 using namespace GUI;
 
 Manager::Manager() : _controls()
@@ -12,12 +16,58 @@ Manager::Manager() : _controls()
     _mouse_left_button_pressed = false;
 }
 
-void Manager::add(Base *ctrl)
+Manager::Manager(std::string path) : _controls()
 {
-    if (ctrl)
-    {
-        _controls.add(ctrl);
+    _hover = &_controls;
+    _drag = nullptr;
+    _pressed = nullptr;
+    _focus = nullptr;
+    _mouse_left_button_pressed = false;
+
+    std::ifstream cfg_file(path);
+    nlohmann::json cfg = nlohmann::json::parse(cfg_file);  
+    create_gui_tree(&_controls, cfg);
+    cfg_file.close();
+}
+
+void Manager::create_gui_tree(Base *ctl, nlohmann::json &cfg)
+{
+    if (cfg["childes"].is_null()) {
+        return;
     }
+    if (!cfg["childes"].is_array()) {
+        throw std::runtime_error("Unexpected child param type");
+    }
+    for (auto& childe_cfg: cfg["childes"]) {
+        std::shared_ptr<Base> elem = create_gui_element(childe_cfg);
+        _dynamic_elements.push_back(elem);
+        elem->setPosition(elem->getPosition() + ctl->getPosition());
+        ctl->add(elem.get());
+        create_gui_tree(elem.get(), childe_cfg);
+    }
+}
+
+std::shared_ptr<Base> Manager::create_gui_element(nlohmann::json &cfg)
+{
+    if (cfg["type"].is_null()) {
+        throw std::runtime_error("Element type does not specified");
+    }
+    if (!cfg["type"].is_string()) {
+        throw std::runtime_error("Unexpected type param type");
+    }
+    std::shared_ptr<Base> ptr;
+    if (cfg["type"] == "panel") { 
+        ptr = std::make_shared<Panel>(cfg); 
+    } else if (cfg["type"] == "textbox") { 
+        ptr = std::make_shared<Textbox>(cfg); 
+    } else if (cfg["type"] == "button") { 
+        ptr = std::make_shared<Button>(cfg); 
+    } else if (cfg["type"] == "slider") { 
+        ptr = std::make_shared<Slider>(cfg); 
+    } else {
+        throw std::runtime_error("Unexpected element type");
+    }
+    return ptr;
 }
 
 void Manager::update_hover(const sf::Event::MouseMoveEvent &e)

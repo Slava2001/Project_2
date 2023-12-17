@@ -2,15 +2,19 @@
 #define INCLUDE_GUI_GUI_BASE_HPP
 
 #include "SFML/Graphics.hpp"
+
+#include "nlohmann/json.hpp"
+
 namespace GUI
 {
     class Base : public sf::Transformable, public sf::Drawable
     {
     public:
         /// @brief Constructor
-        /// @param hitbox element hitbox size
-        /// @param is_fixed is fixed flag
-        Base(sf::Vector2f hitbox = sf::Vector2f(0, 0), bool is_fixed = true);
+        Base();
+        /// @brief Constructor
+        /// @param cfg element config
+        Base(nlohmann::json &cfg);
 
         /// @brief Get element state
         /// @return true if element is fixed? else false
@@ -29,6 +33,9 @@ namespace GUI
         /// @brief Get element global position (regarding the window)
         /// @return global position in pixel
         sf::Vector2i get_global_position();
+        /// @brief Get element id
+        /// @return id string
+        std::string get_id();
 
         /// @brief Update hower
         /// @param mouse_pos relative cursor position
@@ -73,6 +80,8 @@ namespace GUI
         Base *_parent;
         Base *_old_parent;
         sf::Vector2f _old_position;
+        // uniq text id for find element
+        std::string _id;
 
         /// @brief Set element hitbox size
         /// @param hitbox new hitbox size
@@ -80,6 +89,7 @@ namespace GUI
 
     private:
         std::vector<Base *> _childes;
+        // local bounds (does not include position)
         sf::FloatRect _bounds;
         bool _is_fixed;
     };

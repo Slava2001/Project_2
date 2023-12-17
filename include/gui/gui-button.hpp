@@ -6,6 +6,8 @@
 
 #include <functional>
 
+#include "nlohmann/json.hpp"
+
 namespace GUI
 {
 
@@ -13,8 +15,8 @@ namespace GUI
     {
     public:
         /// @brief Constructor
-        /// @param callback click callback
-        Button(std::function<void(Button &)> callback = default_on_click_callback);
+        /// @param cfg button config
+        Button(nlohmann::json &cfg);
         /// @brief Set button label
         /// @param str label text
         void set_text(std::string str);
@@ -25,26 +27,28 @@ namespace GUI
         bool add(Base *ctrl) override;
         /// @brief mouse press callback
         /// @param e mouse button event
-        virtual void on_press(const sf::Event::MouseButtonEvent &e) override;
+        void on_press(const sf::Event::MouseButtonEvent &e) override;
         /// @brief mouse release callback
         /// @param e mouse button event
-        virtual void on_release(const sf::Event::MouseButtonEvent &e) override;
+        void on_release(const sf::Event::MouseButtonEvent &e) override;
         /// @brief mouse click callback
         /// @param e mouse button event
-        virtual void on_click(const sf::Event::MouseButtonEvent &e) override;
+        void on_click(const sf::Event::MouseButtonEvent &e) override;
         /// @brief cursor enter callback
-        virtual void on_enter() override;
+        void on_enter() override;
         /// @brief cursor leave callback
-        virtual void on_leave() override;
+        void on_leave() override;
+        /// @brief Set on click callback
+        /// @param callback callback to set
+        void set_click_callback(std::function<void(Button &)> callback);
 
         void draw(sf::RenderTarget &target, const sf::RenderStates &states) const;
 
     private:
-        static const sf::Vector2f _size;
-
         sf::RectangleShape _body;
         sf::Text _text;
         std::function<void(Button &)> _on_click_callback;
+        sf::Color _body_color;
 
         /// @brief default click callback, do nothing
         /// @param btn buttun

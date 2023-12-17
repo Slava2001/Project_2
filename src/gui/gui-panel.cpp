@@ -1,22 +1,31 @@
 #include "gui-panel.hpp"
+#include "util.hpp"
 
 using namespace GUI;
 
-constexpr sf::Color Panel::_body_enter_color(100, 100, 100, 200);
-constexpr sf::Color Panel::_head_enter_color(100, 100, 100, 250);
-constexpr sf::Color Panel::_body_leave_color(0, 0, 0, 200);
-constexpr sf::Color Panel::_head_leave_color(0, 0, 0, 250);
-constexpr sf::Vector2f Panel::_panel_size(100, 100);
-constexpr int Panel::_head_size = 15;
-
-Panel::Panel() : Base(_panel_size, false)
+Panel::Panel(nlohmann::json &cfg) : Base(cfg)
 {
+    _body_leave_color = color_from_string(cfg.value("body_color", "#000000"));
+    _head_leave_color = color_from_string(cfg.value("head_color", "#000000"));
+    _body_enter_color = _body_leave_color;
+    _head_enter_color = _head_leave_color;
+    if (cfg["body_enter_color"].is_string()) 
+    {
+        _body_enter_color = color_from_string(cfg.value("body_enter_color", "#000000"));
+    }
+    if (cfg["head_enter_color"].is_string()) 
+    {
+        _head_enter_color = color_from_string(cfg.value("head_enter_color", "#000000"));
+    }
     _head.setFillColor(_head_leave_color);
     _body.setFillColor(_body_leave_color);
-
-    _head.setSize(sf::Vector2f(_panel_size.x, _head_size));
-    _body.setPosition(sf::Vector2f(0, _head_size));
-    _body.setSize(sf::Vector2f(_panel_size.x, _panel_size.y - _head_size));
+    sf::Vector2f panel_size;
+    panel_size.x = cfg.value("width", 0);
+    panel_size.y = cfg.value("height", 0);
+    int head_size = cfg.value("head_size", 0);
+    _head.setSize(sf::Vector2f(panel_size.x, head_size));
+    _body.setPosition(sf::Vector2f(0, head_size));
+    _body.setSize(sf::Vector2f(panel_size.x, panel_size.y - head_size));
 }
 
 void Panel::on_enter()
