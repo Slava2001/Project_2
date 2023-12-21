@@ -4,13 +4,16 @@
 #include "gui-base.hpp"
 #include "SFML/System.hpp"
 
+#include "nlohmann/json.hpp"
+
 namespace GUI
 {
     class Panel : public Base
     {
     public:
         /// @brief Constructor
-        Panel();
+        /// @param cfg panel config
+        Panel(nlohmann::json &cfg);
         /// @brief cursor enter callback
         void on_enter() override;
         /// @brief cursor leave callback
@@ -25,13 +28,11 @@ namespace GUI
         void draw(sf::RenderTarget &target, const sf::RenderStates &states) const;
 
     private:
-        static const sf::Color _body_enter_color;
-        static const sf::Color _head_enter_color;
-        static const sf::Color _body_leave_color;
-        static const sf::Color _head_leave_color;
-        static const sf::Vector2f _panel_size;
-        static const int _head_size;
-
+        sf::Color _body_enter_color;
+        sf::Color _head_enter_color;
+        sf::Color _body_leave_color;
+        sf::Color _head_leave_color;
+        
         sf::RectangleShape _head;
         sf::RectangleShape _body;
     };

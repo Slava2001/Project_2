@@ -12,16 +12,15 @@ namespace GUI
     {
     public:
         /// @brief Constructor
-        /// @param size slider size
-        /// @param min minimum value
-        /// @param max maximum value
-        /// @param step change value step (must be more than (max-min)/(size.x-size.y))
-        /// @note the size and range must be a multiple of the step,
-        ///       otherwise the slider will not be drawn exactly
-        Slider(sf::Vector2f size, float min = 0, float max = 100, float step = 1);
+        /// @param cfg slider config
+        Slider(nlohmann::json &cfg);
         /// @brief Get slider value
         /// @return current value
         float get_value() const;
+        /// @brief Set slider value
+        /// @param val value to set
+        void set_value(float val);
+
         /// @brief Set change value callback
         /// @param callback callback
         void set_change_value_callback(std::function<void(Slider &s)> callback);
@@ -39,8 +38,8 @@ namespace GUI
         void draw(sf::RenderTarget &target, const sf::RenderStates &states) const;
 
     private:
-        static const sf::Color _body_color;
-        static const sf::Color _arrow_color;
+        sf::Color _body_color;
+        sf::Color _arrow_color;
 
         sf::RectangleShape _body;
         sf::RectangleShape _arrow;

@@ -1,0 +1,271 @@
+{
+    "definitions": {
+        "color": {
+            "type": "string",
+            "patternss": "^#([0-9a-fA-F]{2}){3,4}$"
+        }
+    },
+    "type": "object",
+    "anyOf": [
+        {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "description": "element type",
+                    "enum": [
+                        "panel"
+                    ]
+                },
+                "width": {
+                    "type": "number",
+                    "description": "element hitbox width in pixel"
+                },
+                "height": {
+                    "type": "number",
+                    "description": "element hitbox height in pixel"
+                },
+                "is_fixed": {
+                    "type": "boolean",
+                    "description": "element can be moved"
+                },
+                "left": {
+                    "type": "number",
+                    "description": "element offset by x in pixels"
+                },
+                "top": {
+                    "type": "number",
+                    "description": "element offset by y in pixels"
+                },
+                "id": {
+                    "type": "string",
+                    "description": "uniq id for find this element"
+                },
+                "childes": {
+                    "type": "array",
+                    "description": "element childes",
+                    "items": {
+                        "$ref": "#"
+                    }
+                },
+                "head_size": {
+                    "type": "number",
+                    "description": "head line height"
+                },
+                "body_enter_color": {
+                    "$ref": "#/definitions/color",
+                    "description": "body enter color"
+                },
+                "head_enter_color": {
+                    "$ref": "#/definitions/color",
+                    "description": "head enter color"
+                },
+                "body_color": {
+                    "$ref": "#/definitions/color",
+                    "description": "body color"
+                },
+                "head_color": {
+                    "$ref": "#/definitions/color",
+                    "description": "head color"
+                }
+            }
+        },
+        {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "description": "element type",
+                    "enum": [
+                        "slider"
+                    ]
+                },
+                "width": {
+                    "type": "number",
+                    "description": "element hitbox width in pixel"
+                },
+                "height": {
+                    "type": "number",
+                    "description": "element hitbox height in pixel"
+                },
+                "is_fixed": {
+                    "type": "boolean",
+                    "description": "element can be moved"
+                },
+                "left": {
+                    "type": "number",
+                    "description": "element offset by x in pixels"
+                },
+                "top": {
+                    "type": "number",
+                    "description": "element offset by y in pixels"
+                },
+                "id": {
+                    "type": "string",
+                    "description": "uniq id for find this element"
+                },
+                "childes": {
+                    "type": "array",
+                    "description": "element childes",
+                    "items": {
+                        "$ref": "#"
+                    }
+                },
+                "body_color": {
+                    "$ref": "#/definitions/color",
+                    "description": "body color"
+                },
+                "arrow_color": {
+                    "$ref": "#/definitions/color",
+                    "description": "arrow color"
+                },
+                "min": {
+                    "type": "number",
+                    "description": "slider minimum value"
+                },
+                "max": {
+                    "type": "number",
+                    "description": "slider maximum value"
+                },
+                "step": {
+                    "type": "number",
+                    "description": "slider step"
+                }
+            }
+        },
+        {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "description": "element type",
+                    "enum": [
+                        "button"
+                    ]
+                },
+                "width": {
+                    "type": "number",
+                    "description": "element hitbox width in pixel"
+                },
+                "height": {
+                    "type": "number",
+                    "description": "element hitbox height in pixel"
+                },
+                "is_fixed": {
+                    "type": "boolean",
+                    "description": "element can be moved"
+                },
+                "left": {
+                    "type": "number",
+                    "description": "element offset by x in pixels"
+                },
+                "top": {
+                    "type": "number",
+                    "description": "element offset by y in pixels"
+                },
+                "id": {
+                    "type": "string",
+                    "description": "uniq id for find this element"
+                },
+                "childes": {
+                    "type": "array",
+                    "description": "element childes",
+                    "items": {
+                        "$ref": "#"
+                    }
+                },
+                "text": {
+                    "type": "string",
+                    "description": "Button text"
+                },
+                "body_color" : {
+                    "$ref": "#/definitions/color",
+                    "description": "body color"
+                },
+                "text_color" : {
+                    "$ref": "#/definitions/color",
+                    "description": "text color"
+                },
+                "font_size" : {
+                    "type": "integer",
+                    "description": "font size"
+                }
+            }
+        },
+        {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "description": "element type",
+                    "enum": [
+                        "textbox"
+                    ]
+                },
+                "width": {
+                    "type": "number",
+                    "description": "element hitbox width in pixel"
+                },
+                "is_fixed": {
+                    "type": "boolean",
+                    "description": "element can be moved"
+                },
+                "left": {
+                    "type": "number",
+                    "description": "element offset by x in pixels"
+                },
+                "top": {
+                    "type": "number",
+                    "description": "element offset by y in pixels"
+                },
+                "id": {
+                    "type": "string",
+                    "description": "uniq id for find this element"
+                },
+                "childes": {
+                    "type": "array",
+                    "description": "element childes",
+                    "items": {
+                        "$ref": "#"
+                    }
+                },
+                "line_count": {
+                    "type": "integer",
+                    "description": "count of line"
+                },
+                "font_size": {
+                    "type": "number",
+                    "description": "text font size"
+                },
+                "is_scroling": {
+                    "type": "boolean",
+                    "description": "will the text field scroll when it overflows"
+                },
+                "is_changeable": {
+                    "type": "boolean",
+                    "description": "can user change text"
+                },
+                "outline_thickness": {
+                    "type": "integer",
+                    "description": "outline thickness"
+                },
+                "outline_thickness_color": {
+                    "$ref": "#/definitions/color",
+                    "description": "outline thickness color"
+                },
+                "body_color": {
+                    "$ref": "#/definitions/color",
+                    "description": "body color"
+                },
+                "focus_color": {
+                    "$ref": "#/definitions/color",
+                    "description": "focus color"
+                },
+                "text_color": {
+                    "$ref": "#/definitions/color",
+                    "description": "text color"
+                }
+            }
+        }
+    ]
+}

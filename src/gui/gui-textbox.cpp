@@ -1,26 +1,30 @@
 #include "gui-textbox.hpp"
 #include "resources.hpp"
 #include "debug-drawer.hpp"
+#include "util.hpp"
 
 #include "SFML/Window.hpp"
 
 using namespace GUI;
 
-constexpr sf::Color Textbox::_defocus_color = sf::Color(200, 200, 200);
-constexpr sf::Color Textbox::_focus_color = sf::Color::White;
-constexpr sf::Color Textbox::_text_color = sf::Color::Black;
-constexpr int Textbox::_outline_thickness = 2;
-constexpr sf::Color Textbox::_outline_thickness_color = sf::Color(100, 100, 100);
 constexpr char Textbox::_fake_newline_marker = 13;
 
-Textbox::Textbox(float len, int char_size, int line_count)
+Textbox::Textbox(nlohmann::json &cfg) : Base(cfg)
 {
-    _is_scroling = false;
-    _is_changeable = true;
+    int line_count = cfg.value("line_count", 1); 
+    int len = cfg.value("width", 0); 
+    int char_size = cfg.value("font_size", 0);
+    _outline_thickness = cfg.value("outline_thickness", 2);
+    _defocus_color = color_from_string(cfg.value("body_color", "#000000"));
+    _focus_color = color_from_string(cfg.value("focus_color", "#000000"));
+    _text_color = color_from_string(cfg.value("text_color", "#000000"));
+    _outline_thickness_color = color_from_string(cfg.value("outline_thickness_color", "#000000"));
+    _is_scroling = cfg.value("is_scroling", false);
+    _is_changeable = cfg.value("is_changeable", true);
     _is_multiline = line_count > 1;
-    _text_render.setFont(Resources::Fonts::main);
-    _text_render.setFillColor(sf::Color::Black);
+    _text_render.setFillColor(_text_color);
     _text_render.setCharacterSize(char_size);
+    _text_render.setFont(Resources.fonts.main);
 
     _line_spasing = _text_render.getFont()->getLineSpacing(char_size) *
                     _text_render.getLineSpacing();

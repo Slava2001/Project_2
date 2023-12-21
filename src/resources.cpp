@@ -1,21 +1,16 @@
 #include "resources.hpp"
+#include "settings.hpp"
 
 #include <exception>
 
-namespace Resources
-{
-    namespace Fonts
-    {
-        sf::Font main;
-    }
-}
+struct Resources Resources = {
 
-#define RESOURCES_PATH "./resources"
+};
 
 void Resources::load()
 {
-    if (!Resources::Fonts::main.loadFromFile(RESOURCES_PATH "/UbuntuMono-R.ttf"))
+    if (!fonts.main.loadFromFile(Settings.text.fonts_path.main))
     {
-        throw std::runtime_error("Failed to load font");
+        throw std::runtime_error("Failed to load main font");
     }
 }

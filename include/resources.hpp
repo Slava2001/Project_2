@@ -3,15 +3,14 @@
 
 #include "SFML/Graphics.hpp"
 
-namespace Resources
-{
-    namespace Fonts
-    {
-        extern sf::Font main;
-    }
-
+struct Resources {
+    struct Fonts {
+        sf::Font main;
+    } fonts;
     /// @brief Load resources.
     void load();
-}
+};
+
+extern struct Resources Resources;
 
 #endif // INCLUDE_RESOUECES_HPP

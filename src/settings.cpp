@@ -1,20 +1,33 @@
 #include "settings.hpp"
 
-namespace Settings
+#define RESOURCES_PATH "./resources/"
+
+struct Settings Settings = {
+    .path_to_settings = "./settings.json",
+    .window = {
+        .height = 400,
+        .width = 400,
+        .fps_limit = 120,
+        .title = "Project 2"
+    },
+    .text = {
+        .fonts_path = {
+            .main = RESOURCES_PATH"UbuntuMono-R.ttf",
+        },
+        .debug_text_size = 12
+    },
+    .debug = {
+        .fps_update_periud_s = 0.1
+    },
+    .gui_cfg_path = {
+        .main = RESOURCES_PATH"gui_cfg_main.json"
+    }
+};
+
+void Settings::load() 
 {
-    namespace Window
-    {
-        int height = 400;
-        int width = 400;
-        int fps_limit = 120;
-        const char *title = "Project 2";
-    }
-    namespace Text
-    {
-        int debug_text_size = 12;
-    }
-    namespace Debug
-    {
-        float fps_update_periud = 0.1;
-    }
+}
+
+void Settings::save() 
+{
 }
