@@ -41,7 +41,7 @@ void Manager::create_gui_tree(Base *ctl, nlohmann::json &cfg)
     for (auto& childe_cfg: cfg["childes"]) {
         std::shared_ptr<Base> elem = create_gui_element(childe_cfg);
         _dynamic_elements.push_back(elem);
-        elem->setPosition(elem->getPosition() + ctl->getPosition());
+        elem->setPosition(elem->getPosition() + (sf::Vector2f)ctl->get_global_position());
         ctl->add(elem.get());
         create_gui_tree(elem.get(), childe_cfg);
     }
