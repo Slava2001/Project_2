@@ -40,6 +40,7 @@ void Slider::set_value(float val)
     if (val > _max) {
         val = _max;
     }
+    val = std::round(val/_step)*_step;
     sf::Vector2f pos(_arrow.getPosition());
     pos.x = ((val - _min) / (_max - _min)) * (_size.x - _size.y);
     _arrow.setPosition(pos);

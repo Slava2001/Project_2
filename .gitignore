@@ -1,6 +1,7 @@
 bin
 build
 .vscode
+.vs
 Project2
 start.bat
 start.sh

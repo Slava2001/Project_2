@@ -1,7 +1,7 @@
 [submodule "3rdparty/SFML"]
 	path = 3rdparty/SFML
-	url = git@github.com:SFML/SFML.git
-	
+	url = https://github.com/SFML/SFML.git
+
 [submodule "3rdparty/json"]
 	path = 3rdparty/json
-	url = git@github.com:nlohmann/json.git
+	url = https://github.com/nlohmann/json.git

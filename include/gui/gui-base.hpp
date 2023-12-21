@@ -74,14 +74,13 @@ namespace GUI
         /// @brief on mouse move callback
         /// @param e mouse move event
         virtual void on_mouse_move(const sf::Event::MouseMoveEvent &e);
+        
         virtual void draw(sf::RenderTarget &target, const sf::RenderStates &states) const;
 
     protected:
         Base *_parent;
         Base *_old_parent;
         sf::Vector2f _old_position;
-        // uniq text id for find element
-        std::string _id;
 
         /// @brief Set element hitbox size
         /// @param hitbox new hitbox size
@@ -92,6 +91,8 @@ namespace GUI
         // local bounds (does not include position)
         sf::FloatRect _bounds;
         bool _is_fixed;
+        // uniq text id for find element
+        std::string _id;
     };
 }
 #endif // INCLUDE_GUI_GUI_BASE_HPP
