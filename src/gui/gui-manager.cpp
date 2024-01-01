@@ -16,7 +16,7 @@ Manager::Manager() : _controls()
     _mouse_left_button_pressed = false;
 }
 
-Manager::Manager(std::string path) : _controls()
+Manager::Manager(const std::string &path) : _controls()
 {
     _hover = &_controls;
     _drag = nullptr;
@@ -55,17 +55,19 @@ std::shared_ptr<Base> Manager::create_gui_element(nlohmann::json &cfg)
     if (!cfg["type"].is_string()) {
         throw std::runtime_error("Unexpected type param type");
     }
+
     std::shared_ptr<Base> ptr;
-    if (cfg["type"] == "panel") { 
+    std::string type = cfg["type"];
+    if (type == "panel") { 
         ptr = std::make_shared<Panel>(cfg); 
-    } else if (cfg["type"] == "textbox") { 
+    } else if (type == "textbox") { 
         ptr = std::make_shared<Textbox>(cfg); 
-    } else if (cfg["type"] == "button") { 
+    } else if (type == "button") { 
         ptr = std::make_shared<Button>(cfg); 
-    } else if (cfg["type"] == "slider") { 
+    } else if (type == "slider") { 
         ptr = std::make_shared<Slider>(cfg); 
     } else {
-        throw std::runtime_error("Unexpected element type");
+        throw std::runtime_error("Unexpected gui element type");
     }
     return ptr;
 }

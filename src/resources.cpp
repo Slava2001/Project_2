@@ -1,16 +1,31 @@
 #include "resources.hpp"
 #include "settings.hpp"
+#include "nlohmann/json.hpp"
 
 #include <exception>
 
-struct Resources Resources = {
+using namespace Resources;
 
-};
-
-void Resources::load()
+Manager::Manager(const nlohmann::json &cfg)
 {
-    if (!fonts.main.loadFromFile(Settings.text.fonts_path.main))
-    {
-        throw std::runtime_error("Failed to load main font");
+    if (!cfg.is_array()) {
+        throw std::runtime_error("invalid resources config");
     }
+
+    for (const auto& res_cfg: cfg) {
+        std::string type = res_cfg.value("type", "");
+        std::string name = res_cfg.value("name", "");
+        std::string path = res_cfg.value("name", "");
+    }
+
+}
+
+sf::Texture *Manager::get_texture(const std::string &name)
+{
+
+}
+
+sf::Texture *Manager::get_font(const std::string &name)
+{
+
 }

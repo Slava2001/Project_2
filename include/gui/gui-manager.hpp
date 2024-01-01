@@ -24,7 +24,7 @@ namespace GUI
         Manager();
         /// @brief Create GUI from json config
         /// @param path path to json config file
-        Manager(std::string path);
+        Manager(const std::string &path);
         /// @brief Handling event
         /// @param e event
         void event_handling(const sf::Event &e);
