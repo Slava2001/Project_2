@@ -29,11 +29,8 @@ namespace GUI
 
     private:
         sf::Color _body_enter_color;
-        sf::Color _head_enter_color;
         sf::Color _body_leave_color;
-        sf::Color _head_leave_color;
         
-        sf::RectangleShape _head;
         sf::RectangleShape _body;
     };
 };

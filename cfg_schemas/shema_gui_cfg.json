@@ -48,25 +48,13 @@
                         "$ref": "#"
                     }
                 },
-                "head_size": {
-                    "type": "number",
-                    "description": "head line height"
-                },
                 "body_enter_color": {
                     "$ref": "#/definitions/color",
                     "description": "body enter color"
                 },
-                "head_enter_color": {
-                    "$ref": "#/definitions/color",
-                    "description": "head enter color"
-                },
                 "body_color": {
                     "$ref": "#/definitions/color",
                     "description": "body color"
-                },
-                "head_color": {
-                    "$ref": "#/definitions/color",
-                    "description": "head color"
                 }
             }
         },
