@@ -1,4 +1,5 @@
-#pragma once
+#ifndef INCLUDE_LOGGER_HPP
+#define INCLUDE_LOGGER_HPP
 
 #include <iostream>
 #include <sstream>
@@ -61,3 +62,5 @@
 #define log_fatal(...) LOG(LOG_LVL_FATAL, LOG_BG_COLOR_REG "FATAL" LOG_COLOR_CLEAR, ##__VA_ARGS__)
 
 #define log_enter() log_debug("Enter")
+
+#endif // INCLUDE_LOGGER_HPP

@@ -10,6 +10,7 @@
 
 #include "SFML/System.hpp"
 
+#include "resources.hpp"
 #include "nlohmann/json.hpp"
 
 #include <string>
@@ -23,8 +24,8 @@ namespace GUI
         /// @brief Constructor
         Manager();
         /// @brief Create GUI from json config
-        /// @param path path to json config file
-        Manager(const std::string &path);
+        /// @param cfg json config file
+        Manager(nlohmann::json &cfg);
         /// @brief Handling event
         /// @param e event
         void event_handling(const sf::Event &e);
@@ -45,7 +46,6 @@ namespace GUI
             throw std::runtime_error("filed to find element by id: " + id);
         }
 
-
         void draw(sf::RenderTarget &target, const sf::RenderStates &states) const;
 
     private:
@@ -58,6 +58,7 @@ namespace GUI
         Base *_focus;
         // all dynamic allocated gui element
         std::vector<std::shared_ptr<Base>> _dynamic_elements;
+        Resources::Manager _resources;
 
         /// @brief Update hover
         /// @param e mouse move event

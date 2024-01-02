@@ -12,7 +12,7 @@ Base::Base() : _parent(nullptr), _bounds()
     _id = "";
 }
 
-Base::Base(nlohmann::json &cfg) : _parent(nullptr)
+Base::Base(nlohmann::json &cfg, const Resources::Manager &res_mngr) : _parent(nullptr)
 {
     _bounds.top = 0;
     _bounds.left = 0;

@@ -1,14 +1,14 @@
 #ifndef INCLUDE_GUI_GUI_TEXTBOX_HPP
 #define INCLUDE_GUI_GUI_TEXTBOX_HPP
 
+#include "resources.hpp"
 #include "gui-base.hpp"
 #include "SFML/System.hpp"
+#include "nlohmann/json.hpp"
 
 #include <string>
 #include <sstream>
 #include <functional>
-
-#include "nlohmann/json.hpp"
 
 namespace GUI
 {
@@ -17,7 +17,8 @@ namespace GUI
     public:
         /// @brief Constructor
         /// @param cfg textbox config
-        Textbox(nlohmann::json &cfg);
+        /// @param res_mngr resources
+        Textbox(nlohmann::json &cfg, const Resources::Manager &res_mngr);
         /// @brief Get text from textbox
         /// @return textbox text
         std::string get_text();

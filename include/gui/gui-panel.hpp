@@ -1,9 +1,9 @@
 #ifndef INCLUDE_GUI_GUI_PANEL_HPP
 #define INCLUDE_GUI_GUI_PANEL_HPP
 
+#include "resources.hpp"
 #include "gui-base.hpp"
 #include "SFML/System.hpp"
-
 #include "nlohmann/json.hpp"
 
 namespace GUI
@@ -13,7 +13,8 @@ namespace GUI
     public:
         /// @brief Constructor
         /// @param cfg panel config
-        Panel(nlohmann::json &cfg);
+        /// @param res_mngr resources
+        Panel(nlohmann::json &cfg, const Resources::Manager &res_mngr);
         /// @brief cursor enter callback
         void on_enter() override;
         /// @brief cursor leave callback

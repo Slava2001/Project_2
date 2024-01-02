@@ -6,7 +6,8 @@
 
 using namespace GUI;
 
-Slider::Slider(nlohmann::json &cfg) : Base(cfg)
+Slider::Slider(nlohmann::json &cfg, const Resources::Manager &res_mngr): 
+    Base(cfg, res_mngr)
 {
     _body_color = color_from_string(cfg.value("body_color", "#000000"));
     _arrow_color = color_from_string(cfg.value("arrow_color", "#000000"));

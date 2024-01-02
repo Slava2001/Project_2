@@ -9,7 +9,8 @@ using namespace GUI;
 
 constexpr char Textbox::_fake_newline_marker = 13;
 
-Textbox::Textbox(nlohmann::json &cfg) : Base(cfg)
+Textbox::Textbox(nlohmann::json &cfg, const Resources::Manager &res_mngr): 
+    Base(cfg, res_mngr)
 {
     int line_count = cfg.value("line_count", 1); 
     int len = cfg.value("width", 0); 
@@ -24,7 +25,7 @@ Textbox::Textbox(nlohmann::json &cfg) : Base(cfg)
     _is_multiline = line_count > 1;
     _text_render.setFillColor(_text_color);
     _text_render.setCharacterSize(char_size);
-    _text_render.setFont(Resources.fonts.main);
+    _text_render.setFont(*res_mngr.get_font(cfg.value("font", DEFAULT_RESOURCE_NAME)));
 
     _line_spasing = _text_render.getFont()->getLineSpacing(char_size) *
                     _text_render.getLineSpacing();

@@ -1,12 +1,12 @@
 #ifndef INCLUDE_GUI_GUI_BUTTON_HPP
 #define INCLUDE_GUI_GUI_BUTTON_HPP
 
+#include "resources.hpp"
 #include "gui-base.hpp"
 #include "SFML/System.hpp"
+#include "nlohmann/json.hpp"
 
 #include <functional>
-
-#include "nlohmann/json.hpp"
 
 namespace GUI
 {
@@ -16,7 +16,8 @@ namespace GUI
     public:
         /// @brief Constructor
         /// @param cfg button config
-        Button(nlohmann::json &cfg);
+        /// @param res_mngr resources
+        Button(nlohmann::json &cfg, const Resources::Manager &res_mngr);
         /// @brief Set button label
         /// @param str label text
         void set_text(std::string str);

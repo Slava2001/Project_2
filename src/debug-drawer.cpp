@@ -49,15 +49,15 @@ void Debug_drawer::draw(sf::RenderTarget &target, const sf::RenderStates &states
     }
     _rects.clear();
 
-    sf::Text tx;
-    tx.setFont(Resources.fonts.main);
-    tx.setCharacterSize(Settings.text.debug_text_size);
+    // sf::Text tx;
+    // tx.setFont(Resources.fonts.main);
+    // tx.setCharacterSize(Settings.text.debug_text_size);
 
-    for (std::size_t i = 0; i < _text_lines.size(); i++)
-    {
-        tx.setString(_text_lines[i]);
-        tx.setPosition(sf::Vector2f(0, i * Settings.text.debug_text_size));
-        target.draw(tx);
-    }
+    // for (std::size_t i = 0; i < _text_lines.size(); i++)
+    // {
+    //     tx.setString(_text_lines[i]);
+    //     tx.setPosition(sf::Vector2f(0, i * Settings.text.debug_text_size));
+    //     target.draw(tx);
+    // }
     _text_lines.clear();
 }
