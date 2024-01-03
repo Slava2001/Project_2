@@ -2,6 +2,8 @@
 #include "resources.hpp"
 #include "debug-drawer.hpp"
 #include "gui-manager.hpp"
+#define LOG_LVL LOG_LVL_DEBUG
+#include "logger.hpp"
 
 #include "SFML/Graphics.hpp"
 #include "SFML/System.hpp"
@@ -10,7 +12,11 @@
 
 int main()
 {
+    log_enter();
+    time_t seed = time(nullptr);
+    log_info("Start. Seed: ", seed);
     srand(time(nullptr));
+    log_info("Init resources");
     Resources.load();
 
     sf::RenderWindow window(sf::VideoMode(sf::Vector2u(Settings.window.width,
@@ -23,7 +29,8 @@ int main()
     sf::Clock clock;
     int frame_counter = 0;
     int current_fps = 0;
-
+    
+    log_info("Init GUI");
     GUI::Manager gui(Settings.gui_cfg_path.main);
     
     uint8_t r = 0, g = 0, b = 0;
