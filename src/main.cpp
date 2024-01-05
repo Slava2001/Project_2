@@ -25,7 +25,15 @@ int main()
                             Settings.window.title);
     window.setFramerateLimit(Settings.window.fps_limit);
 
-    Debug_drawer debug_drawer;
+    std::ifstream cfg_file("./resources/cfg.json");
+    nlohmann::json cfg = nlohmann::json::parse(cfg_file);  
+    cfg_file.close();
+
+    if (cfg["debug"].is_null()) {
+        log_fatal("Debug config not provided");
+        throw std::runtime_error("Debug config not provided");
+    }
+    Debug_drawer debug_drawer(cfg["debug"]);
 
     sf::Clock clock;
     int frame_counter = 0;
