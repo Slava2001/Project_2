@@ -1,5 +1,6 @@
 #include "gui-panel.hpp"
 #include "util.hpp"
+#include "logger.hpp"
 
 using namespace GUI;
 

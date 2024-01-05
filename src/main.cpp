@@ -14,6 +14,8 @@
 int main()
 {
     log_enter();
+    // disable SFML logs
+    sf::err().rdbuf(nullptr);
     time_t seed = time(nullptr);
     log_info("Start. Seed: ", seed);
     srand(time(nullptr));

@@ -46,7 +46,7 @@ void Manager::load_resource(const std::string &type,
             return;
         }
         _textures[name] = std::move(t);
-    } if (type == "font") {
+    } else if (type == "font") {
         auto f = std::make_unique<sf::Font>();
         if (!f->loadFromFile(path)) {
             log_error("Failed to load font. name: ", name, " path: ", path);
@@ -54,9 +54,10 @@ void Manager::load_resource(const std::string &type,
         }
         _fonts[name] = std::move(f);
     } else {
-        log_error("Failed to load resource, unexpected type: ", type);        
+        log_error("Failed to load resource, unexpected type: ", type);   
+        return;     
     }
-    log_info("Load resource: type: ", type, " name: ", name, " path: ", path);
+    log_info("type: ", type, ", name: ", name, ", path: ", path);
 }
 
 sf::Texture *Manager::get_texture(const std::string &name) const
