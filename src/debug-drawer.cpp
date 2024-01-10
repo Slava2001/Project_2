@@ -1,9 +1,21 @@
 #include "debug-drawer.hpp"
 #include "settings.hpp"
 #include "resources.hpp"
+#include "logger.hpp"
 
-std::vector<std::string> Debug_drawer::_text_lines;
-std::vector<sf::FloatRect> Debug_drawer::_rects;
+Debug_drawer *Debug_drawer::_instance = nullptr;
+
+Debug_drawer::Debug_drawer(nlohmann::json &cfg)
+{
+    if (_instance) {
+        log_fatal("Try create second debug draver instanse");
+        throw std::runtime_error("Try create second debug draver instanse");
+    }
+    _instance = this;
+    if (!cfg["resources"].is_null()) {
+        _resources.load(cfg["resources"]);
+    }
+}
 
 template <>
 void Debug_drawer::add_string(const std::string &str, sf::Vector2i val)
@@ -11,7 +23,7 @@ void Debug_drawer::add_string(const std::string &str, sf::Vector2i val)
     std::stringstream _sstr;
     _sstr << str;
     _sstr << "(" << val.x << "; " << val.y << ")";
-    _text_lines.push_back(_sstr.str());
+    _instance->_text_lines.push_back(_sstr.str());
     _sstr.clear();
 }
 
@@ -21,18 +33,18 @@ void Debug_drawer::add_string(const std::string &str, sf::Vector2f val)
     std::stringstream _sstr;
     _sstr << str;
     _sstr << "(" << val.x << "; " << val.y << ")";
-    _text_lines.push_back(_sstr.str());
+    _instance->_text_lines.push_back(_sstr.str());
     _sstr.clear();
 }
 
 void Debug_drawer::add_string(const std::string &str)
 {
-    _text_lines.push_back(str);
+    _instance->_text_lines.push_back(str);
 }
 
 void Debug_drawer::add_rect(const sf::FloatRect &rec)
 {
-    _rects.push_back(rec);
+    _instance->_rects.push_back(rec);
 }
 
 void Debug_drawer::draw(sf::RenderTarget &target, const sf::RenderStates &states) const
@@ -41,16 +53,15 @@ void Debug_drawer::draw(sf::RenderTarget &target, const sf::RenderStates &states
     rs.setFillColor(sf::Color::Transparent);
     rs.setOutlineThickness(-1);
     rs.setOutlineColor(sf::Color::Yellow);
-    for (sf::FloatRect &r : _rects)
+    for (sf::FloatRect &r : _instance->_rects)
     {
         rs.setPosition(sf::Vector2f(r.left, r.top));
         rs.setSize(sf::Vector2f(r.width, r.height));
         target.draw(rs);
     }
-    _rects.clear();
+    _instance->_rects.clear();
 
-    sf::Text tx;
-    tx.setFont(Resources.fonts.main);
+    sf::Text tx(*_instance->_resources.get_font(DEFAULT_RESOURCE_NAME));
     tx.setCharacterSize(Settings.text.debug_text_size);
 
     for (std::size_t i = 0; i < _text_lines.size(); i++)
@@ -59,5 +70,5 @@ void Debug_drawer::draw(sf::RenderTarget &target, const sf::RenderStates &states
         tx.setPosition(sf::Vector2f(0, i * Settings.text.debug_text_size));
         target.draw(tx);
     }
-    _text_lines.clear();
+    _instance->_text_lines.clear();
 }

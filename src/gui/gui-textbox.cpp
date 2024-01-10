@@ -9,10 +9,12 @@ using namespace GUI;
 
 constexpr char Textbox::_fake_newline_marker = 13;
 
-Textbox::Textbox(nlohmann::json &cfg) : Base(cfg)
+Textbox::Textbox(nlohmann::json &cfg, const Resources::Manager &res_mngr):
+    Base(cfg, res_mngr),
+    _text_render(*res_mngr.get_font(cfg.value("font", DEFAULT_RESOURCE_NAME)))
 {
-    int line_count = cfg.value("line_count", 1); 
-    int len = cfg.value("width", 0); 
+    int line_count = cfg.value("line_count", 1);
+    int len = cfg.value("width", 0);
     int char_size = cfg.value("font_size", 0);
     _outline_thickness = cfg.value("outline_thickness", 2);
     _defocus_color = color_from_string(cfg.value("body_color", "#000000"));
@@ -24,9 +26,8 @@ Textbox::Textbox(nlohmann::json &cfg) : Base(cfg)
     _is_multiline = line_count > 1;
     _text_render.setFillColor(_text_color);
     _text_render.setCharacterSize(char_size);
-    _text_render.setFont(Resources.fonts.main);
 
-    _line_spasing = _text_render.getFont()->getLineSpacing(char_size) *
+    _line_spasing = _text_render.getFont().getLineSpacing(char_size) *
                     _text_render.getLineSpacing();
 
     sf::Vector2f textbox_size(len, _line_spasing * line_count);
@@ -41,18 +42,18 @@ void Textbox::on_key_press(const sf::Event::KeyEvent &e)
 {
     if (_is_changeable)
     {
-        if (e.code == sf::Keyboard::Enter && ((e.shift && _is_multiline) || !_is_multiline))
+        if (e.code == sf::Keyboard::Key::Enter && ((e.shift && _is_multiline) || !_is_multiline))
         {
             if (_enter_callback)
             {
                 _enter_callback(*this);
             }
         }
-        else if (e.code == sf::Keyboard::Enter)
+        else if (e.code == sf::Keyboard::Key::Enter)
         {
             push_char('\n');
         }
-        else if (e.code == sf::Keyboard::Backspace)
+        else if (e.code == sf::Keyboard::Key::Backspace)
         {
             pop_char();
         }

@@ -1,9 +1,11 @@
 #include "gui-panel.hpp"
 #include "util.hpp"
+#include "logger.hpp"
 
 using namespace GUI;
 
-Panel::Panel(nlohmann::json &cfg) : Base(cfg)
+Panel::Panel(nlohmann::json &cfg, const Resources::Manager &res_mngr): 
+    Base(cfg, res_mngr)
 {
     _body_leave_color = color_from_string(cfg.value("body_color", "#000000"));
     _body_enter_color = _body_leave_color;

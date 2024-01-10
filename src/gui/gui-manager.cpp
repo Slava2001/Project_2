@@ -1,9 +1,8 @@
 #include "gui-manager.hpp"
 #include "debug-drawer.hpp"
+#include "logger.hpp"
 
 #include "nlohmann/json.hpp"
-
-#include <fstream>
 
 using namespace GUI;
 
@@ -16,7 +15,7 @@ Manager::Manager() : _controls()
     _mouse_left_button_pressed = false;
 }
 
-Manager::Manager(std::string path) : _controls()
+Manager::Manager(nlohmann::json &cfg) : _controls()
 {
     _hover = &_controls;
     _drag = nullptr;
@@ -24,10 +23,12 @@ Manager::Manager(std::string path) : _controls()
     _focus = nullptr;
     _mouse_left_button_pressed = false;
 
-    std::ifstream cfg_file(path);
-    nlohmann::json cfg = nlohmann::json::parse(cfg_file);  
-    create_gui_tree(&_controls, cfg);
-    cfg_file.close();
+    if (!cfg["resources"].is_null()) {
+        _resources.load(cfg["resources"]);
+    }
+    if (!cfg["layout"].is_null()) {
+        create_gui_tree(&_controls, cfg["layout"]);
+    }
 }
 
 void Manager::create_gui_tree(Base *ctl, nlohmann::json &cfg)
@@ -36,7 +37,7 @@ void Manager::create_gui_tree(Base *ctl, nlohmann::json &cfg)
         return;
     }
     if (!cfg["childes"].is_array()) {
-        throw std::runtime_error("Unexpected child param type");
+        throw std::runtime_error("Unexpected childes param type");
     }
     for (auto& childe_cfg: cfg["childes"]) {
         std::shared_ptr<Base> elem = create_gui_element(childe_cfg);
@@ -55,17 +56,19 @@ std::shared_ptr<Base> Manager::create_gui_element(nlohmann::json &cfg)
     if (!cfg["type"].is_string()) {
         throw std::runtime_error("Unexpected type param type");
     }
+
     std::shared_ptr<Base> ptr;
-    if (cfg["type"] == "panel") { 
-        ptr = std::make_shared<Panel>(cfg); 
-    } else if (cfg["type"] == "textbox") { 
-        ptr = std::make_shared<Textbox>(cfg); 
-    } else if (cfg["type"] == "button") { 
-        ptr = std::make_shared<Button>(cfg); 
-    } else if (cfg["type"] == "slider") { 
-        ptr = std::make_shared<Slider>(cfg); 
+    std::string type = cfg["type"];
+    if (type == "panel") {
+        ptr = std::make_shared<Panel>(cfg, _resources);
+    } else if (type == "textbox") {
+        ptr = std::make_shared<Textbox>(cfg, _resources);
+    } else if (type == "button") {
+        ptr = std::make_shared<Button>(cfg, _resources);
+    } else if (type == "slider") {
+        ptr = std::make_shared<Slider>(cfg, _resources);
     } else {
-        throw std::runtime_error("Unexpected element type");
+        throw std::runtime_error("Unexpected gui element type");
     }
     return ptr;
 }

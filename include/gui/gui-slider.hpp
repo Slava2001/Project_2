@@ -1,8 +1,10 @@
 #ifndef INCLUDE_GUI_GUI_SLIDER_HPP
 #define INCLUDE_GUI_GUI_SLIDER_HPP
 
+#include "resources.hpp"
 #include "gui-base.hpp"
 #include "SFML/System.hpp"
+#include "nlohmann/json.hpp"
 
 #include <functional>
 
@@ -13,7 +15,8 @@ namespace GUI
     public:
         /// @brief Constructor
         /// @param cfg slider config
-        Slider(nlohmann::json &cfg);
+        /// @param res_mngr resources
+        Slider(nlohmann::json &cfg, const Resources::Manager &res_mngr);
         /// @brief Get slider value
         /// @return current value
         float get_value() const;

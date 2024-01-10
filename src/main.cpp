@@ -8,30 +8,43 @@
 #include "SFML/Graphics.hpp"
 #include "SFML/System.hpp"
 
+#include <fstream>
 #include <sstream>
 
 int main()
 {
     log_enter();
+    // disable SFML logs
+    sf::err().rdbuf(nullptr);
     time_t seed = time(nullptr);
     log_info("Start. Seed: ", seed);
     srand(time(nullptr));
-    log_info("Init resources");
-    Resources.load();
 
     sf::RenderWindow window(sf::VideoMode(sf::Vector2u(Settings.window.width,
                                                        Settings.window.height)),
                             Settings.window.title);
     window.setFramerateLimit(Settings.window.fps_limit);
 
-    Debug_drawer debug_drawer;
+    std::ifstream cfg_file("./resources/cfg.json");
+    nlohmann::json cfg = nlohmann::json::parse(cfg_file);  
+    cfg_file.close();
+
+    if (cfg["debug"].is_null()) {
+        log_fatal("Debug config not provided");
+        throw std::runtime_error("Debug config not provided");
+    }
+    Debug_drawer debug_drawer(cfg["debug"]);
 
     sf::Clock clock;
     int frame_counter = 0;
     int current_fps = 0;
-    
+
+    std::ifstream gui_cfg_file("./resources/gui_cfg_main.json");
+    nlohmann::json gui_cfg = nlohmann::json::parse(gui_cfg_file);  
+    gui_cfg_file.close();
+        
     log_info("Init GUI");
-    GUI::Manager gui(Settings.gui_cfg_path.main);
+    GUI::Manager gui(gui_cfg);
     
     uint8_t r = 0, g = 0, b = 0;
     GUI::Slider *slider_r = gui.get_elem<GUI::Slider>("background_color_r");

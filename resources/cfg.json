@@ -1,0 +1,11 @@
+{
+    "debug": {
+        "resources": [
+            {
+                "name": "default",
+                "type": "font",
+                "path": "./resources/UbuntuMono-R.ttf"
+            }
+        ]
+    }
+}

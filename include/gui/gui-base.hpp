@@ -1,8 +1,8 @@
 #ifndef INCLUDE_GUI_GUI_BASE_HPP
 #define INCLUDE_GUI_GUI_BASE_HPP
 
+#include "resources.hpp"
 #include "SFML/Graphics.hpp"
-
 #include "nlohmann/json.hpp"
 
 namespace GUI
@@ -14,7 +14,8 @@ namespace GUI
         Base();
         /// @brief Constructor
         /// @param cfg element config
-        Base(nlohmann::json &cfg);
+        /// @param res_mngr resources
+        Base(nlohmann::json &cfg, const Resources::Manager &res_mngr);
 
         /// @brief Get element state
         /// @return true if element is fixed? else false

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef INCLUDE_LOGGER_HPP
+#define INCLUDE_LOGGER_HPP
 
 #include <iostream>
 #include <sstream>
@@ -41,17 +42,17 @@
 /// @param lvl logging level
 /// @param lvl_name string indicating the logging level
 /// @param ... message
-#define LOG(lvl, lvl_name, ...)                                                     \
-    do {                                                                            \
-        if (lvl >= LOG_LVL) {                                                       \
-            std::stringstream msg;                                                  \
-            msg << "[" << time(0) << "] "                                           \
-                << lvl_name << " "                                                  \
-                << LOG_COLOR_GRAY << __PRETTY_FUNCTION__ << ": " << LOG_COLOR_CLEAR \
-                UNWRAP(__VA_ARGS__)                                                 \
-                << std::endl;                                                       \
-            std::cout << msg.str();                                                 \
-        }                                                                           \
+#define LOG(lvl, lvl_name, ...)                                          \
+    do {                                                                 \
+        if (lvl >= LOG_LVL) {                                            \
+            std::stringstream msg;                                       \
+            msg << "[" << time(0) << "] "                                \
+                << lvl_name << " "                                       \
+                << LOG_COLOR_GRAY << __func__ << ": " << LOG_COLOR_CLEAR \
+                UNWRAP(__VA_ARGS__)                                      \
+                << std::endl;                                            \
+            std::cout << msg.str();                                      \
+        }                                                                \
     } while(0)
 
 #define log_debug(...) LOG(LOG_LVL_DEBUG, LOG_BG_GREEN     "DEBUG" LOG_COLOR_CLEAR, ##__VA_ARGS__)
@@ -61,3 +62,5 @@
 #define log_fatal(...) LOG(LOG_LVL_FATAL, LOG_BG_COLOR_REG "FATAL" LOG_COLOR_CLEAR, ##__VA_ARGS__)
 
 #define log_enter() log_debug("Enter")
+
+#endif // INCLUDE_LOGGER_HPP
