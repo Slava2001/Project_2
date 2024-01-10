@@ -61,8 +61,7 @@ void Debug_drawer::draw(sf::RenderTarget &target, const sf::RenderStates &states
     }
     _instance->_rects.clear();
 
-    sf::Text tx;
-    tx.setFont(*_instance->_resources.get_font(DEFAULT_RESOURCE_NAME));
+    sf::Text tx(*_instance->_resources.get_font(DEFAULT_RESOURCE_NAME));
     tx.setCharacterSize(Settings.text.debug_text_size);
 
     for (std::size_t i = 0; i < _text_lines.size(); i++)

@@ -5,8 +5,9 @@
 
 using namespace GUI;
 
-Button::Button(nlohmann::json &cfg, const Resources::Manager &res_mngr): 
-    Base(cfg, res_mngr), 
+Button::Button(nlohmann::json &cfg, const Resources::Manager &res_mngr):
+    Base(cfg, res_mngr),
+    _text(*res_mngr.get_font(cfg.value("font", DEFAULT_RESOURCE_NAME))),
     _on_click_callback(default_on_click_callback)
 {
     sf::Vector2f size;
@@ -18,7 +19,6 @@ Button::Button(nlohmann::json &cfg, const Resources::Manager &res_mngr):
     sf::Color text_color = color_from_string(cfg.value("text_color", "#000000"));
     _text.setFillColor(text_color);
     _text.setCharacterSize(cfg.value("font_size", 0));
-    _text.setFont(*res_mngr.get_font(cfg.value("font", DEFAULT_RESOURCE_NAME)));
     set_text(cfg.value("text", ""));
 }
 
