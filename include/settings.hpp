@@ -24,7 +24,7 @@ struct Settings {
     struct GUI_cfg_path {
         std::string main;
     } gui_cfg_path;
-    
+
     /// @brief Load settings
     void load();
     /// @brief Save settings
