@@ -26,21 +26,20 @@ Manager::Manager(nlohmann::json &cfg) : _controls()
     if (!cfg["resources"].is_null()) {
         _resources.load(cfg["resources"]);
     }
-    if (!cfg["layout"].is_null()) {    
+    if (!cfg["layout"].is_null()) {
         create_gui_tree(&_controls, cfg["layout"]);
     }
 }
 
 void Manager::create_gui_tree(Base *ctl, nlohmann::json &cfg)
 {
-
     if (cfg["childes"].is_null()) {
         return;
     }
     if (!cfg["childes"].is_array()) {
         throw std::runtime_error("Unexpected childes param type");
     }
-    for (auto& childe_cfg: cfg["childes"]) {        
+    for (auto& childe_cfg: cfg["childes"]) {
         std::shared_ptr<Base> elem = create_gui_element(childe_cfg);
         _dynamic_elements.push_back(elem);
         elem->setPosition(elem->getPosition() + (sf::Vector2f)ctl->get_global_position());
@@ -60,14 +59,14 @@ std::shared_ptr<Base> Manager::create_gui_element(nlohmann::json &cfg)
 
     std::shared_ptr<Base> ptr;
     std::string type = cfg["type"];
-    if (type == "panel") { 
-        ptr = std::make_shared<Panel>(cfg, _resources); 
-    } else if (type == "textbox") { 
-        ptr = std::make_shared<Textbox>(cfg, _resources); 
-    } else if (type == "button") { 
-        ptr = std::make_shared<Button>(cfg, _resources); 
-    } else if (type == "slider") { 
-        ptr = std::make_shared<Slider>(cfg, _resources); 
+    if (type == "panel") {
+        ptr = std::make_shared<Panel>(cfg, _resources);
+    } else if (type == "textbox") {
+        ptr = std::make_shared<Textbox>(cfg, _resources);
+    } else if (type == "button") {
+        ptr = std::make_shared<Button>(cfg, _resources);
+    } else if (type == "slider") {
+        ptr = std::make_shared<Slider>(cfg, _resources);
     } else {
         throw std::runtime_error("Unexpected gui element type");
     }

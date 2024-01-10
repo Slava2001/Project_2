@@ -11,7 +11,7 @@ Manager::Manager()
 {
 }
 
-void Manager::load(nlohmann::json &cfg) 
+void Manager::load(nlohmann::json &cfg)
 {
     if (!cfg.is_array()) {
         log_fatal("Invalid resources config type");
@@ -21,22 +21,22 @@ void Manager::load(nlohmann::json &cfg)
     for (const auto& res_cfg: cfg) {
         if (!res_cfg["type"].is_string()) {
             log_error("Failed to load resources. Resource type does not specified");
-            continue;        
+            continue;
         }
         if (!res_cfg["name"].is_string()) {
             log_error("Failed to load resources. Resource name does not specified");
-            continue;        
+            continue;
         }
         if (!res_cfg["path"].is_string()) {
             log_error("Failed to load resources. Resource path does not specified");
-            continue;        
+            continue;
         }
         load_resource(res_cfg["type"], res_cfg["name"], res_cfg["path"]);
     }
 }
 
-void Manager::load_resource(const std::string &type, 
-                            const std::string &name, 
+void Manager::load_resource(const std::string &type,
+                            const std::string &name,
                             const std::string &path)
 {
     if (type == "texture") {
@@ -54,18 +54,19 @@ void Manager::load_resource(const std::string &type,
         }
         _fonts[name] = std::move(f);
     } else {
-        log_error("Failed to load resource, unexpected type: ", type);   
-        return;     
+        log_error("Failed to load resource, "
+                  "unexpected type: ", type, ", name: ", name, ", path: ", path);
+        return;
     }
     log_info("type: ", type, ", name: ", name, ", path: ", path);
 }
 
-sf::Texture *Manager::get_texture(const std::string &name) const
+const sf::Texture *Manager::get_texture(const std::string &name) const
 {
     auto t = _textures.find(name);
     if (t != _textures.end()) {
         return t->second.get();
-    } 
+    }
     log_warn("Texture \"", name, "\" not found");
     t = _textures.find(DEFAULT_RESOURCE_NAME);
     if (t != _textures.end()) {
@@ -75,12 +76,12 @@ sf::Texture *Manager::get_texture(const std::string &name) const
     throw std::runtime_error("Default texture not found");
 }
 
-sf::Font *Manager::get_font(const std::string &name) const
+const sf::Font *Manager::get_font(const std::string &name) const
 {
     auto t = _fonts.find(name);
     if (t != _fonts.end()) {
         return t->second.get();
-    } 
+    }
     log_warn("Font \"", name, "\" not found");
     t = _fonts.find(DEFAULT_RESOURCE_NAME);
     if (t != _fonts.end()) {
