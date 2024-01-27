@@ -18,24 +18,24 @@ Manager::Manager()
 
 void Manager::update(float delta_time)
 {
-    change_scene_if_need();
     if (_scene) {
         _scene->update(delta_time);
     }
+    change_scene_if_need();
 }
 
 void Manager::event_handling(const sf::Event &e)
 {
-    change_scene_if_need();
     if (_scene) {
         _scene->event_handling(e);
     }
+    change_scene_if_need();
 }
 
 void Manager::load_scene(nlohmann::json &cfg)
 {
     log_info("Request scene loading");
-    _instance->_scene_cfg = cfg;
+    _instance->_scene_cfg = std::move(cfg);
     _instance->_requaer_load_scene = true;
 }
 

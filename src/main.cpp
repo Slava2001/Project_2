@@ -44,7 +44,6 @@ int main()
     sf::Clock fps_clock;
     int frame_counter = 0;
     int current_fps = 0;
-    sf::Clock frame_clock;
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -61,7 +60,7 @@ int main()
         }
         Debug_drawer::add_string("FPS: ", current_fps);
 
-        mgr.update(frame_clock.restart().asSeconds());
+        mgr.update(1./Settings.window.fps_limit);
 
         window.clear(sf::Color(0xaaaacc));
         window.draw(mgr);
