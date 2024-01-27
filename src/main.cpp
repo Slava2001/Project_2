@@ -3,6 +3,7 @@
 #define LOG_LVL LOG_LVL_DEBUG
 #include "logger.hpp"
 #include "scene-manager.hpp"
+#include "util.hpp"
 
 #include "SFML/Graphics.hpp"
 #include "SFML/System.hpp"
@@ -24,9 +25,7 @@ int main()
                             Settings.window.title);
     window.setFramerateLimit(Settings.window.fps_limit);
 
-    std::ifstream cfg_file("./resources/cfg.json");
-    nlohmann::json cfg = nlohmann::json::parse(cfg_file);
-    cfg_file.close();
+    nlohmann::json cfg = cfg_from_file("./resources/cfg.json");
 
     if (cfg["debug"].is_null()) {
         log_fatal("Debug config not provided");
@@ -34,12 +33,13 @@ int main()
     }
     Debug_drawer debug_drawer(cfg["debug"]);
 
-    if (cfg["main_scene"].is_null()) {
-        log_fatal("Main scene config not provided");
-        throw std::runtime_error("Main scene config not provided");
+    if (!cfg["main_scene"].is_string()) {
+        log_fatal("Main scene path to config not provided");
+        throw std::runtime_error("Main scene path to config not provided");
     }
+    nlohmann::json main_scene_cfg = cfg_from_file(cfg["main_scene"]);
     Scene::Manager mgr;
-    mgr.load_scene(cfg["main_scene"]);
+    mgr.load_scene(main_scene_cfg);
 
     sf::Clock fps_clock;
     int frame_counter = 0;

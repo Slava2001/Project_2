@@ -17,9 +17,6 @@ namespace GUI
         /// @param res_mngr resources
         Base(nlohmann::json &cfg, const Resources::Manager &res_mngr);
 
-        /// @brief Get element state
-        /// @return true if element is fixed? else false
-        bool is_fixed() const;
         /// @brief Add GUI element
         /// @param ctrl pointer to GUI element
         /// @return true if element added, else false
@@ -37,6 +34,16 @@ namespace GUI
         /// @brief Get element id
         /// @return id string
         std::string get_id();
+
+        /// @brief Get element state
+        /// @return true if element is fixed, else false
+        bool is_fixed() const;
+        /// @brief Get element visibility
+        /// @return true if element is visible, else false
+        bool is_visible() const;
+        /// @brief Set element visibility
+        /// @brief flag value to set
+        void set_visible(bool flag);
 
         /// @brief Update hower
         /// @param mouse_pos relative cursor position
@@ -75,7 +82,7 @@ namespace GUI
         /// @brief on mouse move callback
         /// @param e mouse move event
         virtual void on_mouse_move(const sf::Event::MouseMoveEvent &e);
-        
+
         virtual void draw(sf::RenderTarget &target, const sf::RenderStates &states) const;
 
     protected:
@@ -92,6 +99,7 @@ namespace GUI
         // local bounds (does not include position)
         sf::FloatRect _bounds;
         bool _is_fixed;
+        bool _is_visible;
         // uniq text id for find element
         std::string _id;
     };
