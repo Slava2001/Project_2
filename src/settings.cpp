@@ -24,10 +24,10 @@ struct Settings Settings = {
     }
 };
 
-void Settings::load() 
+void Settings::load()
 {
 }
 
-void Settings::save() 
+void Settings::save()
 {
 }
