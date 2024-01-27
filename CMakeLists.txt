@@ -59,6 +59,7 @@ set(SRC "src/main.cpp"
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -Wno-unused-parameter")
 add_executable(${PROJECT_NAME} ${SRC})
 
+target_link_libraries(LAN_LIB sfml-network)
 target_link_libraries(${PROJECT_NAME} LAN_LIB)
 target_link_libraries(SCENE_LIB LAN_LIB)
 target_link_libraries(${PROJECT_NAME} SCENE_LIB)
