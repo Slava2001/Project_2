@@ -18,7 +18,7 @@ int main()
     sf::err().rdbuf(nullptr);
     time_t seed = time(nullptr);
     log_info("Start. Seed: ", seed);
-    srand(time(nullptr));
+    srand(seed);
 
     sf::RenderWindow window(sf::VideoMode(sf::Vector2u(Settings.window.width,
                                                        Settings.window.height)),
