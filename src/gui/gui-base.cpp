@@ -24,13 +24,15 @@ Base::Base(nlohmann::json &cfg, const Resources::Manager &res_mngr) : _parent(nu
     pos.y = cfg.value("top", 0);
     setPosition(pos);
     _id = cfg.value("id", "");
+    _is_visible = cfg.value("is_visible", true);
 }
 
 bool Base::update_hover(sf::Vector2i mouse_pos, Base *&hover)
 {
     for (int i = _childes.size() - 1; i >= 0; i--)
     {
-        if (_childes[i]->update_hover(mouse_pos - (sf::Vector2i)getPosition(), hover))
+        if (_childes[i]->is_visible() &&
+            _childes[i]->update_hover(mouse_pos - (sf::Vector2i)getPosition(), hover))
         {
             return true;
         }
@@ -110,6 +112,16 @@ bool Base::is_fixed() const
     return _is_fixed;
 }
 
+void Base::set_visible(bool flag)
+{
+    _is_visible = flag;
+}
+
+bool Base::is_visible() const
+{
+    return _is_visible;
+}
+
 void Base::on_click(const sf::Event::MouseButtonEvent &e)
 {
 }
@@ -169,6 +181,9 @@ void Base::draw(sf::RenderTarget &target, const sf::RenderStates &states) const
     sf::RenderStates states_copy(states.transform * getTransform());
     for (Base *c : _childes)
     {
-        target.draw(*c, states_copy);
+        if (c->is_visible())
+        {
+            target.draw(*c, states_copy);
+        }
     }
 }

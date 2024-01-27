@@ -11,6 +11,8 @@ Debug_scene::Debug_scene(nlohmann::json &cfg):
 {
     _gui.get_elem<GUI::Button>("press_me_button")->set_click_callback([=](GUI::Button &) {
         log_info("Press...");
+        GUI::Slider *s = _gui.get_elem<GUI::Slider>("background_color_r");
+        s->set_visible(!s->is_visible());
     });
 }
 

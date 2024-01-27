@@ -29,6 +29,10 @@
                     "type": "boolean",
                     "description": "element can be moved"
                 },
+                "is_visible": {
+                    "type": "boolean",
+                    "description": "Set element visibility"
+                },
                 "left": {
                     "type": "number",
                     "description": "element offset by x in pixels"
@@ -79,6 +83,10 @@
                 "is_fixed": {
                     "type": "boolean",
                     "description": "element can be moved"
+                },
+                "is_visible": {
+                    "type": "boolean",
+                    "description": "Set element visibility"
                 },
                 "left": {
                     "type": "number",
@@ -143,6 +151,10 @@
                     "type": "boolean",
                     "description": "element can be moved"
                 },
+                "is_visible": {
+                    "type": "boolean",
+                    "description": "Set element visibility"
+                },
                 "left": {
                     "type": "number",
                     "description": "element offset by x in pixels"
@@ -197,6 +209,10 @@
                 "is_fixed": {
                     "type": "boolean",
                     "description": "element can be moved"
+                },
+                "is_visible": {
+                    "type": "boolean",
+                    "description": "Set element visibility"
                 },
                 "left": {
                     "type": "number",
