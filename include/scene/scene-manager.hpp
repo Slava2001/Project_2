@@ -7,6 +7,7 @@
 
 #include "scene-base.hpp"
 #include "scene-debug.hpp"
+#include "scene-test-server.hpp"
 
 namespace Scene
 {

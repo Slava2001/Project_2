@@ -65,6 +65,8 @@ std::unique_ptr<Base> Manager::create_scene(nlohmann::json &cfg)
     std::unique_ptr<Base> ptr;
     if (cfg["type"] == "debug") {
         ptr = std::make_unique<Debug_scene>(cfg);
+    } else if (cfg["type"] == "test_server_scene") {
+        ptr = std::make_unique<Test_server_scene>(cfg);
     } else {
         log_fatal("Unexpected scene type: ", cfg["type"]);
         throw std::runtime_error("Unexpected scene type");
