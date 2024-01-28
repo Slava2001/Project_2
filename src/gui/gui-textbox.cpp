@@ -26,7 +26,6 @@ Textbox::Textbox(nlohmann::json &cfg, const Resources::Manager &res_mngr):
     _is_multiline = line_count > 1;
     _text_render.setFillColor(_text_color);
     _text_render.setCharacterSize(char_size);
-
     _line_spasing = _text_render.getFont().getLineSpacing(char_size) *
                     _text_render.getLineSpacing();
 
@@ -36,6 +35,7 @@ Textbox::Textbox(nlohmann::json &cfg, const Resources::Manager &res_mngr):
     _body.setFillColor(_defocus_color);
     _body.setOutlineThickness(_outline_thickness);
     _body.setOutlineColor(_outline_thickness_color);
+    *this << cfg.value("text", "");
 }
 
 void Textbox::on_key_press(const sf::Event::KeyEvent &e)

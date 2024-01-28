@@ -1,5 +1,6 @@
 {
     "debug": {
+        "text_color": "#000000",
         "resources": [
             {
                 "name": "default",

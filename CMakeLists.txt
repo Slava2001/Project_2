@@ -30,7 +30,8 @@ include_directories("${CMAKE_CURRENT_LIST_DIR}/3rdparty/json/include")
 set(LINK_FLAGS "${LINK_FLAGS} -DSFML_STATIC")
 
 include_directories("${CMAKE_CURRENT_LIST_DIR}/include/lan")
-set(LAN_SRC "src/lan/lan-server.cpp")
+set(LAN_SRC "src/lan/lan-manager.cpp"
+            "src/lan/lan-channel.cpp")
 add_library(LAN_LIB STATIC ${LAN_SRC})
 
 include_directories("${CMAKE_CURRENT_LIST_DIR}/include/scene")

@@ -2,6 +2,7 @@
 #include "resources.hpp"
 #include "settings.hpp"
 #include "util.hpp"
+#include "logger.hpp"
 
 using namespace GUI;
 
@@ -73,4 +74,5 @@ void Button::set_click_callback(std::function<void(Button &)> callback)
 
 void Button::default_on_click_callback(Button &btn)
 {
+    log_warn("Click ignored. Button id: \"", btn.get_id(), "\"");
 }

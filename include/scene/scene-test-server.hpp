@@ -4,7 +4,7 @@
 #include "SFML/Graphics.hpp"
 #include "scene-base.hpp"
 #include "gui-manager.hpp"
-#include "lan-server.hpp"
+#include "lan-manager.hpp"
 
 namespace Scene
 {
@@ -25,7 +25,11 @@ namespace Scene
         void draw(sf::RenderTarget &target, const sf::RenderStates &states) const;
     private:
         GUI::Manager _gui;
-        Lan::Server _server;
+        Lan::Manager _server;
+        Lan::Channel *_input_channel;
+        Lan::Channel *_output_channel;
+        GUI::Textbox *_text_out;
+        bool _is_server;
     };
 
 }
