@@ -97,7 +97,6 @@ void Manager::update()
         }
 
         if (status == sf::Socket::Status::Done) {
-            std::cout << std::endl;
             log_debug("Send to ", c.second._addr.toString(), ":", c.second._port,
                       " len: ", c.second.get_packet()->getDataSize(),
                       " tag: ", (int)c.second.get_packet()->get_tag(),
