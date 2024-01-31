@@ -1,5 +1,6 @@
 #include "lan-manager.hpp"
-#define LOG_LVL LOG_LVL_INFO
+#include "lan-packet.hpp"
+#define LOG_LVL LOG_LVL_DEBUG
 #include "logger.hpp"
 
 #include <cstring>
@@ -18,7 +19,12 @@ void Manager::start(uint16_t port)
     }
     _socket.setBlocking(false);
     _is_started = true;
-    log_info("Server started. Port: ", port);
+    log_info("Server started. Port: ", get_port());
+}
+
+uint16_t Manager::get_port()
+{
+    return _socket.getLocalPort();
 }
 
 void Manager::stop()
@@ -34,6 +40,7 @@ Channel* Manager::open(sf::IpAddress addr, uint16_t port)
 {
     _channels[addr.toInteger()].set_addr(addr);
     _channels[addr.toInteger()].set_port(port);
+    log_debug("Open channel ", addr.toString(), ":", port);
     return &_channels[addr.toInteger()];
 }
 
@@ -82,17 +89,15 @@ void Manager::update()
 // send ////////////////////////////////////////////////////////////////////////////////////////////
 
     for (auto &c: _channels) {
-        if (c.first == sf::IpAddress::Any.toInteger()) {
-            continue;
-        }
         if (!c.second.has_packet_to_send()) {
             continue;
         }
 
-        sf::Socket::Status status = _socket.send(*c.second.get_packet(), c.second._addr,
-                                                 c.second._port);
+        sf::Socket::Status status = _socket.send(*c.second.get_packet(), c.second.get_addr(),
+                                                 c.second.get_port());
         if (status == sf::Socket::Status::Error) {
-            log_fatal("Failed to send data to ", c.second._addr.toString(), ":", c.second._port);
+            log_fatal("Failed to send data to ", c.second.get_addr().toString(), ":",
+                                                 c.second.get_port());
             throw std::runtime_error("Failed to send data");
         }
 

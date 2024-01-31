@@ -13,12 +13,13 @@ class Manager {
 public:
     Manager();
 
-    void start(uint16_t port);
+    void start(uint16_t port = sf::UdpSocket::AnyPort);
     void stop();
     Channel* open();
     Channel* open(sf::IpAddress addr, uint16_t port);
     void close(Channel *channel);
 
+    uint16_t get_port();
     void update();
 
 private:

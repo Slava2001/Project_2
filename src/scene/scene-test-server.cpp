@@ -14,14 +14,10 @@ Test_server_scene::Test_server_scene(nlohmann::json &cfg):
     _input_channel(nullptr),
     _output_channel(nullptr)
 {
-    _input_channel = _server.open();
-
     _text_out = _gui.get_elem<GUI::Textbox>("text_out");
     _gui.get_elem<GUI::Textbox>("input")->set_enter_callback([&](GUI::Textbox &t) {
         if (_output_channel) {
-            Lan::Packet packet;
-            packet.set_tag(0x00);
-            packet.set_important(true);
+            Lan::Packet packet(Lan::Packet::TAG_STRING);
             packet << t.get_text();
             _output_channel->send(packet);
         }
@@ -47,20 +43,17 @@ Test_server_scene::Test_server_scene(nlohmann::json &cfg):
         GUI::Panel *menu = _gui.get_elem<GUI::Panel>("menu");
         GUI::Textbox *port_textbox = _gui.get_elem<GUI::Textbox>("port_input");
         GUI::Textbox *ip_textbox = _gui.get_elem<GUI::Textbox>("ip_input");
-        GUI::Textbox *my_port_textbox = _gui.get_elem<GUI::Textbox>("my_port_input");
         std::stringstream port_str(port_textbox->get_text());
-        std::stringstream my_port_str(my_port_textbox->get_text());
-        uint16_t port, my_port;
+        uint16_t port;
         port_str >> port;
-        my_port_str >> my_port;
-        _server.start(my_port);
+        _server.start();
 
         std::optional<sf::IpAddress> addr = sf::IpAddress::resolve(ip_textbox->get_text());
         if (addr.has_value()) {
             _output_channel = _server.open(addr.value(), port);
             messager->set_visible(true);
             menu->set_visible(false);
-            Lan::Packet packet;
+            Lan::Packet packet(Lan::Packet::TAG_STRING);
             _output_channel->send(packet);
         } else {
             ip_textbox->clear();
@@ -73,15 +66,11 @@ void Test_server_scene::update(float delta_time)
     _server.update();
 
     Lan::Packet packet;
-
-
     if (_input_channel && _input_channel->recv(packet) == Lan::Status::OK) {
         _output_channel = _server.open(packet.get_sender_addr(),
                                     packet.get_sender_port());
         *_text_out << "[" << packet.get_sender_addr().toString() << "] *connected*\n";
-        Lan::Packet ans;
-        ans.set_tag(0x00);
-        ans.set_important(true);
+        Lan::Packet ans(Lan::Packet::TAG_STRING);
         ans << "Wellcom!";
         _output_channel->send(ans);
     }
