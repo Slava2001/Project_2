@@ -1,6 +1,6 @@
 #include "settings.hpp"
 #include "debug-drawer.hpp"
-#define LOG_LVL LOG_LVL_DEBUG
+#define LOG_LVL LOG_LVL_INFO
 #include "logger.hpp"
 #include "scene-manager.hpp"
 #include "util.hpp"

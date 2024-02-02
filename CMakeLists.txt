@@ -32,6 +32,7 @@ set(LINK_FLAGS "${LINK_FLAGS} -DSFML_STATIC")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/include/lan")
 set(LAN_SRC "src/lan/lan-manager.cpp"
             "src/lan/lan-channel.cpp"
+            "src/lan/lan-recv-channel.cpp"
             "src/lan/lan-packet.cpp")
 add_library(LAN_LIB STATIC ${LAN_SRC})
 

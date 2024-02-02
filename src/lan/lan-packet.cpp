@@ -6,11 +6,19 @@
 
 using namespace Lan;
 
-Packet::Packet() : _tag(Packet::TAG_UNDEFINED), _addr(sf::IpAddress::Any)
+Packet::Packet():
+    _tag(Packet::TAG_UNDEFINED),
+    _sequence_counter(0),
+    _addr(sf::IpAddress::Any),
+    _port(0)
 {
 }
 
-Packet::Packet(Packet::Tag tag) : _tag(tag), _addr(sf::IpAddress::Any)
+Packet::Packet(Packet::Tag tag):
+    _tag(tag),
+    _sequence_counter(0),
+    _addr(sf::IpAddress::Any),
+    _port(0)
 {
 }
 

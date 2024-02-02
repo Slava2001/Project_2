@@ -26,8 +26,9 @@ namespace Scene
     private:
         GUI::Manager _gui;
         Lan::Manager _server;
-        Lan::Channel *_input_channel;
-        Lan::Channel *_output_channel;
+        Lan::Recv_channel *_recv_channel;
+        std::vector<Lan::Channel *> _client_channels;
+        Lan::Channel *_client_channel;
         GUI::Textbox *_text_out;
         bool _is_server;
     };

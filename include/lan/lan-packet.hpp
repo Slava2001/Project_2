@@ -35,13 +35,13 @@ private:
     static const unsigned _header_size = sizeof(uint8_t) + sizeof(uint32_t);
 
     sf::Packet tmp;
-    bool _is_important;
     Tag _tag;
     uint32_t _sequence_counter;
     sf::IpAddress _addr;
     uint16_t _port;
 
     friend class Channel;
+    friend class Recv_channel;
     void set_sequence_counter(uint32_t counter);
     void set_sender_addr(const sf::IpAddress &addr);
     void set_sender_port(uint16_t port);

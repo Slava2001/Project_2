@@ -1,6 +1,6 @@
 #include "lan-manager.hpp"
 #include "lan-packet.hpp"
-#define LOG_LVL LOG_LVL_DEBUG
+#define LOG_LVL LOG_LVL_INFO
 #include "logger.hpp"
 
 #include <cstring>
@@ -31,22 +31,30 @@ void Manager::stop()
 {
 }
 
-Channel* Manager::open()
+Recv_channel* Manager::get_default_channel()
 {
-    return open(sf::IpAddress::Any, 0);
+    return &_default_channel;
+}
+
+uint64_t Manager::get_addr_hash(const sf::IpAddress &addr, uint16_t port)
+{
+    return ((((uint64_t)addr.toInteger()) << 32) | port);
 }
 
 Channel* Manager::open(sf::IpAddress addr, uint16_t port)
 {
-    _channels[addr.toInteger()].set_addr(addr);
-    _channels[addr.toInteger()].set_port(port);
+    Channel* channel = &_channels[get_addr_hash(addr, port)];
+    channel->set_addr(addr);
+    channel->set_port(port);
     log_debug("Open channel ", addr.toString(), ":", port);
-    return &_channels[addr.toInteger()];
+    return channel;
 }
 
 void Manager::close(Channel *channel)
 {
-    _channels.erase(channel->_addr.toInteger());
+    if (channel) {
+        _channels.erase(get_addr_hash(channel->get_addr(), channel->get_port()));
+    }
 }
 
 void Manager::update()
@@ -74,19 +82,33 @@ void Manager::update()
         if (!client_addr.has_value()) {
             log_warn("Client has not addres");
         } else {
-            auto it = _channels.find(client_addr.value().toInteger());
+            auto it = _channels.find(get_addr_hash(client_addr.value(), client_port));
             if (it != _channels.end()) {
                 it->second.take_packet(&packet, client_addr.value(), client_port);
             } else {
-                auto it = _channels.find(sf::IpAddress::Any.toInteger());
-                if (it != _channels.end()) {
-                    it->second.take_packet(&packet, client_addr.value(), client_port);
-                }
+                _default_channel.take_packet(&packet, client_addr.value(), client_port);
             }
         }
     }
 
 // send ////////////////////////////////////////////////////////////////////////////////////////////
+
+    if (_default_channel.has_packet_to_send()) {
+        sf::Socket::Status status = _socket.send(*_default_channel.get_packet(),
+                                                 _default_channel.get_addr(),
+                                                 _default_channel.get_port());
+        if (status == sf::Socket::Status::Error) {
+            log_fatal("Failed to send ACK to ", _default_channel.get_addr().toString(), ":",
+                                                _default_channel.get_port());
+            throw std::runtime_error("Failed to send ACK");
+        }
+
+        if (status == sf::Socket::Status::Done) {
+            log_debug("Send ACK to ", _default_channel.get_addr().toString(), ":",
+                                      _default_channel.get_port());
+            _default_channel.pop_packet();
+        }
+    }
 
     for (auto &c: _channels) {
         if (!c.second.has_packet_to_send()) {
@@ -102,7 +124,7 @@ void Manager::update()
         }
 
         if (status == sf::Socket::Status::Done) {
-            log_debug("Send to ", c.second._addr.toString(), ":", c.second._port,
+            log_debug("Send to ", c.second.get_addr().toString(), ":", c.second.get_port(),
                       " len: ", c.second.get_packet()->getDataSize(),
                       " tag: ", (int)c.second.get_packet()->get_tag(),
                       " sequence counter: ", c.second.get_packet()->get_sequence_counter());
