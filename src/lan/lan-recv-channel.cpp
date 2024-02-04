@@ -20,7 +20,7 @@ Status Recv_channel::recv(struct Packet &packet)
     if (_recv_buff.empty()) {
         return Status::NOT_READY;
     }
-    packet = _recv_buff.front();
+    packet = std::move(_recv_buff.front());
     _recv_buff.pop();
     return Status::OK;
 }
@@ -32,7 +32,9 @@ Status Recv_channel::get_status()
 
 void Recv_channel::reset()
 {
-
+    _status = Status::OK;
+    _send_buff = std::queue<Lan::Packet>();
+    _recv_buff= std::queue<Lan::Packet>();
 }
 
 const sf::IpAddress& Recv_channel::get_addr() const
