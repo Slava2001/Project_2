@@ -12,7 +12,7 @@ Recv_channel::Recv_channel():
 
 }
 
-Status Recv_channel::recv(struct Packet &packet)
+Status Recv_channel::recv(Packet &packet)
 {
     if (_status != Status::OK) {
         return _status;
@@ -62,11 +62,12 @@ void Recv_channel::pop_packet()
     _send_buff.pop();
 }
 
-Status Recv_channel::send_not_important(const struct Packet &packet)
+Status Recv_channel::send_not_important(const Packet &packet)
 {
-    if (_send_buff.size() >= packet_buffer_max_len) {
+    if (_send_buff.size() >= PACKET_BUFFER_MAX_LEN) {
         log_warn("Send queue is full");
-        return Status::NOT_READY;
+        _status = Status::OVERFLOW;
+        return Status::OVERFLOW;
     }
     _send_buff.push(packet);
     return Status::OK;
@@ -98,12 +99,13 @@ Status Recv_channel::take_packet(Packet *packet, sf::IpAddress addr, uint16_t po
         return Status::OK;
     }
 
-    if (_recv_buff.size() >= packet_buffer_max_len) {
+    if (_recv_buff.size() >= PACKET_BUFFER_MAX_LEN) {
         log_warn("Recv buffer is full. Drop packet from ", addr.toString(), ":", port);
         if (packet->is_important()) {
             log_error("Droped important packet");
         }
-        return Status::NOT_READY;
+        _status = Status::OVERFLOW;
+        return Status::OVERFLOW;
     }
 
     _recv_buff.push(*packet);

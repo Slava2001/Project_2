@@ -13,14 +13,14 @@
 namespace Lan {
 
     // time before re-sending an important packet if confirmation is not received
-    constexpr sf::Time time_between_resends = sf::milliseconds(125);
+    constexpr sf::Time TIME_BETWEEN_RESENDS = sf::milliseconds(125);
     // The number of attempts to send an important message.
     // If within the specified number of times it was not possible to receive a response,
     // the connection is considered broken
-    constexpr unsigned resends_count = 3;
+    constexpr unsigned RESENDS_COUNT = 24;
     // Maximum downtime. If the channel does not receive packets within this time,
     // it sends a PING to check communication
-    constexpr sf::Time time_between_pings = sf::milliseconds(1000);
+    constexpr sf::Time TIME_BETWEEN_PINGS = sf::milliseconds(1000);
 
     /// @brief Lan channel
     class Channel: public Recv_channel {
@@ -30,7 +30,7 @@ namespace Lan {
         /// @brief Send packet
         /// @param packet packet to send
         /// @return channel status
-        Status send(const struct Packet &packet);
+        Status send(const Packet &packet);
         /// @brief reset channel state
         virtual void reset() override;
         /// @brief Get the address to which the channel is attached
@@ -52,16 +52,16 @@ namespace Lan {
 
         bool _waiting_ack;
         sf::Clock _waiting_time;
-        unsigned _resend_count;
+        unsigned _resends_count;
         sf::Clock _time_since_last_receipt;
         /// @brief Send an important package
         /// @param packet packet send
         /// @return channel status
-        Status send_important(const struct Packet &packet);
+        Status send_important(const Packet &packet);
         /// @brief Send an not important package
         /// @param packet packet send
         /// @return channel status
-        Status send_not_important(const struct Packet &packet) override;
+        Status send_not_important(const Packet &packet) override;
 
         friend class Manager;
         /// @brief Set the address to which the channel is attached

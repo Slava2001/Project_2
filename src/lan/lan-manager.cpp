@@ -19,7 +19,7 @@ void Manager::start(uint16_t port)
     }
     _socket.setBlocking(false);
     _is_started = true;
-    log_info("Server started. Port: ", get_port());
+    log_info("Listener started. Port: ", get_port());
 }
 
 uint16_t Manager::get_port()
@@ -29,6 +29,7 @@ uint16_t Manager::get_port()
 
 void Manager::stop()
 {
+    _is_started = false;
 }
 
 Recv_channel* Manager::get_default_channel()
@@ -111,24 +112,22 @@ void Manager::update()
     }
 
     for (auto &c: _channels) {
-        if (!c.second.has_packet_to_send()) {
-            continue;
-        }
+        while (c.second.has_packet_to_send()) {
+            sf::Socket::Status status = _socket.send(*c.second.get_packet(), c.second.get_addr(),
+                                                    c.second.get_port());
+            if (status == sf::Socket::Status::Error) {
+                log_fatal("Failed to send data to ", c.second.get_addr().toString(), ":",
+                                                    c.second.get_port());
+                throw std::runtime_error("Failed to send data");
+            }
 
-        sf::Socket::Status status = _socket.send(*c.second.get_packet(), c.second.get_addr(),
-                                                 c.second.get_port());
-        if (status == sf::Socket::Status::Error) {
-            log_fatal("Failed to send data to ", c.second.get_addr().toString(), ":",
-                                                 c.second.get_port());
-            throw std::runtime_error("Failed to send data");
-        }
-
-        if (status == sf::Socket::Status::Done) {
-            log_debug("Send to ", c.second.get_addr().toString(), ":", c.second.get_port(),
-                      " len: ", c.second.get_packet()->getDataSize(),
-                      " tag: ", (int)c.second.get_packet()->get_tag(),
-                      " sequence counter: ", c.second.get_packet()->get_sequence_counter());
-            c.second.pop_packet();
+            if (status == sf::Socket::Status::Done) {
+                log_debug("Send to ", c.second.get_addr().toString(), ":", c.second.get_port(),
+                        " len: ", c.second.get_packet()->getDataSize(),
+                        " tag: ", (int)c.second.get_packet()->get_tag(),
+                        " sequence counter: ", c.second.get_packet()->get_sequence_counter());
+                c.second.pop_packet();
+            }
         }
     }
 

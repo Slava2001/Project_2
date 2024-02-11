@@ -66,6 +66,7 @@ void Debug_drawer::draw(sf::RenderTarget &target, const sf::RenderStates &states
     sf::Text tx(*_instance->_resources.get_font(DEFAULT_RESOURCE_NAME));
     tx.setCharacterSize(Settings.text.debug_text_size);
     tx.setFillColor(_text_color);
+    tx.setOutlineThickness(2);
     for (std::size_t i = 0; i < _text_lines.size(); i++)
     {
         tx.setString(_text_lines[i]);

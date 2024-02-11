@@ -24,6 +24,8 @@ namespace Lan {
             CHANNEL_TAG_ACK = 0x01,
             // important tags:
             CHANNEL_TAG_PING = 0x80,
+            TAG_REQUEST_SLOT = 0x81,
+            TAG_CONFIRM_CONNECT = 0x82,
             TAG_STRING,
             TAG_COUNT = 0x100
         };
@@ -55,7 +57,7 @@ namespace Lan {
     private:
         static const unsigned _header_size = sizeof(uint8_t) + sizeof(uint32_t);
 
-        sf::Packet tmp;
+        sf::Packet _tmp;
         Tag _tag;
         uint32_t _sequence_counter;
         sf::IpAddress _addr;

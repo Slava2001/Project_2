@@ -64,13 +64,13 @@ void Packet::set_sender_port(uint16_t port)
 
 const void* Packet::onSend(std::size_t& size)
 {
-    tmp.clear();
+    _tmp.clear();
     uint8_t tag = (uint8_t)_tag;
-    tmp << tag;
-    tmp << _sequence_counter;
-    tmp.append(getData(), getDataSize());
-    size = tmp.getDataSize();
-    return tmp.getData();
+    _tmp << tag;
+    _tmp << _sequence_counter;
+    _tmp.append(getData(), getDataSize());
+    size = _tmp.getDataSize();
+    return _tmp.getData();
 }
 
 void Packet::onReceive(const void* data, std::size_t size)
@@ -79,11 +79,11 @@ void Packet::onReceive(const void* data, std::size_t size)
         return;
     }
 
-    tmp.clear();
-    tmp.append(data, _header_size);
+    _tmp.clear();
+    _tmp.append(data, _header_size);
     uint8_t tag;
-    tmp >> tag;
+    _tmp >> tag;
     _tag = (Packet::Tag)tag;
-    tmp >> _sequence_counter;
+    _tmp >> _sequence_counter;
     append((uint8_t *)data + _header_size, size - _header_size);
 }

@@ -12,13 +12,14 @@
 namespace Lan {
 
     // packet queue size
-    constexpr unsigned packet_buffer_max_len = 64;
+    constexpr unsigned PACKET_BUFFER_MAX_LEN = 64;
 
     enum class Status {
         OK,
         NOT_READY,
         TIMEOUT,
-        ERROR
+        ERROR,
+        OVERFLOW
     };
 
     /// @brief Receiving channel. This channel can only be used to receive packets.
@@ -29,7 +30,7 @@ namespace Lan {
         /// @brief Get received packet
         /// @param packet received packet
         /// @return channel status
-        Status recv(struct Packet &packet);
+        Status recv(Packet &packet);
         /// @brief Get channel status
         /// @return channel status
         Status get_status();
@@ -47,7 +48,7 @@ namespace Lan {
         /// @brief Send an important package
         /// @param packet packet send
         /// @return channel status
-        virtual Status send_not_important(const struct Packet &packet);
+        virtual Status send_not_important(const Packet &packet);
 
         friend class Manager;
         /// @brief Get the address to which the channel is attached

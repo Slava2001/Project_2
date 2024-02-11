@@ -1,5 +1,5 @@
 #include "lan-channel.hpp"
-#define LOG_LVL LOG_LVL_INFO
+#define LOG_LVL LOG_LVL_DEBUG
 #include "logger.hpp"
 
 #include <cstring>
@@ -14,9 +14,8 @@ Channel::Channel():
     _recv_sequence_counter(0),
     _recv_important_sequence_counter(0),
     _waiting_ack(false),
-    _resend_count(0)
+    _resends_count(0)
 {
-
 }
 
 void Channel::reset()
@@ -28,7 +27,7 @@ void Channel::reset()
     _recv_important_sequence_counter = 0;
     _waiting_ack = false;
     _waiting_time.reset();
-    _resend_count = 0;
+    _resends_count = 0;
     _time_since_last_receipt.reset();
     _send_buff = std::queue<Lan::Packet>();
     _send_important_buff = std::queue<Lan::Packet>();
@@ -46,10 +45,12 @@ Status Channel::send(const Packet &packet)
     return send_not_important(packet);
 }
 
-Status Channel::send_important(const struct Packet &packet)
+Status Channel::send_important(const Packet &packet)
 {
-    if (_send_important_buff.size() >= packet_buffer_max_len) {
-        return Status::NOT_READY;
+    if (_send_important_buff.size() >= PACKET_BUFFER_MAX_LEN) {
+        log_warn("Send queue is full");
+        _status = Status::OVERFLOW;
+        return Status::OVERFLOW;
     }
     _send_important_buff.push(packet);
     _send_important_buff.back().set_sequence_counter(_send_important_sequence_counter);
@@ -57,10 +58,12 @@ Status Channel::send_important(const struct Packet &packet)
     return Status::OK;
 }
 
-Status Channel::send_not_important(const struct Packet &packet)
+Status Channel::send_not_important(const Packet &packet)
 {
-    if (_send_buff.size() >= packet_buffer_max_len) {
-        return Status::NOT_READY;
+    if (_send_buff.size() >= PACKET_BUFFER_MAX_LEN) {
+        log_warn("Send queue is full");
+        _status = Status::OVERFLOW;
+        return Status::OVERFLOW;
     }
     _send_buff.push(packet);
     _send_buff.back().set_sequence_counter(_send_sequence_counter);
@@ -99,7 +102,7 @@ bool Channel::has_packet_to_send()
     if (_status != Status::OK) {
         return false;
     }
-    if (_time_since_last_receipt.getElapsedTime() >= time_between_pings) {
+    if (_time_since_last_receipt.getElapsedTime() >= TIME_BETWEEN_PINGS) {
         _time_since_last_receipt.restart();
         Packet ping(Packet::CHANNEL_TAG_PING);
         if (send_important(ping) != Status::OK) {
@@ -107,13 +110,16 @@ bool Channel::has_packet_to_send()
         }
         log_debug("Send PING to ", _addr.toString(), ":", _port);
     }
-    if (_waiting_time.isRunning() && _waiting_time.getElapsedTime() > time_between_resends) {
-        _resend_count++;
-        if (_resend_count > resends_count) {
+    if (_waiting_time.isRunning() && _waiting_time.getElapsedTime() > TIME_BETWEEN_RESENDS) {
+        _resends_count++;
+        log_debug("Re-send ", _resends_count, "/", RESENDS_COUNT);
+        if (_resends_count > RESENDS_COUNT) {
             log_warn("Re-send timeout. addr: ", _addr.toString(), ":", _port);
             _status = Status::TIMEOUT;
+            _waiting_time.reset();
             return false;
         }
+        _waiting_time.restart();
         _waiting_ack = false;
     }
     return (!_send_important_buff.empty() && !_waiting_ack) || !_send_buff.empty();
@@ -194,12 +200,13 @@ Status Channel::take_packet(Packet *packet, sf::IpAddress addr, uint16_t port)
         return Status::OK;
     }
 
-    if (_recv_buff.size() >= packet_buffer_max_len) {
+    if (_recv_buff.size() >= PACKET_BUFFER_MAX_LEN) {
         log_warn("Recv buffer is full. Drop packet from ", addr.toString(), ":", port);
         if (packet->is_important()) {
             log_error("Droped important packet");
         }
-        return Status::NOT_READY;
+        _status = Status::OVERFLOW;
+        return Status::OVERFLOW;
     }
 
     _recv_buff.push(*packet);
