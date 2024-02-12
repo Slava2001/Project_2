@@ -22,11 +22,11 @@ namespace Lan {
             // not important tags:
             TAG_UNDEFINED = 0x00,
             CHANNEL_TAG_ACK = 0x01,
+            TAG_STRING,
             // important tags:
             CHANNEL_TAG_PING = 0x80,
             TAG_REQUEST_SLOT = 0x81,
             TAG_CONFIRM_CONNECT = 0x82,
-            TAG_STRING,
             TAG_COUNT = 0x100
         };
 

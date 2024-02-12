@@ -1,4 +1,4 @@
-#define LOG_LVL LOG_LVL_DEBUG
+#define LOG_LVL LOG_LVL_INFO
 #include "logger.hpp"
 #include "lan-server.hpp"
 #include "debug-drawer.hpp"
@@ -9,7 +9,6 @@ Server::Server(uint16_t port)
 {
     _manager.start(port);
     _default_channel = _manager.get_default_channel();
-
 }
 
 Server::~Server()
@@ -48,6 +47,7 @@ void Server::update()
 
     if (_clients_to_erase.size() > 0) {
         for (const auto &c: _clients_to_erase) {
+            _manager.close(c->_channel);
             _clients.erase(c);
         }
         _clients_to_erase.clear();
@@ -64,10 +64,10 @@ void Server::client_disconnect(std::shared_ptr<Client> client)
 void Server::client_sends_to_others(std::shared_ptr<Client> client, const Packet &packet)
 {
     for (const auto &c: _clients) {
-        if (c != client) {
+        if (c != client && _clients_to_erase.find(c) == _clients_to_erase.end()) {
             if (c->_channel->send(packet) != Status::OK) {
                 log_error("Failed to send packet to client");
-                client_disconnect(client);
+                client_disconnect(c);
             }
         }
     }

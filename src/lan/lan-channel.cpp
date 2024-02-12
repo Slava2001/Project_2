@@ -1,5 +1,5 @@
 #include "lan-channel.hpp"
-#define LOG_LVL LOG_LVL_DEBUG
+#define LOG_LVL LOG_LVL_INFO
 #include "logger.hpp"
 
 #include <cstring>
