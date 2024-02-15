@@ -36,6 +36,7 @@ private:
     std::vector<sf::FloatRect> _rects;
     Resources::Manager _resources;
     static Debug_drawer *_instance;
+    sf::Color _text_color;
 };
 
 template <>

@@ -2,6 +2,7 @@
 #include "settings.hpp"
 #include "resources.hpp"
 #include "logger.hpp"
+#include "util.hpp"
 
 Debug_drawer *Debug_drawer::_instance = nullptr;
 
@@ -15,6 +16,7 @@ Debug_drawer::Debug_drawer(nlohmann::json &cfg)
     if (!cfg["resources"].is_null()) {
         _resources.load(cfg["resources"]);
     }
+    _text_color = color_from_string(cfg.value("text_color", "#000000"));
 }
 
 template <>
@@ -63,7 +65,8 @@ void Debug_drawer::draw(sf::RenderTarget &target, const sf::RenderStates &states
 
     sf::Text tx(*_instance->_resources.get_font(DEFAULT_RESOURCE_NAME));
     tx.setCharacterSize(Settings.text.debug_text_size);
-
+    tx.setFillColor(_text_color);
+    tx.setOutlineThickness(2);
     for (std::size_t i = 0; i < _text_lines.size(); i++)
     {
         tx.setString(_text_lines[i]);

@@ -1,5 +1,6 @@
 {
     "debug": {
+        "text_color": "#FFFFFF",
         "resources": [
             {
                 "name": "default",
@@ -8,5 +9,5 @@
             }
         ]
     },
-    "main_scene": "./resources/debug_scene_cfg.json"
+    "main_scene": "./resources/test_server_scene.json"
 }

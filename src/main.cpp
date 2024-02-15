@@ -1,6 +1,6 @@
 #include "settings.hpp"
 #include "debug-drawer.hpp"
-#define LOG_LVL LOG_LVL_DEBUG
+#define LOG_LVL LOG_LVL_INFO
 #include "logger.hpp"
 #include "scene-manager.hpp"
 #include "util.hpp"
@@ -18,7 +18,7 @@ int main()
     sf::err().rdbuf(nullptr);
     time_t seed = time(nullptr);
     log_info("Start. Seed: ", seed);
-    srand(time(nullptr));
+    srand(seed);
 
     sf::RenderWindow window(sf::VideoMode(sf::Vector2u(Settings.window.width,
                                                        Settings.window.height)),

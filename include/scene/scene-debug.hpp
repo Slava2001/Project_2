@@ -4,7 +4,6 @@
 #include "SFML/Graphics.hpp"
 #include "scene-base.hpp"
 #include "gui-manager.hpp"
-#include "gui-manager.hpp"
 
 namespace Scene
 {
