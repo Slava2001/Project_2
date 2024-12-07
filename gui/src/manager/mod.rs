@@ -1,5 +1,5 @@
-mod manager;
 mod input_event;
+mod manager;
 
-pub use manager::Manager;
 pub use input_event::{InputEvent, MouseButton};
+pub use manager::Manager;

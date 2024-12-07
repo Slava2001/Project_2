@@ -1,5 +1,5 @@
-mod widget;
 mod base_widget;
+mod widget;
 
-pub use widget::Widget;
 pub use base_widget::BaseWidget;
+pub use widget::Widget;

@@ -5,7 +5,7 @@ pub struct BaseWidget {}
 
 impl BaseWidget {
     pub fn new() -> Self {
-        Self {  }
+        Self {}
     }
 }
 

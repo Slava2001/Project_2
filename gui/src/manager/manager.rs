@@ -1,11 +1,14 @@
-use crate::{renderer::{Drawble, Rect, Renderer}, widget::BaseWidget};
+use crate::{
+    renderer::{Drawble, Rect, Renderer},
+    widget::BaseWidget,
+};
 
 use super::InputEvent;
 
 pub struct Manager {
     root: BaseWidget,
     rect: Rect<f64>,
-    bound: bool
+    bound: bool,
 }
 
 impl Manager {
@@ -16,7 +19,7 @@ impl Manager {
     pub fn handle_event(&mut self, event: InputEvent) {
         match event {
             InputEvent::MouseClick(_mouse_button) => todo!(),
-            InputEvent::MouseMove(x, y) => self.bound = self.rect.check_bounds(x, y)
+            InputEvent::MouseMove(x, y) => self.bound = self.rect.check_bounds(x, y),
         }
     }
 }

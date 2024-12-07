@@ -35,12 +35,14 @@ struct PistonRenderer<'a> {
 
 impl<'a> Renderer for PistonRenderer<'a> {
     fn draw_border(&mut self, rect: &Rect<f64>, w: f64, c: &Color) {
-        Rectangle::new([0.0; 4]).border(Border { color: Into::<[f32; 4]>::into(c), radius: w }).draw(
-            [rect.x, rect.y, rect.h, rect.w],
-            &DrawState::default(),
-            self.ctx.transform,
-            self.g,
-        );
+        Rectangle::new([0.0; 4])
+            .border(Border { color: Into::<[f32; 4]>::into(c), radius: w })
+            .draw(
+                [rect.x, rect.y, rect.h, rect.w],
+                &DrawState::default(),
+                self.ctx.transform,
+                self.g,
+            );
     }
 }
 
@@ -60,7 +62,7 @@ fn run() -> Result<(), Error> {
         if let Some(args) = e.render_args() {
             gl.draw(args.viewport(), |c, g| {
                 clear([1.0; 4], g);
-                let mut renderer = PistonRenderer {ctx: c, g: g};
+                let mut renderer = PistonRenderer { ctx: c, g: g };
                 gui.draw(&mut renderer);
             });
         }

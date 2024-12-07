@@ -1,4 +1,3 @@
 use crate::renderer::Drawble;
 
-pub trait Widget: Drawble {
-}
+pub trait Widget: Drawble {}

@@ -1,7 +1,7 @@
 pub enum MouseButton {
     Left,
     Right,
-    Midle
+    Midle,
 }
 
 pub enum InputEvent {
