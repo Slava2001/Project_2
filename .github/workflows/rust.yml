@@ -35,11 +35,13 @@ jobs:
     name: Build (Ubuntu)
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Build
         run: cargo build --release
   build_windows:
     name: Build (Windows)
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Build
         run: cargo build --release
