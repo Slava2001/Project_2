@@ -55,10 +55,12 @@ impl Widget for BaseWidget {
 }
 
 impl Drawble for BaseWidget {
-    fn draw(&self, renderer: &mut dyn Renderer) {
-        renderer.draw_rect(&self.rect, &self.color);
+    fn draw(&self, renderer: &mut dyn Renderer, state: &dyn crate::renderer::State) {
+        renderer.draw_rect(state, &self.rect, &self.color);
+        let mut new_state = state.boxed_clone();
+        new_state.translate(self.rect.x, self.rect.y);
         for c in self.childs.iter() {
-            c.borrow().draw(renderer);
+            c.borrow().draw(renderer, new_state.as_ref());
         }
     }
 }

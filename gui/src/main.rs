@@ -3,6 +3,7 @@ use glutin_window::GlutinWindow as Window;
 use graphics::{clear, Context, DrawState, Rectangle};
 use gui::manager::input_event::{self, InputEvent};
 use gui::manager::Manager;
+use gui::renderer::State;
 use gui::renderer::{color::Color, Drawble, Rect, Renderer};
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
@@ -28,14 +29,26 @@ impl Error {
     }
 }
 
+struct PistonState {
+}
+
+impl<'a> State<'a> for PistonState {
+    fn boxed_clone(&self) -> Box<dyn State> {
+        Box::new(PistonState {})
+    }
+
+    fn translate(&mut self, _x: f64, _y: f64) {
+    }
+}
+
 struct PistonRenderer<'a> {
-    ctx: Context,
     g: &'a mut GlGraphics,
+    ctx: Context
 }
 
 impl<'a> Renderer for PistonRenderer<'a> {
-    fn draw_rect(&mut self, rect: &Rect<f64>, c: &Color) {
-        Rectangle::new(c.into()).draw(
+    fn draw_rect(&mut self, _state: &dyn State, rect: &Rect<f64>, color: &Color) {
+        Rectangle::new(color.into()).draw(
             [rect.x, rect.y, rect.h, rect.w],
             &DrawState::default(),
             self.ctx.transform,
@@ -61,7 +74,7 @@ fn run() -> Result<(), Error> {
             gl.draw(args.viewport(), |c, g| {
                 clear([1.0; 4], g);
                 let mut renderer = PistonRenderer { ctx: c, g: g };
-                gui.draw(&mut renderer);
+                gui.draw(&mut renderer, &PistonState {});
             });
         }
 

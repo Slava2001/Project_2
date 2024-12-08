@@ -1,6 +1,6 @@
 use std::{cell::RefCell, rc::Rc};
 
-use crate::renderer::{color, Drawble, Renderer};
+use crate::renderer::{color, Drawble, Renderer, State};
 
 use super::{
     input_event::InputEvent,
@@ -52,9 +52,12 @@ impl Manager {
 }
 
 impl Drawble for Manager {
-    fn draw(&self, renderer: &mut dyn Renderer) {
-        self.root.borrow().draw(renderer);
-        renderer
-            .draw_rect(&[self.mouse.0 - 5.0, self.mouse.1 - 5.0, 10.0, 10.0].into(), &color::RED);
+    fn draw(&self, renderer: &mut dyn Renderer, state: &dyn State) {
+        self.root.borrow().draw(renderer, state);
+        renderer.draw_rect(
+            state,
+            &[self.mouse.0 - 5.0, self.mouse.1 - 5.0, 10.0, 10.0].into(),
+            &color::RED,
+        );
     }
 }
