@@ -1,14 +1,14 @@
 use error_stack::Result;
 use glutin_window::GlutinWindow as Window;
-use graphics::rectangle::Border;
 use graphics::{clear, Context, DrawState, Rectangle};
-use gui::manager::{InputEvent, Manager};
-use gui::renderer::{Color, Drawble, Rect, Renderer};
+use gui::manager::input_event::{self, InputEvent};
+use gui::manager::Manager;
+use gui::renderer::{color::Color, Drawble, Rect, Renderer};
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::RenderEvent;
 use piston::window::WindowSettings;
-use piston::MouseCursorEvent;
+use piston::{Button, MouseCursorEvent, PressEvent};
 
 const WINDOW_H: f64 = 480.0;
 const WINDOW_W: f64 = 480.0;
@@ -34,15 +34,13 @@ struct PistonRenderer<'a> {
 }
 
 impl<'a> Renderer for PistonRenderer<'a> {
-    fn draw_border(&mut self, rect: &Rect<f64>, w: f64, c: &Color) {
-        Rectangle::new([0.0; 4])
-            .border(Border { color: Into::<[f32; 4]>::into(c), radius: w })
-            .draw(
-                [rect.x, rect.y, rect.h, rect.w],
-                &DrawState::default(),
-                self.ctx.transform,
-                self.g,
-            );
+    fn draw_rect(&mut self, rect: &Rect<f64>, c: &Color) {
+        Rectangle::new(c.into()).draw(
+            [rect.x, rect.y, rect.h, rect.w],
+            &DrawState::default(),
+            self.ctx.transform,
+            self.g,
+        );
     }
 }
 
@@ -69,6 +67,14 @@ fn run() -> Result<(), Error> {
 
         if let Some(args) = e.mouse_cursor_args() {
             gui.handle_event(InputEvent::MouseMove(args[0], args[1]));
+        }
+        if let Some(Button::Mouse(args)) = e.press_args() {
+            let btn = match args {
+                piston::MouseButton::Left => input_event::MouseButton::Left,
+                piston::MouseButton::Right => input_event::MouseButton::Right,
+                _ => input_event::MouseButton::Middle,
+            };
+            gui.handle_event(InputEvent::MouseClick(btn));
         }
     }
     Ok(())

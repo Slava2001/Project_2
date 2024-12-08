@@ -1,9 +1,11 @@
+#[derive(Clone, Copy)]
 pub enum MouseButton {
     Left,
     Right,
-    Midle,
+    Middle,
 }
 
+#[derive(Clone, Copy)]
 pub enum InputEvent {
     MouseClick(MouseButton),
     MouseMove(f64, f64),

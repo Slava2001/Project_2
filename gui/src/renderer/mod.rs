@@ -1,8 +1,7 @@
-mod color;
+pub mod color;
 mod rect;
 mod renderer;
 
-pub use color::Color;
 pub use rect::Rect;
 pub use renderer::Renderer;
 

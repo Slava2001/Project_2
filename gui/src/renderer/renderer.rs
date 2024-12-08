@@ -1,5 +1,5 @@
-use super::{Color, Rect};
+use super::{color::Color, Rect};
 
 pub trait Renderer {
-    fn draw_border(&mut self, rect: &Rect<f64>, width: f64, color: &Color);
+    fn draw_rect(&mut self, rect: &Rect<f64>, color: &Color);
 }
