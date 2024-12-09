@@ -1,9 +1,8 @@
 use error_stack::Result;
 use glutin_window::GlutinWindow as Window;
-use graphics::{clear, Context, DrawState, Rectangle};
+use graphics::{clear, Context, DrawState, Rectangle, Transformed};
 use gui::manager::input_event::{self, InputEvent};
 use gui::manager::Manager;
-use gui::renderer::State;
 use gui::renderer::{color::Color, Drawble, Rect, Renderer};
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
@@ -29,35 +28,36 @@ impl Error {
     }
 }
 
-struct PistonState {
-}
-
-impl<'a> State<'a> for PistonState {
-    fn boxed_clone(&self) -> Box<dyn State> {
-        Box::new(PistonState {})
-    }
-
-    fn translate(&mut self, _x: f64, _y: f64) {
-    }
-}
-
 struct PistonRenderer<'a> {
     g: &'a mut GlGraphics,
-    ctx: Context
+    ctx: Vec<Context>
 }
 
 impl<'a> Renderer for PistonRenderer<'a> {
-    fn draw_rect(&mut self, _state: &dyn State, rect: &Rect<f64>, color: &Color) {
+    fn draw_rect(&mut self, rect: &Rect<f64>, color: &Color) {
         Rectangle::new(color.into()).draw(
             [rect.x, rect.y, rect.h, rect.w],
             &DrawState::default(),
-            self.ctx.transform,
+            self.ctx.last().unwrap().transform,
             self.g,
         );
     }
+    
+    fn push_state(&mut self) {
+        self.ctx.push(*self.ctx.last().unwrap());
+    }
+    
+    fn pop_state(&mut self) {
+        self.ctx.pop();
+    }
+    
+    fn translate(&mut self, x: f64, y: f64) {
+        let state = self.ctx.pop().unwrap().trans(x, y);
+        self.ctx.push(state);
+    }
 }
 
-fn run() -> Result<(), Error> {
+    fn run() -> Result<(), Error> {
     let mut window: Window = WindowSettings::new("GUI Demo", [WINDOW_H, WINDOW_W])
         .graphics_api(OpenGL::V3_2)
         .exit_on_esc(true)
@@ -73,8 +73,8 @@ fn run() -> Result<(), Error> {
         if let Some(args) = e.render_args() {
             gl.draw(args.viewport(), |c, g| {
                 clear([1.0; 4], g);
-                let mut renderer = PistonRenderer { ctx: c, g: g };
-                gui.draw(&mut renderer, &PistonState {});
+                let mut renderer = PistonRenderer { ctx: vec![c], g: g };
+                gui.draw(&mut renderer);
             });
         }
 
