@@ -30,7 +30,7 @@ impl Error {
 
 struct PistonRenderer<'a> {
     g: &'a mut GlGraphics,
-    ctx: Vec<Context>
+    ctx: Vec<Context>,
 }
 
 impl<'a> Renderer for PistonRenderer<'a> {
@@ -42,22 +42,22 @@ impl<'a> Renderer for PistonRenderer<'a> {
             self.g,
         );
     }
-    
+
     fn push_state(&mut self) {
         self.ctx.push(*self.ctx.last().unwrap());
     }
-    
+
     fn pop_state(&mut self) {
         self.ctx.pop();
     }
-    
+
     fn translate(&mut self, x: f64, y: f64) {
         let state = self.ctx.pop().unwrap().trans(x, y);
         self.ctx.push(state);
     }
 }
 
-    fn run() -> Result<(), Error> {
+fn run() -> Result<(), Error> {
     let mut window: Window = WindowSettings::new("GUI Demo", [WINDOW_H, WINDOW_W])
         .graphics_api(OpenGL::V3_2)
         .exit_on_esc(true)
