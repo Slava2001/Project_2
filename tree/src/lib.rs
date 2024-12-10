@@ -42,7 +42,7 @@ impl<T> Node<T> {
         if let Some(parent) = parent {
             if let Some(parent) = parent.upgrade() {
                 parent.borrow_mut().childs.retain(|v| !Rc::ptr_eq(v, &self.node));
-                return Some(Node{node: parent});
+                return Some(Node { node: parent });
             }
         }
         None
