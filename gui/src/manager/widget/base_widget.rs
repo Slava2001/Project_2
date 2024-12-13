@@ -39,7 +39,7 @@ impl Widget for BaseWidget {
                             self.detach(&self_rc);
                             *caught = Some(self_rc);
                         }
-                    },
+                    }
                     _ => {}
                 },
                 InputEvent::MouseRelease(mouse_button) => match mouse_button {
@@ -49,8 +49,8 @@ impl Widget for BaseWidget {
                             self.add_widget(self_rc, caught.clone());
                             let pos = caught.borrow().get_positon() - self.get_global_positon();
                             caught.borrow_mut().set_positon(pos);
-                        } 
-                    },
+                        }
+                    }
                     _ => {}
                 },
                 _ => {}

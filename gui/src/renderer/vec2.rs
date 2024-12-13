@@ -45,7 +45,7 @@ impl<T: Add<Output = T> + Copy> Add for &Vec2<T> {
     type Output = Vec2<T>;
 
     fn add(self, rhs: Self) -> Self::Output {
-        Vec2::<T>{ x: self.x + rhs.x, y: self.y + rhs.y }
+        Vec2::<T> { x: self.x + rhs.x, y: self.y + rhs.y }
     }
 }
 
@@ -61,6 +61,6 @@ impl<T: Sub<Output = T> + Copy> Sub for &Vec2<T> {
     type Output = Vec2<T>;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        Vec2::<T>{ x: self.x - rhs.x, y: self.y - rhs.y }
+        Vec2::<T> { x: self.x - rhs.x, y: self.y - rhs.y }
     }
 }
