@@ -1,52 +1,58 @@
-use std::{cell::RefCell, rc::Rc};
-
-use crate::renderer::{color, Drawble, Renderer};
-
 use super::{
     input_event::InputEvent,
-    widget::{event::Event, BaseWidget, Widget},
+    widget::{event::Event, BaseWidget, WidgetRef},
 };
+use crate::renderer::{vec2::Vec2f, Drawble, Renderer};
 
 pub struct Manager {
-    root: Rc<RefCell<dyn Widget>>,
-    hovered: Option<Rc<RefCell<dyn Widget>>>,
-    mouse: (f64, f64),
+    root: WidgetRef,
+    hovered: WidgetRef,
+    caught: Option<WidgetRef>,
+    mouse: Vec2f,
 }
 
 impl Manager {
     pub fn new() -> Self {
-        let mut root = BaseWidget::new([0.0; 4].into());
-        let mut sub_widget = BaseWidget::new([100.0, 100.0, 50.0, 50.0].into());
-        sub_widget
-            .add_widget(Rc::new(RefCell::new(BaseWidget::new([100.0, 100.0, 50.0, 50.0].into()))));
-        root.add_widget(Rc::new(RefCell::new(sub_widget)));
-
-        Self { root: Rc::new(RefCell::new(root)), mouse: (0.0, 0.0), hovered: None }
+        let root = WidgetRef::new(BaseWidget::new([0.0; 4].into()));
+        let sub_widget = WidgetRef::new(BaseWidget::new([100.0, 100.0, 50.0, 50.0].into()));
+        for y in 0..5 {
+            for x in 0..5 {
+                let subsub_widget = WidgetRef::new(BaseWidget::new(
+                    [100.0 + 20.0 * x as f64, 100.0 + 20.0 * y as f64, 10.0, 10.0].into(),
+                ));
+                sub_widget.borrow_mut().add_widget(sub_widget.clone(), subsub_widget);
+            }
+        }
+        root.borrow_mut().add_widget(root.clone(), sub_widget);
+        Self { hovered: root.clone(), root, mouse: Vec2f::new(0.0, 0.0), caught: None }
     }
 
     pub fn handle_event(&mut self, event: InputEvent) {
-        match event {
-            InputEvent::MouseClick(_) => {
-                if let Some(h) = &self.hovered {
-                    h.borrow_mut().handle_event(Event::InputEvent(event));
-                }
-            }
-            InputEvent::MouseMove(x, y) => {
-                self.mouse = (x, y);
-                let hovered = self.root.borrow().get_hovered(x, y);
-                match (&self.hovered, &hovered) {
-                    (None, Some(h)) => h.borrow_mut().handle_event(Event::MouseEnter),
-                    (Some(h), None) => h.borrow_mut().handle_event(Event::MouseLeave),
-                    (Some(h1), Some(h2)) => {
-                        if !Rc::ptr_eq(h1, h2) {
-                            h1.borrow_mut().handle_event(Event::MouseLeave);
-                            h2.borrow_mut().handle_event(Event::MouseEnter);
-                        }
-                    }
-                    _ => {}
-                };
-                self.hovered = hovered;
-            }
+        if let InputEvent::MouseMove(x, y) = event {
+            self.mouse = (x, y).into();
+            self.caught.as_ref().map(|t| t.borrow_mut().set_positon(self.mouse));
+        }
+        self.hovered.borrow_mut().handle_event(
+            self.hovered.clone(),
+            Event::InputEvent(event),
+            &mut self.caught,
+        );
+        // if let Some(c) = self.caught.clone() {
+        //     c.borrow_mut().handle_event(c.clone(), Event::InputEvent(event), &mut self.caught);
+        // }
+        self.update_hovered(self.mouse);
+    }
+
+    fn update_hovered(&mut self, pos: Vec2f) {
+        let hovered = self.root.borrow().get_hovered(pos).unwrap_or(self.root.clone());
+        if self.hovered != hovered {
+            hovered.borrow_mut().handle_event(hovered.clone(), Event::MouseLeave, &mut self.caught);
+            self.hovered.borrow_mut().handle_event(
+                self.hovered.clone(),
+                Event::MouseEnter,
+                &mut self.caught,
+            );
+            self.hovered = hovered;
         }
     }
 }
@@ -54,7 +60,6 @@ impl Manager {
 impl Drawble for Manager {
     fn draw(&self, renderer: &mut dyn Renderer) {
         self.root.borrow().draw(renderer);
-        renderer
-            .draw_rect(&[self.mouse.0 - 5.0, self.mouse.1 - 5.0, 10.0, 10.0].into(), &color::RED);
+        self.caught.as_ref().map(|c| c.borrow().draw(renderer));
     }
 }

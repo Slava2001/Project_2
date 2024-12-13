@@ -7,6 +7,7 @@ pub enum MouseButton {
 
 #[derive(Clone, Copy)]
 pub enum InputEvent {
-    MouseClick(MouseButton),
+    MousePress(MouseButton),
+    MouseRelease(MouseButton),
     MouseMove(f64, f64),
 }

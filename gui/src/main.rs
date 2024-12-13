@@ -1,14 +1,15 @@
 use error_stack::Result;
 use glutin_window::GlutinWindow as Window;
-use graphics::{clear, Context, DrawState, Rectangle, Transformed};
+use graphics::{clear, line, Context, DrawState, Rectangle, Transformed};
 use gui::manager::input_event::{self, InputEvent};
 use gui::manager::Manager;
+use gui::renderer::vec2::Vec2f;
 use gui::renderer::{color::Color, Drawble, Rect, Renderer};
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::RenderEvent;
 use piston::window::WindowSettings;
-use piston::{Button, MouseCursorEvent, PressEvent};
+use piston::{Button, MouseCursorEvent, PressEvent, ReleaseEvent};
 
 const WINDOW_H: f64 = 480.0;
 const WINDOW_W: f64 = 480.0;
@@ -55,6 +56,16 @@ impl<'a> Renderer for PistonRenderer<'a> {
         let state = self.ctx.pop().unwrap().trans(x, y);
         self.ctx.push(state);
     }
+
+    fn draw_line(&mut self, from: Vec2f, to: Vec2f, color: &Color) {
+        line(
+            color.into(),
+            1.0,
+            [from.x, from.y, to.x, to.y],
+            self.ctx.last().unwrap().transform,
+            self.g,
+        );
+    }
 }
 
 fn run() -> Result<(), Error> {
@@ -87,7 +98,15 @@ fn run() -> Result<(), Error> {
                 piston::MouseButton::Right => input_event::MouseButton::Right,
                 _ => input_event::MouseButton::Middle,
             };
-            gui.handle_event(InputEvent::MouseClick(btn));
+            gui.handle_event(InputEvent::MousePress(btn));
+        }
+        if let Some(Button::Mouse(args)) = e.release_args() {
+            let btn = match args {
+                piston::MouseButton::Left => input_event::MouseButton::Left,
+                piston::MouseButton::Right => input_event::MouseButton::Right,
+                _ => input_event::MouseButton::Middle,
+            };
+            gui.handle_event(InputEvent::MouseRelease(btn));
         }
     }
     Ok(())
