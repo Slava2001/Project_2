@@ -7,6 +7,14 @@ pub struct Rect<T> {
     pub h: T,
 }
 
+impl<T: Copy> Copy for Rect<T> {}
+
+impl<T: Clone> Clone for Rect<T> {
+    fn clone(&self) -> Self {
+        Self { x: self.x.clone(), y: self.y.clone(), w: self.w.clone(), h: self.h.clone() }
+    }
+}
+
 impl<T: Copy + Add<Output = T> + PartialOrd<T>> Rect<T> {
     pub fn check_bounds(&self, x: T, y: T) -> bool {
         self.x < x && self.y < y && (self.x + self.w) > x && (self.y + self.h) > y

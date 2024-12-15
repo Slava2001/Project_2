@@ -1,5 +1,5 @@
 pub mod input_event;
-mod manager;
 pub mod widget;
+mod manager;
 
-pub use manager::Manager;
+pub use manager::{Manager, Caught, State};

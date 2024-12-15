@@ -1,64 +1,28 @@
 use std::{
     cell::RefCell,
-    mem::replace,
     rc::{Rc, Weak},
 };
 
 use super::{event::Event, widget::WidgetRef, Widget};
 use crate::{
-    manager::input_event::{InputEvent, MouseButton},
-    renderer::{
-        color::{self, Color},
-        vec2::Vec2f,
-        Drawble, Rect, Renderer,
-    },
+    manager::manager::State,
+    renderer::{color, vec2::Vec2f, Drawble, Rect, Renderer},
 };
 
 pub struct BaseWidget {
     rect: Rect<f64>,
-    color: Color,
     childs: Vec<WidgetRef>,
     parent: Option<Weak<RefCell<dyn Widget>>>,
 }
 
 impl BaseWidget {
     pub fn new(rect: Rect<f64>) -> Self {
-        Self { rect, childs: Vec::new(), color: color::BLACK, parent: None }
+        Self { rect, childs: Vec::new(), parent: None }
     }
 }
 
 impl Widget for BaseWidget {
-    fn handle_event(&mut self, self_rc: WidgetRef, event: Event, caught: &mut Option<WidgetRef>) {
-        match event {
-            Event::InputEvent(input_event) => match input_event {
-                InputEvent::MousePress(mouse_button) => match mouse_button {
-                    MouseButton::Right => self.color = color::GREEN,
-                    MouseButton::Left => {
-                        if caught.is_none() {
-                            self.set_positon(self.get_global_positon());
-                            self.detach(&self_rc);
-                            *caught = Some(self_rc);
-                        }
-                    }
-                    _ => {}
-                },
-                InputEvent::MouseRelease(mouse_button) => match mouse_button {
-                    MouseButton::Left => {
-                        if caught.is_some() {
-                            let caught = replace(caught, None).unwrap();
-                            self.add_widget(self_rc, caught.clone());
-                            let pos = caught.borrow().get_positon() - self.get_global_positon();
-                            caught.borrow_mut().set_positon(pos);
-                        }
-                    }
-                    _ => {}
-                },
-                _ => {}
-            },
-            Event::MouseEnter => self.color = color::GRAY,
-            Event::MouseLeave => self.color = color::BLACK,
-        }
-    }
+    fn handle_event(&mut self, _self_rc: WidgetRef, _event: Event, _state: &mut State) {}
 
     fn get_hovered(&self, mut pos: Vec2f) -> Option<WidgetRef> {
         pos = pos - (self.rect.x, self.rect.y).into();
@@ -121,11 +85,18 @@ impl Widget for BaseWidget {
             .map(|p| p.upgrade().map(|p| pos = pos + p.borrow().get_global_positon()));
         pos
     }
+
+    fn get_rect(&self) -> &Rect<f64> {
+        &self.rect
+    }
+
+    fn get_parent(&mut self) -> Option<Weak<RefCell<dyn Widget>>> {
+        self.parent.clone()
+    }
 }
 
 impl Drawble for BaseWidget {
     fn draw(&self, renderer: &mut dyn Renderer) {
-        renderer.draw_rect(&self.rect, &self.color);
         renderer.push_state();
         renderer.translate(self.rect.x, self.rect.y);
         for c in self.childs.iter() {
