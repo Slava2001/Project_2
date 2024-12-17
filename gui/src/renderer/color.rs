@@ -23,15 +23,9 @@ impl<T: Copy + Into<f32>> From<[T; 4]> for Color {
     }
 }
 
-impl<T: Copy + From<f32>> Into<[T; 4]> for Color {
-    fn into(self) -> [T; 4] {
-        [self.r.into(), self.g.into(), self.b.into(), self.a.into()]
-    }
-}
-
-impl<T: Copy + From<f32>> Into<[T; 4]> for &Color {
-    fn into(self) -> [T; 4] {
-        [self.r.into(), self.g.into(), self.b.into(), self.a.into()]
+impl<T: Copy + From<f32>> From<&Color> for [T; 4] {
+    fn from(val: &Color) -> Self {
+        [val.r.into(), val.g.into(), val.b.into(), val.a.into()]
     }
 }
 

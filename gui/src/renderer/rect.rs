@@ -26,9 +26,3 @@ impl<T: Copy> From<[T; 4]> for Rect<T> {
         Self { x: v[0], y: v[1], w: v[2], h: v[3] }
     }
 }
-
-impl<T: Copy> Into<[T; 4]> for Rect<T> {
-    fn into(self) -> [T; 4] {
-        [self.x, self.y, self.w, self.h]
-    }
-}

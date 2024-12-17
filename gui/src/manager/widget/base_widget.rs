@@ -3,10 +3,14 @@ use std::{
     rc::{Rc, Weak},
 };
 
-use super::{event::Event, widget::WidgetRef, Widget};
-use crate::{
-    manager::manager::State,
-    renderer::{color, vec2::Vec2f, Drawble, Rect, Renderer},
+use super::{
+    super::{
+        super::renderer::{color, rect::Rect, vec2::Vec2f, Drawble, Renderer},
+        State,
+    },
+    event::Event,
+    widget_ref::WidgetRef,
+    Widget,
 };
 
 pub struct BaseWidget {
@@ -41,18 +45,15 @@ impl Widget for BaseWidget {
         self.rect.check_bounds(pos.x, pos.y)
     }
 
-    fn add_widget(&mut self, self_rc: WidgetRef, widget: WidgetRef) {
-        widget.borrow_mut().set_parent(Some(Rc::downgrade(&self_rc)));
-        self.childs.push(widget);
-    }
-
     fn set_parent(&mut self, parent: Option<Weak<RefCell<dyn Widget>>>) {
         self.parent = parent;
     }
 
     fn detach(&mut self, self_rc: &WidgetRef) {
-        if let Some(p) = &self.parent {
-            p.upgrade().map(|p| p.borrow_mut().erase_widget(self_rc));
+        if let Some(ref p) = self.parent {
+            if let Some(ref p) = p.upgrade() {
+                p.borrow_mut().erase_widget(self_rc);
+            }
         }
         self.parent = None;
     }
@@ -92,6 +93,11 @@ impl Widget for BaseWidget {
 
     fn get_parent(&mut self) -> Option<Weak<RefCell<dyn Widget>>> {
         self.parent.clone()
+    }
+
+    fn add_widget(&mut self, self_ref: WidgetRef, widget: &mut dyn Widget, widget_ref: WidgetRef) {
+        widget.set_parent(Some(Rc::downgrade(&self_ref)));
+        self.childs.push(widget_ref);
     }
 }
 

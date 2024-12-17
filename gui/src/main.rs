@@ -4,7 +4,7 @@ use graphics::{clear, line, Context, DrawState, Rectangle, Transformed};
 use gui::manager::input_event::{self, InputEvent};
 use gui::manager::Manager;
 use gui::renderer::vec2::Vec2f;
-use gui::renderer::{color::Color, Drawble, Rect, Renderer};
+use gui::renderer::{color::Color, rect::Rect, Drawble, Renderer};
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::RenderEvent;
@@ -78,13 +78,13 @@ fn run() -> Result<(), Error> {
     let event_settings = EventSettings::new();
     let mut events = Events::new(event_settings);
 
-    let mut gui = Manager::new();
+    let mut gui = Manager::new(());
 
     while let Some(e) = events.next(&mut window) {
         if let Some(args) = e.render_args() {
             gl.draw(args.viewport(), |c, g| {
                 clear([1.0; 4], g);
-                let mut renderer = PistonRenderer { ctx: vec![c], g: g };
+                let mut renderer = PistonRenderer { ctx: vec![c], g };
                 gui.draw(&mut renderer);
             });
         }

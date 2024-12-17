@@ -27,12 +27,6 @@ impl<T> From<(T, T)> for Vec2<T> {
     }
 }
 
-impl<T> Into<(T, T)> for Vec2<T> {
-    fn into(self) -> (T, T) {
-        (self.x, self.y)
-    }
-}
-
 impl<T: Add<Output = T>> Add for Vec2<T> {
     type Output = Vec2<T>;
 
