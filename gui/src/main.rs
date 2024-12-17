@@ -34,7 +34,7 @@ struct PistonRenderer<'a> {
     ctx: Vec<Context>,
 }
 
-impl<'a> Renderer for PistonRenderer<'a> {
+impl Renderer for PistonRenderer<'_> {
     fn draw_rect(&mut self, rect: &Rect<f64>, color: &Color) {
         Rectangle::new(color.into()).draw(
             [rect.x, rect.y, rect.h, rect.w],
