@@ -15,5 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: cargo clippy
+        run: cargo clippy --all -- -W missing_docs -W clippy::missing_docs_in_private_items -W clippy::missing_errors_doc -W clippy::missing_panics_doc -D warnings
+
       - name: cargo test --doc
         run: cargo test --doc
