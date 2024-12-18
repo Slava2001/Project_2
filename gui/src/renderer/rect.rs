@@ -1,18 +1,11 @@
 use std::ops::Add;
 
+#[derive(Clone, Copy)]
 pub struct Rect<T> {
     pub x: T,
     pub y: T,
     pub w: T,
     pub h: T,
-}
-
-impl<T: Copy> Copy for Rect<T> {}
-
-impl<T: Clone> Clone for Rect<T> {
-    fn clone(&self) -> Self {
-        Self { x: self.x.clone(), y: self.y.clone(), w: self.w.clone(), h: self.h.clone() }
-    }
 }
 
 impl<T: Copy + Add<Output = T> + PartialOrd<T>> Rect<T> {

@@ -9,26 +9,27 @@ use super::{
         State,
     },
     event::Event,
-    widget_ref::WidgetRef,
+    wref::WRef,
     Widget,
 };
 
-pub struct BaseWidget {
+pub struct Base {
     rect: Rect<f64>,
-    childs: Vec<WidgetRef>,
+    childs: Vec<WRef>,
     parent: Option<Weak<RefCell<dyn Widget>>>,
 }
 
-impl BaseWidget {
+impl Base {
+    #[must_use]
     pub fn new(rect: Rect<f64>) -> Self {
         Self { rect, childs: Vec::new(), parent: None }
     }
 }
 
-impl Widget for BaseWidget {
-    fn handle_event(&mut self, _self_rc: WidgetRef, _event: Event, _state: &mut State) {}
+impl Widget for Base {
+    fn handle_event(&mut self, _self_rc: WRef, _event: Event, _state: &mut State) {}
 
-    fn get_hovered(&self, mut pos: Vec2f) -> Option<WidgetRef> {
+    fn get_hovered(&self, mut pos: Vec2f) -> Option<WRef> {
         pos = pos - (self.rect.x, self.rect.y).into();
         for c in self.childs.iter().rev() {
             if let Some(c) = c.borrow().get_hovered(pos) {
@@ -49,7 +50,7 @@ impl Widget for BaseWidget {
         self.parent = parent;
     }
 
-    fn detach(&mut self, self_rc: &WidgetRef) {
+    fn detach(&mut self, self_rc: &WRef) {
         if let Some(ref p) = self.parent {
             if let Some(ref p) = p.upgrade() {
                 p.borrow_mut().erase_widget(self_rc);
@@ -58,7 +59,7 @@ impl Widget for BaseWidget {
         self.parent = None;
     }
 
-    fn erase_widget(&mut self, widget: &WidgetRef) {
+    fn erase_widget(&mut self, widget: &WRef) {
         self.childs.retain(|c| c != widget);
     }
 
@@ -95,17 +96,17 @@ impl Widget for BaseWidget {
         self.parent.clone()
     }
 
-    fn add_widget(&mut self, self_ref: WidgetRef, widget: &mut dyn Widget, widget_ref: WidgetRef) {
+    fn add_widget(&mut self, self_ref: WRef, widget: &mut dyn Widget, widget_ref: WRef) {
         widget.set_parent(Some(Rc::downgrade(&self_ref)));
         self.childs.push(widget_ref);
     }
 }
 
-impl Drawble for BaseWidget {
+impl Drawble for Base {
     fn draw(&self, renderer: &mut dyn Renderer) {
         renderer.push_state();
         renderer.translate(self.rect.x, self.rect.y);
-        for c in self.childs.iter() {
+        for c in &self.childs {
             c.borrow().draw(renderer);
             renderer.draw_line((0.0, 0.0).into(), c.borrow_mut().get_positon(), &color::RED);
         }

@@ -3,7 +3,7 @@ use std::{cell::RefCell, rc::Weak};
 use crate::{
     manager::{
         input_event::{InputEvent, MouseButton},
-        widget::{base_widget::BaseWidget, event::Event, widget_ref::WidgetRef, Widget},
+        widget::{Base, Event, WRef, Widget},
         Caught, State,
     },
     renderer::{
@@ -15,18 +15,19 @@ use crate::{
 };
 
 pub struct Panel {
-    base: BaseWidget,
+    base: Base,
     color: Color,
 }
 
 impl Panel {
+    #[must_use]
     pub fn new(rect: Rect<f64>) -> Self {
-        Self { color: color::BLACK, base: BaseWidget::new(rect) }
+        Self { color: color::BLACK, base: Base::new(rect) }
     }
 }
 
 impl Widget for Panel {
-    fn handle_event(&mut self, self_rc: WidgetRef, event: Event, state: &mut State) {
+    fn handle_event(&mut self, self_rc: WRef, event: Event, state: &mut State) {
         match event {
             Event::MouseEnter => self.color = color::GREEN,
             Event::MouseLeave => self.color = color::BLACK,
@@ -40,11 +41,11 @@ impl Widget for Panel {
                     }
                 }
                 InputEvent::MouseRelease(MouseButton::Left) => {
-                    if let Some(caught) = &state.caught {
+                    if let Some(ref caught) = state.caught {
                         if caught.widget == self_rc {
                             self.get_parent().map(|p| {
                                 p.upgrade().map(|p| {
-                                    p.clone().borrow_mut().add_widget(p.into(), self, self_rc)
+                                    p.clone().borrow_mut().add_widget(p.into(), self, self_rc);
                                 })
                             });
                             state.caught = None;
@@ -57,7 +58,7 @@ impl Widget for Panel {
         }
     }
 
-    fn get_hovered(&self, pos: Vec2f) -> Option<WidgetRef> {
+    fn get_hovered(&self, pos: Vec2f) -> Option<WRef> {
         self.base.get_hovered(pos)
     }
 
@@ -65,7 +66,7 @@ impl Widget for Panel {
         self.base.check_bounds(pos)
     }
 
-    fn add_widget(&mut self, self_ref: WidgetRef, widget: &mut dyn Widget, widget_ref: WidgetRef) {
+    fn add_widget(&mut self, self_ref: WRef, widget: &mut dyn Widget, widget_ref: WRef) {
         self.base.add_widget(self_ref, widget, widget_ref);
     }
 
@@ -77,11 +78,11 @@ impl Widget for Panel {
         self.base.get_parent()
     }
 
-    fn detach(&mut self, self_rc: &WidgetRef) {
+    fn detach(&mut self, self_rc: &WRef) {
         self.base.detach(self_rc);
     }
 
-    fn erase_widget(&mut self, widget: &WidgetRef) {
+    fn erase_widget(&mut self, widget: &WRef) {
         self.base.erase_widget(widget);
     }
 

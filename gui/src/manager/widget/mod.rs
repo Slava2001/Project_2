@@ -2,20 +2,21 @@ use std::{cell::RefCell, rc::Weak};
 
 use super::State;
 use crate::renderer::{rect::Rect, vec2::Vec2f, Drawble};
-use event::Event;
-use widget_ref::WidgetRef;
+pub use event::Event;
+pub use wref::WRef;
+pub use base::Base;
 
-pub mod base_widget;
-pub mod event;
-pub mod widget_ref;
+mod base;
+mod event;
+mod wref;
 
 pub trait Widget: Drawble {
-    fn handle_event(&mut self, self_ref: WidgetRef, event: Event, state: &mut State);
-    fn get_hovered(&self, pos: Vec2f) -> Option<WidgetRef>;
+    fn handle_event(&mut self, self_ref: WRef, event: Event, state: &mut State);
+    fn get_hovered(&self, pos: Vec2f) -> Option<WRef>;
 
-    fn add_widget(&mut self, self_ref: WidgetRef, widget: &mut dyn Widget, widget_ref: WidgetRef);
-    fn erase_widget(&mut self, widget_ref: &WidgetRef);
-    fn detach(&mut self, self_ref: &WidgetRef);
+    fn add_widget(&mut self, self_ref: WRef, widget: &mut dyn Widget, widget_ref: WRef);
+    fn erase_widget(&mut self, widget_ref: &WRef);
+    fn detach(&mut self, self_ref: &WRef);
     fn set_parent(&mut self, parent: Option<Weak<RefCell<dyn Widget>>>);
     fn get_parent(&mut self) -> Option<Weak<RefCell<dyn Widget>>>;
 

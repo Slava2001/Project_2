@@ -25,7 +25,7 @@ fn main() {
 struct Error(String);
 impl Error {
     fn msg<T: Into<String>>(msg: T) -> Self {
-        Error(msg.into())
+        Self(msg.into())
     }
 }
 

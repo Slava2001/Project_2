@@ -1,17 +1,15 @@
-use std::ops::DerefMut;
-
 use super::{
     renderer::{vec2::Vec2f, Drawble, Renderer},
     widget::Panel,
 };
 use input_event::InputEvent;
-use widget::{base_widget::BaseWidget, event::Event, widget_ref::WidgetRef};
+use widget::{Base, Event, WRef};
 
 pub mod input_event;
 pub mod widget;
 
 pub struct Caught {
-    pub widget: WidgetRef,
+    pub widget: WRef,
     pub offset: Vec2f,
 }
 
@@ -21,30 +19,37 @@ pub struct State {
 }
 
 pub struct Manager {
-    hovered: WidgetRef,
-    root: WidgetRef,
+    hovered: WRef,
+    root: WRef,
     state: State,
 }
 
 impl Manager {
+    #[must_use]
     pub fn new(_cfg: ()) -> Self {
-        let root = WidgetRef::new(BaseWidget::new([0.0; 4].into()));
-        let sub_widget = WidgetRef::new(Panel::new([100.0, 100.0, 50.0, 50.0].into()));
+        let root = WRef::new(Base::new([0.0; 4].into()));
+        let sub_widget = WRef::new(Panel::new([100.0, 100.0, 50.0, 50.0].into()));
         for y in 0..3 {
             for x in 0..3 {
-                let subsub_widget = WidgetRef::new(Panel::new(
-                    [100.0 + 60.0 * x as f64, 100.0 + 60.0 * y as f64, 50.0, 50.0].into(),
+                let subsub_widget = WRef::new(Panel::new(
+                    [
+                        60.0f64.mul_add(f64::from(x), 100.0),
+                        60.0f64.mul_add(f64::from(y), 100.0),
+                        50.0,
+                        50.0,
+                    ]
+                    .into(),
                 ));
                 sub_widget.borrow_mut().add_widget(
                     sub_widget.clone(),
-                    subsub_widget.borrow_mut().deref_mut(),
+                    &mut *subsub_widget.borrow_mut(),
                     subsub_widget.clone(),
                 );
             }
         }
         root.borrow_mut().add_widget(
             root.clone(),
-            sub_widget.borrow_mut().deref_mut(),
+            &mut *sub_widget.borrow_mut(),
             sub_widget.clone(),
         );
         Self {
@@ -59,7 +64,7 @@ impl Manager {
             self.state.mouse = (x, y).into();
         }
 
-        if let Some(c) = &self.state.caught {
+        if let Some(ref c) = self.state.caught {
             let w = c.widget.clone();
             w.borrow_mut().handle_event(w.clone(), Event::InputEvent(event), &mut self.state);
         }
@@ -75,7 +80,7 @@ impl Manager {
     }
 
     fn update_hovered(&mut self, pos: Vec2f) {
-        let hovered = self.root.borrow().get_hovered(pos).unwrap_or(self.root.clone());
+        let hovered = self.root.borrow().get_hovered(pos).unwrap_or_else(|| self.root.clone());
         if self.hovered != hovered {
             hovered.borrow_mut().handle_event(hovered.clone(), Event::MouseEnter, &mut self.state);
             self.hovered.borrow_mut().handle_event(
