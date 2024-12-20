@@ -1,14 +1,22 @@
+//! 2D vector
+
 use std::ops::{Add, Sub};
 
+/// f64 vec2 
 pub type Vec2f = Vec2<f64>;
 
+/// 2D vector
 #[derive(Copy, Clone)]
 pub struct Vec2<T> {
+    /// X component
     pub x: T,
+    /// Y component
     pub y: T,
 }
 
 impl<T> Vec2<T> {
+    /// Create new 2D vector
+    #[must_use]
     pub const fn new(x: T, y: T) -> Self {
         Self { x, y }
     }

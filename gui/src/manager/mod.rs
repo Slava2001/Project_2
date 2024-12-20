@@ -1,5 +1,6 @@
+//! Gui manager. This module manages the life cycle of GUI elements
 use super::{
-    renderer::{vec2::Vec2f, Drawble, Renderer},
+    renderer::{vec2::Vec2f, Drawable, Renderer},
     widget::Panel,
 };
 use input_event::InputEvent;
@@ -8,23 +9,34 @@ use widget::{Base, Event, WRef};
 pub mod input_event;
 pub mod widget;
 
+/// The coughed widget, that follows the cursor
 pub struct Caught {
+    /// Reference on coughed widget
     pub widget: WRef,
+    /// Coughed widget offset. Widget position calculated as cursor position + `offset`
     pub offset: Vec2f,
 }
 
+/// Manager state
 pub struct State {
+    /// Coughed widget
     pub caught: Option<Caught>,
+    /// Cursor position
     pub mouse: Vec2f,
 }
 
+/// GUI manager
 pub struct Manager {
+    /// Reference on widget under cursor
     hovered: WRef,
+    /// Reference on root widget
     root: WRef,
+    /// manager state
     state: State,
 }
 
 impl Manager {
+    /// Create new GUI manager
     #[must_use]
     pub fn new(_cfg: ()) -> Self {
         let root = WRef::new(Base::new([0.0; 4].into()));
@@ -59,6 +71,7 @@ impl Manager {
         }
     }
 
+    /// Handle event
     pub fn handle_event(&mut self, event: InputEvent) {
         if let InputEvent::MouseMove(x, y) = event {
             self.state.mouse = (x, y).into();
@@ -79,6 +92,7 @@ impl Manager {
         self.update_hovered(self.state.mouse);
     }
 
+    /// Update hovered widget
     fn update_hovered(&mut self, pos: Vec2f) {
         let hovered = self.root.borrow().get_hovered(pos).unwrap_or_else(|| self.root.clone());
         if self.hovered != hovered {
@@ -93,7 +107,8 @@ impl Manager {
     }
 }
 
-impl Drawble for Manager {
+impl Drawable for Manager {
+    /// Draw all visible widgets 
     fn draw(&self, renderer: &mut dyn Renderer) {
         self.root.borrow().draw(renderer);
         if let Some(ref c) = self.state.caught {

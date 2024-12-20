@@ -1,17 +1,21 @@
+//! GUI library usage example
+
 use error_stack::Result;
 use glutin_window::GlutinWindow as Window;
 use graphics::{clear, line, Context, DrawState, Rectangle, Transformed};
 use gui::manager::input_event::{self, InputEvent};
 use gui::manager::Manager;
 use gui::renderer::vec2::Vec2f;
-use gui::renderer::{color::Color, rect::Rect, Drawble, Renderer};
+use gui::renderer::{color::Color, rect::Rect, Drawable, Renderer};
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::RenderEvent;
 use piston::window::WindowSettings;
 use piston::{Button, MouseCursorEvent, PressEvent, ReleaseEvent};
 
+/// Window hight
 const WINDOW_H: f64 = 480.0;
+/// Window width
 const WINDOW_W: f64 = 480.0;
 
 fn main() {
@@ -20,17 +24,22 @@ fn main() {
     }
 }
 
+/// Simple error
 #[derive(Debug, thiserror::Error)]
 #[error("{0}")]
 struct Error(String);
 impl Error {
+    /// Make error from message
     fn msg<T: Into<String>>(msg: T) -> Self {
         Self(msg.into())
     }
 }
 
+/// Simple implementation of renderer
 struct PistonRenderer<'a> {
+    /// Gl graphics
     g: &'a mut GlGraphics,
+    /// Contexts stack
     ctx: Vec<Context>,
 }
 
@@ -68,6 +77,7 @@ impl Renderer for PistonRenderer<'_> {
     }
 }
 
+/// main function
 fn run() -> Result<(), Error> {
     let mut window: Window = WindowSettings::new("GUI Demo", [WINDOW_H, WINDOW_W])
         .graphics_api(OpenGL::V3_2)

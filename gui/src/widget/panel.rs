@@ -1,3 +1,7 @@
+//! Panel
+//! 
+//! Simple widget. It used for groups other widgets
+
 use std::{cell::RefCell, rc::Weak};
 
 use crate::{
@@ -10,16 +14,20 @@ use crate::{
         color::{self, Color},
         rect::Rect,
         vec2::Vec2f,
-        Drawble, Renderer,
+        Drawable, Renderer,
     },
 };
 
+/// Panel widget
 pub struct Panel {
+    /// Base widget
     base: Base,
+    /// Background color
     color: Color,
 }
 
 impl Panel {
+    /// Create new panel with specified bounds
     #[must_use]
     pub fn new(rect: Rect<f64>) -> Self {
         Self { color: color::BLACK, base: Base::new(rect) }
@@ -36,7 +44,7 @@ impl Widget for Panel {
                     if state.caught.is_none() {
                         self.get_parent()
                             .map(|p| p.upgrade().map(|p| p.borrow_mut().erase_widget(&self_rc)));
-                        let offset = self.get_global_positon() - state.mouse;
+                        let offset = self.get_global_position() - state.mouse;
                         state.caught = Some(Caught { widget: self_rc, offset });
                     }
                 }
@@ -49,7 +57,7 @@ impl Widget for Panel {
                                 })
                             });
                             state.caught = None;
-                            self.set_global_positon(self.get_positon());
+                            self.set_global_position(self.get_position());
                         }
                     }
                 }
@@ -90,16 +98,16 @@ impl Widget for Panel {
         self.base.set_positon(pos);
     }
 
-    fn get_positon(&self) -> Vec2f {
-        self.base.get_positon()
+    fn get_position(&self) -> Vec2f {
+        self.base.get_position()
     }
 
-    fn set_global_positon(&mut self, pos: Vec2f) {
-        self.base.set_global_positon(pos);
+    fn set_global_position(&mut self, pos: Vec2f) {
+        self.base.set_global_position(pos);
     }
 
-    fn get_global_positon(&self) -> Vec2f {
-        self.base.get_global_positon()
+    fn get_global_position(&self) -> Vec2f {
+        self.base.get_global_position()
     }
 
     fn get_rect(&self) -> &Rect<f64> {
@@ -107,7 +115,7 @@ impl Widget for Panel {
     }
 }
 
-impl Drawble for Panel {
+impl Drawable for Panel {
     fn draw(&self, renderer: &mut dyn Renderer) {
         renderer.draw_rect(self.base.get_rect(), &self.color);
         self.base.draw(renderer);

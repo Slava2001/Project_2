@@ -1,3 +1,5 @@
+//! Widget reference. It is wrapper on `Rc<RefCell<dyn Widget>>`
+
 use std::{
     cell::RefCell,
     ops::{Deref, DerefMut},
@@ -6,9 +8,12 @@ use std::{
 
 use super::Widget;
 
+/// Widget reference
 #[derive(Clone)]
 pub struct WRef(Rc<RefCell<dyn Widget>>);
 impl WRef {
+    /// Create new widget reference
+    #[must_use]
     pub fn new<T: 'static + Widget>(widget: T) -> Self {
         Self(Rc::new(RefCell::new(widget)))
     }

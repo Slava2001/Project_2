@@ -1,3 +1,5 @@
+//! Base implementation of widget. It used as root of GUI tree and for implementing other widget
+
 use std::{
     cell::RefCell,
     rc::{Rc, Weak},
@@ -5,7 +7,7 @@ use std::{
 
 use super::{
     super::{
-        super::renderer::{color, rect::Rect, vec2::Vec2f, Drawble, Renderer},
+        super::renderer::{color, rect::Rect, vec2::Vec2f, Drawable, Renderer},
         State,
     },
     event::Event,
@@ -13,13 +15,18 @@ use super::{
     Widget,
 };
 
+/// Base implementation of widget
 pub struct Base {
+    /// Widget bounds
     rect: Rect<f64>,
+    /// Widget childs
     childs: Vec<WRef>,
+    /// Reference on parent widget
     parent: Option<Weak<RefCell<dyn Widget>>>,
 }
 
 impl Base {
+    /// Create new base widget
     #[must_use]
     pub fn new(rect: Rect<f64>) -> Self {
         Self { rect, childs: Vec::new(), parent: None }
@@ -68,23 +75,23 @@ impl Widget for Base {
         self.rect.y = pos.y;
     }
 
-    fn get_positon(&self) -> Vec2f {
+    fn get_position(&self) -> Vec2f {
         Vec2f::new(self.rect.x, self.rect.y)
     }
 
-    fn set_global_positon(&mut self, mut pos: Vec2f) {
+    fn set_global_position(&mut self, mut pos: Vec2f) {
         self.parent
             .as_ref()
-            .map(|p| p.upgrade().map(|p| pos = pos - p.borrow().get_global_positon()));
+            .map(|p| p.upgrade().map(|p| pos = pos - p.borrow().get_global_position()));
         self.rect.x = pos.x;
         self.rect.y = pos.y;
     }
 
-    fn get_global_positon(&self) -> Vec2f {
+    fn get_global_position(&self) -> Vec2f {
         let mut pos = Vec2f::new(self.rect.x, self.rect.y);
         self.parent
             .as_ref()
-            .map(|p| p.upgrade().map(|p| pos = pos + p.borrow().get_global_positon()));
+            .map(|p| p.upgrade().map(|p| pos = pos + p.borrow().get_global_position()));
         pos
     }
 
@@ -102,13 +109,13 @@ impl Widget for Base {
     }
 }
 
-impl Drawble for Base {
+impl Drawable for Base {
     fn draw(&self, renderer: &mut dyn Renderer) {
         renderer.push_state();
         renderer.translate(self.rect.x, self.rect.y);
         for c in &self.childs {
             c.borrow().draw(renderer);
-            renderer.draw_line((0.0, 0.0).into(), c.borrow_mut().get_positon(), &color::RED);
+            renderer.draw_line((0.0, 0.0).into(), c.borrow_mut().get_position(), &color::RED);
         }
         renderer.pop_state();
     }
