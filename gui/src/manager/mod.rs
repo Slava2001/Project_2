@@ -108,7 +108,7 @@ impl Manager {
 }
 
 impl Drawable for Manager {
-    /// Draw all visible widgets 
+    /// Draw all visible widgets
     fn draw(&self, renderer: &mut dyn Renderer) {
         self.root.borrow().draw(renderer);
         if let Some(ref c) = self.state.caught {

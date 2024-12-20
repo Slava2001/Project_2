@@ -13,10 +13,10 @@ mod event;
 mod wref;
 
 /// Widget interface
-/// 
+///
 /// Implement it if you want to create a widget
 /// You can use the composition with the [`Base`] widget to implement a new one
-/// 
+///
 /// [`base`]: base::Base
 pub trait Widget: Drawable {
     /// Handle input event

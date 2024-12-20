@@ -2,7 +2,7 @@
 
 use std::ops::{Add, Sub};
 
-/// f64 vec2 
+/// f64 vec2
 pub type Vec2f = Vec2<f64>;
 
 /// 2D vector

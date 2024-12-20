@@ -1,5 +1,5 @@
 //! Panel
-//! 
+//!
 //! Simple widget. It used for groups other widgets
 
 use std::{cell::RefCell, rc::Weak};

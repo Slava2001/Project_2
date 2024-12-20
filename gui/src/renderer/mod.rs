@@ -6,7 +6,7 @@ pub mod vec2;
 
 /// Objects that implement this trait can be rendered with [`Renderer`]
 pub trait Drawable {
-    /// Draw object 
+    /// Draw object
     fn draw(&self, renderer: &mut dyn Renderer);
 }
 

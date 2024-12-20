@@ -25,11 +25,11 @@ pub const TRANSPARENT: Color = Color { r: 0.0, g: 0.0, b: 0.0, a: 0.0 };
 
 /// Color
 pub struct Color {
-    /// Red 
+    /// Red
     pub r: f32,
-    /// Green 
+    /// Green
     pub g: f32,
-    /// Blue 
+    /// Blue
     pub b: f32,
     /// Alfa
     pub a: f32,
