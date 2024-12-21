@@ -1,0 +1,12 @@
+{
+    "properties": {
+        "rect": {
+            "$ref": "./defines/rect.json",
+            "default": [0,0,0,0]
+        },
+        "debug": {
+            "type":"boolean",
+            "default":false
+        }
+    }
+}

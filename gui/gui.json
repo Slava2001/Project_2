@@ -1,0 +1,11 @@
+{
+    "type": "panel",
+    "background_color": "#000000aa",
+    "rect": [
+        100,
+        100,
+        50,
+        50
+    ],
+    "debug": true
+}

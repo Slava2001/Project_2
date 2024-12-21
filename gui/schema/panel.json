@@ -1,0 +1,13 @@
+{
+    "properties": {
+        "type": {
+            "type": "string",
+            "enum": [
+                "panel"
+            ]
+        },
+        "background_color": {
+            "$ref": "./defines/color.json"
+        }
+    }
+}

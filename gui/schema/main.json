@@ -1,0 +1,28 @@
+{
+    "type": "object",
+    "$ref": "./base.json",
+    "properties": {
+        "childs": {
+            "type": "array",
+            "items": {
+                "$ref": "#"
+            }
+        }
+    },
+    "oneOf": [
+        {
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "base"
+                    ]
+                }
+            }
+        },
+        {
+            "$ref": "./panel.json"
+        }
+    ],
+    "definitions": {}
+}
