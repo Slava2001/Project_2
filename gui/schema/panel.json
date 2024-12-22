@@ -7,7 +7,8 @@
             ]
         },
         "background_color": {
-            "$ref": "./defines/color.json"
+            "$ref": "./defines/color.json",
+            "description": "Panel background color"
         }
     }
 }

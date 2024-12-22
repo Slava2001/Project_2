@@ -1,6 +1,12 @@
 //! Widget interface
 
 use std::{cell::RefCell, rc::Weak};
+use error_stack::Result;
+
+mod base;
+pub mod builder;
+mod event;
+mod wref;
 
 use super::State;
 use crate::renderer::{rect::Rect, vec2::Vec2f, Drawable};
@@ -8,9 +14,10 @@ pub use base::Base;
 pub use event::Event;
 pub use wref::WRef;
 
-mod base;
-mod event;
-mod wref;
+/// Widget error
+#[derive(Debug, thiserror::Error)]
+#[error("Widget error")]
+pub struct Error;
 
 /// Widget interface
 ///
@@ -23,7 +30,15 @@ pub trait Widget: Drawable {
     /// - `self_ref`: ref on self. Do not try borrow, use `self`
     /// - `event`: event to handle
     /// - `state`: current state
-    fn handle_event(&mut self, self_ref: WRef, event: Event, state: &mut State);
+    ///
+    /// # Errors
+    /// Return error if widget failed to handle event
+    fn handle_event(
+        &mut self,
+        self_ref: WRef,
+        event: Event,
+        state: &mut State,
+    ) -> Result<(), Error>;
 
     /// Find the widget under the cursor.
     /// - `pos`: cursor position in local coordinates
@@ -52,7 +67,7 @@ pub trait Widget: Drawable {
 
     /// Set widget local (relative to parent) position
     /// - `pos`: new widget position
-    fn set_positon(&mut self, pos: Vec2f);
+    fn set_position(&mut self, pos: Vec2f);
 
     /// Get widget local (relative to parent) position
     fn get_position(&self) -> Vec2f;

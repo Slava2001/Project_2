@@ -1,28 +1,36 @@
 {
     "type": "object",
-    "$ref": "./base.json",
-    "properties": {
-        "childs": {
-            "type": "array",
-            "items": {
-                "$ref": "#"
-            }
-        }
-    },
-    "oneOf": [
+    "allOf": [
+        {
+            "$ref": "./base.json"
+        },
         {
             "properties": {
-                "type": {
-                    "type": "string",
-                    "enum": [
-                        "base"
-                    ]
+                "childs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#"
+                    },
+                    "description": "Widget children"
                 }
             }
         },
         {
-            "$ref": "./panel.json"
+            "oneOf": [
+                {
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "enum": [
+                                "base"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "$ref": "./panel.json"
+                }
+            ]
         }
-    ],
-    "definitions": {}
+    ]
 }

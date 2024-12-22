@@ -2,11 +2,12 @@
     "properties": {
         "rect": {
             "$ref": "./defines/rect.json",
-            "default": [0,0,0,0]
+            "description": "Widget bounders"
         },
         "debug": {
-            "type":"boolean",
-            "default":false
+            "type": "boolean",
+            "default": false,
+            "description": "Enable debug mode"
         }
     }
 }
