@@ -78,6 +78,11 @@ impl Renderer for PistonRenderer<'_> {
             self.g,
         );
     }
+
+    fn draw_img(&mut self, _rect: &Rect<f64>, _texture: gui::renderer::TextureId, _texture_rect: &Rect<f64>) {
+        todo!()
+    }
+
 }
 
 /// main function

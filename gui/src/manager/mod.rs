@@ -3,6 +3,8 @@
 use error_stack::{Result, ResultExt};
 use input_event::InputEvent;
 
+use crate::renderer::ResourceManger;
+
 use super::renderer::{vec2::Vec2f, Drawable, Renderer};
 use widget::{builder::Builder, Event, WRef};
 
@@ -51,8 +53,12 @@ impl Manager {
     ///
     /// # Errors
     /// Return error if config is not valid
-    pub fn new(builder: &Builder, cfg: config::Map<String, config::Value>) -> Result<Self, Error> {
-        let root = Self::make_gui_tree(builder, cfg)?;
+    pub fn new(
+        builder: &Builder,
+        res: &mut dyn ResourceManger,
+        cfg: config::Map<String, config::Value>,
+    ) -> Result<Self, Error> {
+        let root = Self::make_gui_tree(builder, cfg, res)?;
         Ok(Self {
             hovered: root.clone(),
             root,
@@ -64,14 +70,16 @@ impl Manager {
     fn make_gui_tree(
         builder: &Builder,
         mut cfg: config::Map<String, config::Value>,
+        res: &mut dyn ResourceManger,
     ) -> Result<WRef, Error> {
         let childs_cfg = cfg.remove("childs");
-        let widget = builder.build(cfg).change_context(Error::msg("Failed to build widget"))?;
+        let widget =
+            builder.build(cfg, res).change_context(Error::msg("Failed to build widget"))?;
 
         if let Some(childs_cfg) = childs_cfg {
             let childs_cfg = childs_cfg.into_array().unwrap();
             for child_cfg in childs_cfg {
-                let child = Self::make_gui_tree(builder, child_cfg.into_table().unwrap())?;
+                let child = Self::make_gui_tree(builder, child_cfg.into_table().unwrap(), res)?;
                 widget.borrow_mut().add_widget(
                     widget.clone(),
                     &mut *child.borrow_mut(),

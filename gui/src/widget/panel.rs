@@ -127,7 +127,8 @@ impl Drawable for Panel {
 impl BuildFromCfg for Panel {
     fn build(
         mut cfg: config::Map<String, config::Value>,
-    ) -> error_stack::Result<WRef, builder::Error> {
+        _res: &mut dyn crate::renderer::ResourceManger,
+    ) -> Result<WRef, builder::Error> {
         let color = if let Some(rect) = cfg.remove("background_color") {
             rect.into_string()
                 .change_context(builder::Error::msg("Field \"background_color\" is not a string"))?
