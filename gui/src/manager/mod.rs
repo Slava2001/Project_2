@@ -1,4 +1,4 @@
-//! Gui manager. This module manages the life cycle of GUI elements
+//! GUI manager. This module manages the life cycle of GUI elements
 
 use error_stack::{Result, ResultExt};
 use input_event::InputEvent;
