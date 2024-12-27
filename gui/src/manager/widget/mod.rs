@@ -1,7 +1,7 @@
 //! Widget interface
 
-use std::{cell::RefCell, rc::Weak};
 use error_stack::Result;
+use std::{cell::RefCell, rc::Weak};
 
 mod base;
 pub mod builder;

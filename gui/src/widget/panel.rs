@@ -138,9 +138,6 @@ impl BuildFromCfg for Panel {
         } else {
             color::BLACK
         };
-        Ok(WRef::new(Self {
-            base: Base::new(cfg)?,
-            color,
-        }))
+        Ok(WRef::new(Self { base: Base::new(cfg)?, color }))
     }
 }

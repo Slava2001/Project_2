@@ -117,14 +117,16 @@ fn run() -> Result<(), Error> {
                         piston::MouseButton::Right => Some(input_event::MouseButton::Right),
                         piston::MouseButton::Middle => Some(input_event::MouseButton::Middle),
                         _ => None,
-                    }.map(InputEvent::MousePress)
+                    }
+                    .map(InputEvent::MousePress)
                 } else if let Some(Button::Mouse(args)) = e.release_args() {
                     match args {
                         piston::MouseButton::Left => Some(input_event::MouseButton::Left),
                         piston::MouseButton::Right => Some(input_event::MouseButton::Right),
                         piston::MouseButton::Middle => Some(input_event::MouseButton::Middle),
                         _ => None,
-                    }.map(InputEvent::MouseRelease)
+                    }
+                    .map(InputEvent::MouseRelease)
                 } else {
                     None
                 }
