@@ -1,0 +1,36 @@
+{
+    "type": "object",
+    "allOf": [
+        {
+            "$ref": "./base.json"
+        },
+        {
+            "properties": {
+                "childs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#"
+                    },
+                    "description": "Widget children"
+                }
+            }
+        },
+        {
+            "oneOf": [
+                {
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "enum": [
+                                "base"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "$ref": "./panel.json"
+                }
+            ]
+        }
+    ]
+}

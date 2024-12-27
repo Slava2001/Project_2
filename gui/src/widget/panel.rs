@@ -2,12 +2,16 @@
 //!
 //! Simple widget. It used for groups other widgets
 
+use error_stack::{Result, ResultExt};
 use std::{cell::RefCell, rc::Weak};
 
 use crate::{
     manager::{
         input_event::{InputEvent, MouseButton},
-        widget::{Base, Event, WRef, Widget},
+        widget::{
+            builder::{self, BuildFromCfg},
+            Base, Error, Event, WRef, Widget,
+        },
         Caught, State,
     },
     renderer::{
@@ -26,16 +30,13 @@ pub struct Panel {
     color: Color,
 }
 
-impl Panel {
-    /// Create new panel with specified bounds
-    #[must_use]
-    pub fn new(rect: Rect<f64>) -> Self {
-        Self { color: color::BLACK, base: Base::new(rect) }
-    }
-}
-
 impl Widget for Panel {
-    fn handle_event(&mut self, self_rc: WRef, event: Event, state: &mut State) {
+    fn handle_event(
+        &mut self,
+        self_rc: WRef,
+        event: Event,
+        state: &mut State,
+    ) -> Result<(), Error> {
         match event {
             Event::MouseEnter => self.color = color::GREEN,
             Event::MouseLeave => self.color = color::BLACK,
@@ -64,6 +65,7 @@ impl Widget for Panel {
                 _ => {}
             },
         }
+        Ok(())
     }
 
     fn get_hovered(&self, pos: Vec2f) -> Option<WRef> {
@@ -94,8 +96,8 @@ impl Widget for Panel {
         self.base.erase_widget(widget);
     }
 
-    fn set_positon(&mut self, pos: Vec2f) {
-        self.base.set_positon(pos);
+    fn set_position(&mut self, pos: Vec2f) {
+        self.base.set_position(pos);
     }
 
     fn get_position(&self) -> Vec2f {
@@ -119,5 +121,23 @@ impl Drawable for Panel {
     fn draw(&self, renderer: &mut dyn Renderer) {
         renderer.draw_rect(self.base.get_rect(), &self.color);
         self.base.draw(renderer);
+    }
+}
+
+impl BuildFromCfg for Panel {
+    fn build(
+        mut cfg: config::Map<String, config::Value>,
+    ) -> error_stack::Result<WRef, builder::Error> {
+        let color = if let Some(rect) = cfg.remove("background_color") {
+            rect.into_string()
+                .change_context(builder::Error::msg("Field \"background_color\" is not a string"))?
+                .parse::<Color>()
+                .change_context(builder::Error::msg(
+                    "Failed to parse \"background_color\" field as color",
+                ))?
+        } else {
+            color::BLACK
+        };
+        Ok(WRef::new(Self { base: Base::new(cfg)?, color }))
     }
 }

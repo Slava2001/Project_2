@@ -1,5 +1,6 @@
 //! Base implementation of widget. It used as root of GUI tree and for implementing other widget
 
+use error_stack::{Result, ResultExt};
 use std::{
     cell::RefCell,
     rc::{Rc, Weak},
@@ -10,9 +11,10 @@ use super::{
         super::renderer::{color, rect::Rect, vec2::Vec2f, Drawable, Renderer},
         State,
     },
+    builder::{self, BuildFromCfg},
     event::Event,
     wref::WRef,
-    Widget,
+    Error, Widget,
 };
 
 /// Base implementation of widget
@@ -23,18 +25,43 @@ pub struct Base {
     childs: Vec<WRef>,
     /// Reference on parent widget
     parent: Option<Weak<RefCell<dyn Widget>>>,
+    /// Enable debug mode
+    debug: bool,
 }
 
 impl Base {
-    /// Create new base widget
-    #[must_use]
-    pub fn new(rect: Rect<f64>) -> Self {
-        Self { rect, childs: Vec::new(), parent: None }
+    /// Create new Base widget from config
+    ///
+    /// # Errors
+    /// Return error if config is not valid
+    pub fn new(mut cfg: config::Map<String, config::Value>) -> Result<Self, builder::Error> {
+        let rect = if let Some(rect) = cfg.remove("rect") {
+            rect.try_deserialize::<[f64; 4]>()
+                .change_context(builder::Error::msg("Failed to parse \"rect\" field as bounds"))?
+        } else {
+            [0.0; 4]
+        }
+        .into();
+        let debug = if let Some(debug) = cfg.remove("debug") {
+            debug.into_bool().change_context(builder::Error::msg(
+                "Failed to parse \"debug\" field as debug flag",
+            ))?
+        } else {
+            false
+        };
+        Ok(Self { rect, childs: Vec::new(), parent: None, debug })
     }
 }
 
 impl Widget for Base {
-    fn handle_event(&mut self, _self_rc: WRef, _event: Event, _state: &mut State) {}
+    fn handle_event(
+        &mut self,
+        _self_rc: WRef,
+        _event: Event,
+        _state: &mut State,
+    ) -> Result<(), Error> {
+        Ok(())
+    }
 
     fn get_hovered(&self, mut pos: Vec2f) -> Option<WRef> {
         pos = pos - (self.rect.x, self.rect.y).into();
@@ -70,7 +97,7 @@ impl Widget for Base {
         self.childs.retain(|c| c != widget);
     }
 
-    fn set_positon(&mut self, pos: Vec2f) {
+    fn set_position(&mut self, pos: Vec2f) {
         self.rect.x = pos.x;
         self.rect.y = pos.y;
     }
@@ -115,8 +142,16 @@ impl Drawable for Base {
         renderer.translate(self.rect.x, self.rect.y);
         for c in &self.childs {
             c.borrow().draw(renderer);
-            renderer.draw_line((0.0, 0.0).into(), c.borrow_mut().get_position(), &color::RED);
+            if self.debug {
+                renderer.draw_line((0.0, 0.0).into(), c.borrow_mut().get_position(), &color::RED);
+            }
         }
         renderer.pop_state();
+    }
+}
+
+impl BuildFromCfg for Base {
+    fn build(cfg: config::Map<String, config::Value>) -> Result<WRef, builder::Error> {
+        Ok(WRef::new(Self::new(cfg)?))
     }
 }

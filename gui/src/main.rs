@@ -1,12 +1,15 @@
 //! GUI library usage example
 
-use error_stack::Result;
+use config::{Config, File};
+use error_stack::{Result, ResultExt};
 use glutin_window::GlutinWindow as Window;
 use graphics::{clear, line, Context, DrawState, Rectangle, Transformed};
 use gui::manager::input_event::{self, InputEvent};
+use gui::manager::widget::builder::Builder;
 use gui::manager::Manager;
 use gui::renderer::vec2::Vec2f;
-use gui::renderer::{color::Color, rect::Rect, Drawable, Renderer};
+use gui::renderer::Drawable;
+use gui::renderer::{color::Color, rect::Rect, Renderer};
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::RenderEvent;
@@ -88,7 +91,14 @@ fn run() -> Result<(), Error> {
     let event_settings = EventSettings::new();
     let mut events = Events::new(event_settings);
 
-    let mut gui = Manager::new(());
+    let gui_cfg = Config::builder()
+        .add_source(File::with_name("./gui/gui.json"))
+        .build()
+        .change_context(Error::msg("Failed to build GUI config"))?
+        .try_deserialize::<config::Map<String, config::Value>>()
+        .change_context(Error::msg("Failed to deserialize GUI config as table"))?;
+    let mut gui = Manager::new(&Builder::default(), gui_cfg)
+        .change_context(Error::msg("Failed to init GUI manager"))?;
 
     while let Some(e) = events.next(&mut window) {
         if let Some(args) = e.render_args() {
@@ -99,24 +109,32 @@ fn run() -> Result<(), Error> {
             });
         }
 
-        if let Some(args) = e.mouse_cursor_args() {
-            gui.handle_event(InputEvent::MouseMove(args[0], args[1]));
-        }
-        if let Some(Button::Mouse(args)) = e.press_args() {
-            let btn = match args {
-                piston::MouseButton::Left => input_event::MouseButton::Left,
-                piston::MouseButton::Right => input_event::MouseButton::Right,
-                _ => input_event::MouseButton::Middle,
-            };
-            gui.handle_event(InputEvent::MousePress(btn));
-        }
-        if let Some(Button::Mouse(args)) = e.release_args() {
-            let btn = match args {
-                piston::MouseButton::Left => input_event::MouseButton::Left,
-                piston::MouseButton::Right => input_event::MouseButton::Right,
-                _ => input_event::MouseButton::Middle,
-            };
-            gui.handle_event(InputEvent::MouseRelease(btn));
+        let event = e.mouse_cursor_args().map_or_else(
+            || {
+                if let Some(Button::Mouse(args)) = e.press_args() {
+                    match args {
+                        piston::MouseButton::Left => Some(input_event::MouseButton::Left),
+                        piston::MouseButton::Right => Some(input_event::MouseButton::Right),
+                        piston::MouseButton::Middle => Some(input_event::MouseButton::Middle),
+                        _ => None,
+                    }
+                    .map(InputEvent::MousePress)
+                } else if let Some(Button::Mouse(args)) = e.release_args() {
+                    match args {
+                        piston::MouseButton::Left => Some(input_event::MouseButton::Left),
+                        piston::MouseButton::Right => Some(input_event::MouseButton::Right),
+                        piston::MouseButton::Middle => Some(input_event::MouseButton::Middle),
+                        _ => None,
+                    }
+                    .map(InputEvent::MouseRelease)
+                } else {
+                    None
+                }
+            },
+            |args| Some(InputEvent::MouseMove(args[0], args[1])),
+        );
+        if let Some(e) = event {
+            gui.handle_event(e).change_context(Error::msg("GUI failed to handle event"))?;
         }
     }
     Ok(())

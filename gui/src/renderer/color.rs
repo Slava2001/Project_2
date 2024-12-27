@@ -1,5 +1,10 @@
 //! Color type
 
+use std::{
+    fmt,
+    str::{self, FromStr},
+};
+
 /// Blue color
 pub const BLUE: Color = Color { r: 0.0, g: 0.0, b: 1.0, a: 0.7 };
 /// Red color
@@ -24,6 +29,7 @@ pub const WHITE: Color = Color { r: 1.0, g: 1.0, b: 1.0, a: 0.7 };
 pub const TRANSPARENT: Color = Color { r: 0.0, g: 0.0, b: 0.0, a: 0.0 };
 
 /// Color
+#[derive(Debug, PartialEq)]
 pub struct Color {
     /// Red
     pub r: f32,
@@ -50,5 +56,59 @@ impl<T: Copy + From<f32>> From<&Color> for [T; 4] {
 impl<T: Copy + Into<f32>> From<[T; 3]> for Color {
     fn from(v: [T; 3]) -> Self {
         Self { r: v[0].into(), g: v[1].into(), b: v[2].into(), a: 1.0 }
+    }
+}
+
+impl FromStr for Color {
+    type Err = fmt::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        // Color format: #RRGGBB or #RRGGBBAA
+        // Example: #ff0000 - red
+
+        // Parse 2 chars as Hex byte and map to 0..1 range
+        let char_to_color = |h: char, l: char| -> Result<f32, fmt::Error> {
+            let Some(h) = h.to_digit(16) else {
+                return Err(fmt::Error);
+            };
+            let Some(l) = l.to_digit(16) else {
+                return Err(fmt::Error);
+            };
+            let Ok(color) = u8::try_from(h << 4 | l) else {
+                return Err(fmt::Error);
+            };
+            Ok(f32::from(color) / 255.0)
+        };
+        match *s.chars().collect::<Vec<_>>().as_slice() {
+            ['#', rh, rl, gh, gl, bh, bl, ah, al] => Ok(Self {
+                r: char_to_color(rh, rl)?,
+                g: char_to_color(gh, gl)?,
+                b: char_to_color(bh, bl)?,
+                a: char_to_color(ah, al)?,
+            }),
+            ['#', rh, rl, gh, gl, bh, bl] => Ok(Self {
+                r: char_to_color(rh, rl)?,
+                g: char_to_color(gh, gl)?,
+                b: char_to_color(bh, bl)?,
+                a: 1.0,
+            }),
+            _ => Err(fmt::Error),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Color;
+    use std::str::FromStr;
+
+    #[test]
+    fn parse_colors() {
+        assert_eq!(Color::from_str("#000000").unwrap(), Color { r: 0.0, g: 0.0, b: 0.0, a: 1.0 });
+        assert_eq!(Color::from_str("#000000FF").unwrap(), Color { r: 0.0, g: 0.0, b: 0.0, a: 1.0 });
+        assert_eq!(Color::from_str("#00000000").unwrap(), Color { r: 0.0, g: 0.0, b: 0.0, a: 0.0 });
+        assert_eq!(Color::from_str("#FF0000").unwrap(), Color { r: 1.0, g: 0.0, b: 0.0, a: 1.0 });
+        assert_eq!(Color::from_str("#00FF00").unwrap(), Color { r: 0.0, g: 1.0, b: 0.0, a: 1.0 });
+        assert_eq!(Color::from_str("#0000FF").unwrap(), Color { r: 0.0, g: 0.0, b: 1.0, a: 1.0 });
     }
 }
