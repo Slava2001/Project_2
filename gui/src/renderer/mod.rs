@@ -13,6 +13,7 @@ pub trait Drawable {
 use color::Color;
 use rect::Rect;
 use vec2::Vec2f;
+use crate::resources::TextureId;
 
 /// GUI rendered interface
 pub trait Renderer {
@@ -29,23 +30,4 @@ pub trait Renderer {
     fn draw_line(&mut self, from: Vec2f, to: Vec2f, color: &Color);
     /// Draw specified part of texture in some area
     fn draw_img(&mut self, rect: &Rect<f64>, texture: TextureId, texture_rect: &Rect<f64>);
-}
-
-
-/// Resource manger error
-#[derive(Debug, thiserror::Error)]
-#[error("{0}")]
-pub struct Error(String);
-impl Error {
-    /// Make error from message
-    pub fn msg<T: Into<String>>(msg: T) -> Self {
-        Self(msg.into())
-    }
-}
-
-pub struct TextureId(pub usize);
-
-pub trait ResourceManger {
-    fn load_texture(&mut self, name: &str, path: &str) -> Result<TextureId, Error>;
-    fn get_texture(&self, name: &str) -> Result<TextureId, Error>;
 }

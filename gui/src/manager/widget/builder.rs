@@ -5,7 +5,7 @@ use error_stack::{bail, Result, ResultExt};
 use std::collections::HashMap;
 
 use super::WRef;
-use crate::renderer::ResourceManger;
+use crate::resources::Manger;
 
 /// Builder error
 #[derive(Debug, thiserror::Error)]
@@ -24,11 +24,11 @@ pub trait BuildFromCfg {
     ///
     /// # Errors
     /// Return error if config is not valid
-    fn build(cfg: Map<String, Value>, resources: &mut dyn ResourceManger) -> Result<WRef, Error>;
+    fn build(cfg: Map<String, Value>, resources: &mut dyn Manger) -> Result<WRef, Error>;
 }
 
 /// Widget builder function [`BuildFromCfg::build`]).
-type BuildFunc = fn(Map<String, Value>, &mut dyn ResourceManger) -> Result<WRef, Error>;
+type BuildFunc = fn(Map<String, Value>, &mut dyn Manger) -> Result<WRef, Error>;
 
 /// Widget builders map. key - widget type, value - builder function ([`BuildFunc`])
 type BuildFuncsMap = HashMap<String, BuildFunc>;
@@ -54,7 +54,7 @@ impl Builder {
     pub fn build(
         &self,
         mut cfg: Map<String, Value>,
-        res: &mut dyn ResourceManger,
+        res: &mut dyn Manger,
     ) -> Result<WRef, Error> {
         let Some(widget_type) = cfg.remove("type") else {
             bail!(Error::msg("Config dos not contain widget type"));
@@ -72,7 +72,7 @@ impl Builder {
     pub fn reg_widget_builder(
         &mut self,
         widget_type: String,
-        builder: fn(Map<String, Value>, &mut dyn ResourceManger) -> Result<WRef, Error>,
+        builder: BuildFunc,
     ) {
         self.builders_map.insert(widget_type, builder);
     }

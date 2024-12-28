@@ -12,6 +12,29 @@
                         "$ref": "#"
                     },
                     "description": "Widget children"
+                },
+                "recourses": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "description": "Resource name"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "texture"
+                                ]
+                            },
+                            "path": {
+                                "type": "string",
+                                "description": "Path to resource"
+                            }
+                        },
+                        "description": "Widget resources"
+                    }
                 }
             }
         },

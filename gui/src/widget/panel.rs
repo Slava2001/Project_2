@@ -14,20 +14,18 @@ use crate::{
         },
         Caught, State,
     },
-    renderer::{
-        color::{self, Color},
-        rect::Rect,
-        vec2::Vec2f,
-        Drawable, Renderer,
-    },
+    renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer},
+    resources::TextureId,
 };
 
 /// Panel widget
 pub struct Panel {
     /// Base widget
     base: Base,
-    /// Background color
-    color: Color,
+    /// Background texture
+    texture: TextureId,
+    /// Background texture rectangle
+    texture_rect: Rect<f64>,
 }
 
 impl Widget for Panel {
@@ -37,10 +35,7 @@ impl Widget for Panel {
         event: Event,
         state: &mut State,
     ) -> Result<(), Error> {
-        match event {
-            Event::MouseEnter => self.color = color::GREEN,
-            Event::MouseLeave => self.color = color::BLACK,
-            Event::InputEvent(i) => match i {
+        if let Event::InputEvent(i) = event { match i {
                 InputEvent::MousePress(MouseButton::Left) => {
                     if state.caught.is_none() {
                         self.get_parent()
@@ -63,7 +58,7 @@ impl Widget for Panel {
                     }
                 }
                 _ => {}
-            },
+            }
         }
         Ok(())
     }
@@ -119,7 +114,7 @@ impl Widget for Panel {
 
 impl Drawable for Panel {
     fn draw(&self, renderer: &mut dyn Renderer) {
-        renderer.draw_rect(self.base.get_rect(), &self.color);
+        renderer.draw_img(self.base.get_rect(), self.texture, &self.texture_rect);
         self.base.draw(renderer);
     }
 }
@@ -127,18 +122,27 @@ impl Drawable for Panel {
 impl BuildFromCfg for Panel {
     fn build(
         mut cfg: config::Map<String, config::Value>,
-        _res: &mut dyn crate::renderer::ResourceManger,
+        res: &mut dyn crate::resources::Manger,
     ) -> Result<WRef, builder::Error> {
-        let color = if let Some(rect) = cfg.remove("background_color") {
-            rect.into_string()
-                .change_context(builder::Error::msg("Field \"background_color\" is not a string"))?
-                .parse::<Color>()
-                .change_context(builder::Error::msg(
-                    "Failed to parse \"background_color\" field as color",
-                ))?
-        } else {
-            color::BLACK
-        };
-        Ok(WRef::new(Self { base: Base::new(cfg)?, color }))
+        let bg_texture = cfg
+            .remove("background")
+            .ok_or_else(|| builder::Error::msg("Failed to init panel, no filed \"background\""))?;
+        let bg_name = bg_texture.into_string().change_context(builder::Error::msg(
+            "Failed to init panel, filed \"background\" is not a string",
+        ))?;
+        let texture = res.get_texture(&bg_name).change_context(builder::Error::msg(format!(
+            "Failed to init panel, texture: \"{bg_name}\" not found"
+        )))?;
+        let texture_rect = cfg
+            .remove("background_rect")
+            .ok_or_else(|| {
+                builder::Error::msg("Failed to init panel, no filed \"background_rect\"")
+            })?
+            .try_deserialize::<[f64; 4]>()
+            .change_context(builder::Error::msg(
+                "Failed deserialize filed \"background_rect\" as rectangle",
+            ))?
+            .into();
+        Ok(WRef::new(Self { base: Base::new(cfg)?, texture, texture_rect }))
     }
 }
