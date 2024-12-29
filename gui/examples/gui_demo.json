@@ -1,0 +1,192 @@
+{
+    "debug": false,
+    "type": "base",
+    "rect": [
+        0,
+        0,
+        0,
+        0
+    ],
+    "childs": [
+        {
+            "recourses": [
+                {
+                    "name": "default",
+                    "debug": false,
+                    "type": "texture",
+                    "path": "./frame.png"
+                }
+            ],
+            "debug": false,
+            "type": "panel",
+            "background": "default",
+            "background_rect": [
+                0,
+                0,
+                25,
+                25
+            ],
+            "rect": [
+                10,
+                10,
+                190,
+                190
+            ],
+            "childs": [
+                {
+                    "debug": false,
+                    "type": "panel",
+                    "background": "default",
+                    "background_rect": [
+                        0,
+                        0,
+                        25,
+                        25
+                    ],
+                    "rect": [
+                        10,
+                        10,
+                        50,
+                        50
+                    ]
+                },
+                {
+                    "debug": false,
+                    "type": "panel",
+                    "background": "default",
+                    "background_rect": [
+                        0,
+                        0,
+                        25,
+                        25
+                    ],
+                    "rect": [
+                        70,
+                        10,
+                        50,
+                        50
+                    ]
+                },
+                {
+                    "debug": false,
+                    "type": "panel",
+                    "background": "default",
+                    "background_rect": [
+                        0,
+                        0,
+                        25,
+                        25
+                    ],
+                    "rect": [
+                        130,
+                        10,
+                        50,
+                        50
+                    ]
+                },
+                {
+                    "debug": false,
+                    "type": "panel",
+                    "background": "default",
+                    "background_rect": [
+                        0,
+                        0,
+                        25,
+                        25
+                    ],
+                    "rect": [
+                        10,
+                        70,
+                        50,
+                        50
+                    ]
+                },
+                {
+                    "debug": false,
+                    "type": "panel",
+                    "background": "default",
+                    "background_rect": [
+                        0,
+                        0,
+                        25,
+                        25
+                    ],
+                    "rect": [
+                        70,
+                        70,
+                        50,
+                        50
+                    ]
+                },
+                {
+                    "debug": false,
+                    "type": "panel",
+                    "background": "default",
+                    "background_rect": [
+                        0,
+                        0,
+                        25,
+                        25
+                    ],
+                    "rect": [
+                        130,
+                        70,
+                        50,
+                        50
+                    ]
+                },
+                {
+                    "debug": false,
+                    "type": "panel",
+                    "background": "default",
+                    "background_rect": [
+                        0,
+                        0,
+                        25,
+                        25
+                    ],
+                    "rect": [
+                        10,
+                        130,
+                        50,
+                        50
+                    ]
+                },
+                {
+                    "debug": false,
+                    "type": "panel",
+                    "background": "default",
+                    "background_rect": [
+                        0,
+                        0,
+                        25,
+                        25
+                    ],
+                    "rect": [
+                        70,
+                        130,
+                        50,
+                        50
+                    ]
+                },
+                {
+                    "debug": false,
+                    "type": "panel",
+                    "background": "default",
+                    "background_rect": [
+                        0,
+                        0,
+                        25,
+                        25
+                    ],
+                    "rect": [
+                        130,
+                        130,
+                        50,
+                        50
+                    ]
+                }
+            ]
+        }
+    ]
+}

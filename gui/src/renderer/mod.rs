@@ -10,6 +10,7 @@ pub trait Drawable {
     fn draw(&self, renderer: &mut dyn Renderer);
 }
 
+use crate::resources::TextureId;
 use color::Color;
 use rect::Rect;
 use vec2::Vec2f;
@@ -27,4 +28,6 @@ pub trait Renderer {
     fn draw_rect(&mut self, rect: &Rect<f64>, color: &Color);
     /// Draw specified line with specified color and width
     fn draw_line(&mut self, from: Vec2f, to: Vec2f, color: &Color);
+    /// Draw specified part of texture in some area
+    fn draw_img(&mut self, rect: &Rect<f64>, texture: TextureId, texture_rect: &Rect<f64>);
 }

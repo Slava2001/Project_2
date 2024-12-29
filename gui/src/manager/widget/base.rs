@@ -6,6 +6,8 @@ use std::{
     rc::{Rc, Weak},
 };
 
+use crate::resources::Manger;
+
 use super::{
     super::{
         super::renderer::{color, rect::Rect, vec2::Vec2f, Drawable, Renderer},
@@ -151,7 +153,10 @@ impl Drawable for Base {
 }
 
 impl BuildFromCfg for Base {
-    fn build(cfg: config::Map<String, config::Value>) -> Result<WRef, builder::Error> {
+    fn build(
+        cfg: config::Map<String, config::Value>,
+        _r: &mut dyn Manger,
+    ) -> Result<WRef, builder::Error> {
         Ok(WRef::new(Self::new(cfg)?))
     }
 }

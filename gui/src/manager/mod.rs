@@ -1,9 +1,12 @@
-//! GUI manager. This module manages the life cycle of GUI elements
+//! GUI manager
+//!
+//! This module manages the life cycle of GUI elements
 
 use error_stack::{Result, ResultExt};
 use input_event::InputEvent;
 
 use super::renderer::{vec2::Vec2f, Drawable, Renderer};
+use super::resources::Manger;
 use widget::{builder::Builder, Event, WRef};
 
 pub mod input_event;
@@ -51,8 +54,12 @@ impl Manager {
     ///
     /// # Errors
     /// Return error if config is not valid
-    pub fn new(builder: &Builder, cfg: config::Map<String, config::Value>) -> Result<Self, Error> {
-        let root = Self::make_gui_tree(builder, cfg)?;
+    pub fn new(
+        builder: &Builder,
+        res: &mut dyn Manger,
+        cfg: config::Map<String, config::Value>,
+    ) -> Result<Self, Error> {
+        let root = Self::make_gui_tree(builder, cfg, res)?;
         Ok(Self {
             hovered: root.clone(),
             root,
@@ -64,14 +71,46 @@ impl Manager {
     fn make_gui_tree(
         builder: &Builder,
         mut cfg: config::Map<String, config::Value>,
+        res_mngr: &mut dyn Manger,
     ) -> Result<WRef, Error> {
+        if let Some(res_cfg) = cfg.remove("recourses") {
+            let res_arr = res_cfg
+                .into_array()
+                .change_context(Error::msg("\"recourses\" field is not array"))?;
+            for res in res_arr {
+                let mut table = res
+                    .into_table()
+                    .change_context(Error::msg("\"recourses\" array item is not a table"))?;
+
+                let mut gets = |str| {
+                    table
+                        .remove(str)
+                        .ok_or_else(|| {
+                            Error::msg(format!("Some resource has not field \"{str}\""))
+                        })?
+                        .into_string()
+                        .change_context(Error::msg(format!(
+                            "Some resource has invalid field \"{str}\""
+                        )))
+                };
+                let name = gets("name")?;
+                let kind = gets("type")?;
+                let path = gets("path")?;
+                res_mngr.load(&kind, &name, &path).change_context(Error::msg(format!(
+                    "Failed to load resource: name: \"{name}\", type: \"{kind}\", path: \"{path}\""
+                )))?;
+            }
+        }
+
         let childs_cfg = cfg.remove("childs");
-        let widget = builder.build(cfg).change_context(Error::msg("Failed to build widget"))?;
+        let widget =
+            builder.build(cfg, res_mngr).change_context(Error::msg("Failed to build widget"))?;
 
         if let Some(childs_cfg) = childs_cfg {
             let childs_cfg = childs_cfg.into_array().unwrap();
             for child_cfg in childs_cfg {
-                let child = Self::make_gui_tree(builder, child_cfg.into_table().unwrap())?;
+                let child =
+                    Self::make_gui_tree(builder, child_cfg.into_table().unwrap(), res_mngr)?;
                 widget.borrow_mut().add_widget(
                     widget.clone(),
                     &mut *child.borrow_mut(),

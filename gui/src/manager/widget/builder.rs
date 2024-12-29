@@ -1,11 +1,11 @@
 //! Widget builder. GUI manager use it for create widgets by config.
 
-use std::collections::HashMap;
-
 use config::{Map, Value};
 use error_stack::{bail, Result, ResultExt};
+use std::collections::HashMap;
 
 use super::WRef;
+use crate::resources::Manger;
 
 /// Builder error
 #[derive(Debug, thiserror::Error)]
@@ -24,11 +24,14 @@ pub trait BuildFromCfg {
     ///
     /// # Errors
     /// Return error if config is not valid
-    fn build(cfg: Map<String, Value>) -> Result<WRef, Error>;
+    fn build(cfg: Map<String, Value>, resources: &mut dyn Manger) -> Result<WRef, Error>;
 }
 
-/// Widget builders map. key - widget type, value - builder function ([`BuildFromCfg::build`])
-type BuildFuncsMap = HashMap<String, fn(Map<String, Value>) -> Result<WRef, Error>>;
+/// Widget builder function [`BuildFromCfg::build`]).
+type BuildFunc = fn(Map<String, Value>, &mut dyn Manger) -> Result<WRef, Error>;
+
+/// Widget builders map. key - widget type, value - builder function ([`BuildFunc`])
+type BuildFuncsMap = HashMap<String, BuildFunc>;
 
 /// Widget builder
 pub struct Builder {
@@ -48,7 +51,7 @@ impl Builder {
     /// # Errors
     /// Return error if failed to find builder func (request unknown widget type)
     /// or if failed to build widget (invalid config)
-    pub fn build(&self, mut cfg: Map<String, Value>) -> Result<WRef, Error> {
+    pub fn build(&self, mut cfg: Map<String, Value>, res: &mut dyn Manger) -> Result<WRef, Error> {
         let Some(widget_type) = cfg.remove("type") else {
             bail!(Error::msg("Config dos not contain widget type"));
         };
@@ -58,15 +61,11 @@ impl Builder {
         let Some(ref builder) = self.builders_map.get(&widget_type) else {
             bail!(Error::msg(format!("Failed to find builder for \"{widget_type}\"")));
         };
-        builder(cfg)
+        builder(cfg, res)
     }
 
     /// Register widget builder function ([`BuildFromCfg::build`])
-    pub fn reg_widget_builder(
-        &mut self,
-        widget_type: String,
-        builder: fn(Map<String, Value>) -> Result<WRef, Error>,
-    ) {
+    pub fn reg_widget_builder(&mut self, widget_type: String, builder: BuildFunc) {
         self.builders_map.insert(widget_type, builder);
     }
 }

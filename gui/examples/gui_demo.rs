@@ -1,16 +1,20 @@
 //! GUI library usage example
 
+use std::collections::HashMap;
+use std::path::Path;
+
 use config::{Config, File};
-use error_stack::{Result, ResultExt};
+use error_stack::{bail, Result, ResultExt};
 use glutin_window::GlutinWindow as Window;
-use graphics::{clear, line, Context, DrawState, Rectangle, Transformed};
+use graphics::{clear, line, Context, DrawState, Image, Rectangle, Transformed};
 use gui::manager::input_event::{self, InputEvent};
 use gui::manager::widget::builder::Builder;
 use gui::manager::Manager;
 use gui::renderer::vec2::Vec2f;
 use gui::renderer::Drawable;
 use gui::renderer::{color::Color, rect::Rect, Renderer};
-use opengl_graphics::{GlGraphics, OpenGL};
+use gui::resources::{self, Manger, TextureId};
+use opengl_graphics::{GlGraphics, OpenGL, Texture, TextureSettings};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::RenderEvent;
 use piston::window::WindowSettings;
@@ -38,12 +42,54 @@ impl Error {
     }
 }
 
+struct PistonResMngr {
+    textures: Vec<Texture>,
+    textures_map: HashMap<String, TextureId>,
+}
+impl PistonResMngr {
+    pub fn new() -> Self {
+        Self { textures: Vec::new(), textures_map: HashMap::new() }
+    }
+}
+
+impl Manger for PistonResMngr {
+    fn load(&mut self, kind: &str, name: &str, path: &str) -> Result<TextureId, resources::Error> {
+        match kind {
+            "texture" => {
+                let id = TextureId(self.textures.len());
+                let mut settings = TextureSettings::new();
+                settings.set_filter(opengl_graphics::Filter::Nearest);
+                self.textures.push(
+                    Texture::from_path(Path::new(path), &settings).map_err(|e| {
+                        resources::Error::msg(format!("Failed to load texture: {e}"))
+                    })?,
+                );
+                self.textures_map.insert(name.into(), id);
+                Ok(id)
+            }
+            _ => bail!(resources::Error::msg(format!(
+                "Failed to load recourse: unexpected resource \
+                type: \"{kind}\", name: \"{name}\", path: \"{path}\""
+            ))),
+        }
+    }
+
+    fn get_texture(&self, name: &str) -> Result<TextureId, resources::Error> {
+        Ok(*self
+            .textures_map
+            .get(name)
+            .ok_or(resources::Error::msg(format!("Failed to find texture: \"{name}\"")))?)
+    }
+}
+
 /// Simple implementation of renderer
 struct PistonRenderer<'a> {
     /// Gl graphics
     g: &'a mut GlGraphics,
     /// Contexts stack
     ctx: Vec<Context>,
+    /// Resources
+    res: &'a PistonResMngr,
 }
 
 impl Renderer for PistonRenderer<'_> {
@@ -78,6 +124,28 @@ impl Renderer for PistonRenderer<'_> {
             self.g,
         );
     }
+
+    fn draw_img(
+        &mut self,
+        rect: &Rect<f64>,
+        texture: gui::resources::TextureId,
+        texture_rect: &Rect<f64>,
+    ) {
+        Image::new()
+            .rect([rect.x, rect.y, rect.h, rect.w])
+            .src_rect(Into::<[f64; 4]>::into([
+                texture_rect.x,
+                texture_rect.y,
+                texture_rect.h,
+                texture_rect.w,
+            ]))
+            .draw(
+                &self.res.textures[texture.0],
+                &DrawState::default(),
+                self.ctx.last().unwrap().transform,
+                self.g,
+            );
+    }
 }
 
 /// main function
@@ -91,20 +159,22 @@ fn run() -> Result<(), Error> {
     let event_settings = EventSettings::new();
     let mut events = Events::new(event_settings);
 
+    let mut resources = PistonResMngr::new();
+
     let gui_cfg = Config::builder()
-        .add_source(File::with_name("./gui/gui.json"))
+        .add_source(File::with_name("./gui_demo.json"))
         .build()
         .change_context(Error::msg("Failed to build GUI config"))?
         .try_deserialize::<config::Map<String, config::Value>>()
         .change_context(Error::msg("Failed to deserialize GUI config as table"))?;
-    let mut gui = Manager::new(&Builder::default(), gui_cfg)
+    let mut gui = Manager::new(&Builder::default(), &mut resources, gui_cfg)
         .change_context(Error::msg("Failed to init GUI manager"))?;
 
     while let Some(e) = events.next(&mut window) {
         if let Some(args) = e.render_args() {
             gl.draw(args.viewport(), |c, g| {
                 clear([1.0; 4], g);
-                let mut renderer = PistonRenderer { ctx: vec![c], g };
+                let mut renderer = PistonRenderer { ctx: vec![c], g, res: &resources };
                 gui.draw(&mut renderer);
             });
         }

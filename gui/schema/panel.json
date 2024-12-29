@@ -6,9 +6,13 @@
                 "panel"
             ]
         },
-        "background_color": {
-            "$ref": "./defines/color.json",
-            "description": "Panel background color"
+        "background_texture": {
+            "type": "string",
+            "description": "Panel background texture"
+        },
+        "background_rect": {
+            "$ref": "./defines/rect.json",
+            "description": "Panel background texture rectangle"
         }
     }
 }
