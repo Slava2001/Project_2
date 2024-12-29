@@ -51,11 +51,7 @@ impl Builder {
     /// # Errors
     /// Return error if failed to find builder func (request unknown widget type)
     /// or if failed to build widget (invalid config)
-    pub fn build(
-        &self,
-        mut cfg: Map<String, Value>,
-        res: &mut dyn Manger,
-    ) -> Result<WRef, Error> {
+    pub fn build(&self, mut cfg: Map<String, Value>, res: &mut dyn Manger) -> Result<WRef, Error> {
         let Some(widget_type) = cfg.remove("type") else {
             bail!(Error::msg("Config dos not contain widget type"));
         };
@@ -69,11 +65,7 @@ impl Builder {
     }
 
     /// Register widget builder function ([`BuildFromCfg::build`])
-    pub fn reg_widget_builder(
-        &mut self,
-        widget_type: String,
-        builder: BuildFunc,
-    ) {
+    pub fn reg_widget_builder(&mut self, widget_type: String, builder: BuildFunc) {
         self.builders_map.insert(widget_type, builder);
     }
 }

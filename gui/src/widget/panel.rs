@@ -35,7 +35,8 @@ impl Widget for Panel {
         event: Event,
         state: &mut State,
     ) -> Result<(), Error> {
-        if let Event::InputEvent(i) = event { match i {
+        if let Event::InputEvent(i) = event {
+            match i {
                 InputEvent::MousePress(MouseButton::Left) => {
                     if state.caught.is_none() {
                         self.get_parent()

@@ -2,5 +2,5 @@
 
 pub mod manager;
 pub mod renderer;
-pub mod widget;
 pub mod resources;
+pub mod widget;
