@@ -29,6 +29,8 @@ pub struct Base {
     parent: Option<Weak<RefCell<dyn Widget>>>,
     /// Enable debug mode
     debug: bool,
+    /// Widget identifier
+    id: String,
 }
 
 impl Base {
@@ -51,7 +53,14 @@ impl Base {
         } else {
             false
         };
-        Ok(Self { rect, childs: Vec::new(), parent: None, debug })
+        let id = if let Some(debug) = cfg.remove("id") {
+            debug.into_string().change_context(builder::Error::msg(
+                "Failed to parse \"id\" field widget identifier",
+            ))?
+        } else {
+            String::new()
+        };
+        Ok(Self { rect, childs: Vec::new(), parent: None, debug, id })
     }
 }
 
@@ -135,6 +144,22 @@ impl Widget for Base {
     fn add_widget(&mut self, self_ref: WRef, widget: &mut dyn Widget, widget_ref: WRef) {
         widget.set_parent(Some(Rc::downgrade(&self_ref)));
         self.childs.push(widget_ref);
+    }
+
+    fn get_id(&self) -> String {
+        self.id.clone()
+    }
+
+    fn find(&self, id: &str) -> Option<WRef> {
+        for c in self.childs.iter().rev() {
+            if let Some(c) = c.borrow().find(id) {
+                return Some(c);
+            }
+            if c.borrow().get_id() == id {
+                return Some(c.clone());
+            }
+        }
+        None
     }
 }
 

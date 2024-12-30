@@ -111,6 +111,14 @@ impl Widget for Panel {
     fn get_rect(&self) -> &Rect<f64> {
         self.base.get_rect()
     }
+
+    fn find(&self, id: &str) -> Option<WRef> {
+        self.base.find(id)
+    }
+
+    fn get_id(&self) -> String {
+        self.base.get_id()
+    }
 }
 
 impl Drawable for Panel {

@@ -14,6 +14,7 @@ use gui::renderer::vec2::Vec2f;
 use gui::renderer::Drawable;
 use gui::renderer::{color::Color, rect::Rect, Renderer};
 use gui::resources::{self, Manger, TextureId};
+use gui::widget::Panel;
 use opengl_graphics::{GlGraphics, OpenGL, Texture, TextureSettings};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::RenderEvent;
@@ -169,6 +170,13 @@ fn run() -> Result<(), Error> {
         .change_context(Error::msg("Failed to deserialize GUI config as table"))?;
     let mut gui = Manager::new(&Builder::default(), &mut resources, gui_cfg)
         .change_context(Error::msg("Failed to init GUI manager"))?;
+
+    gui.get_by_id("middle_panel")
+        .ok_or_else(|| Error::msg("Required GUI element \"middle_panel\" not found"))?
+        .try_cast::<Panel>()
+        .ok_or(Error::msg(
+            "GUI element \"middle_panel\" has unexpected type. Expected: \"panel\"",
+        ))?;
 
     while let Some(e) = events.next(&mut window) {
         if let Some(args) = e.render_args() {

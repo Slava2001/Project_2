@@ -1,7 +1,7 @@
 //! Widget interface
 
 use error_stack::Result;
-use std::{cell::RefCell, rc::Weak};
+use std::{any::Any, cell::RefCell, rc::Weak};
 
 mod base;
 pub mod builder;
@@ -25,7 +25,7 @@ pub struct Error;
 /// You can use the composition with the [`Base`] widget to implement a new one
 ///
 /// [`base`]: base::Base
-pub trait Widget: Drawable {
+pub trait Widget: Drawable + Any {
     /// Handle input event
     /// - `self_ref`: ref on self. Do not try borrow, use `self`
     /// - `event`: event to handle
@@ -85,4 +85,12 @@ pub trait Widget: Drawable {
 
     /// Get widget boundaries in local (relative to parent) coordinates
     fn get_rect(&self) -> &Rect<f64>;
+
+    /// Get widget identifier
+    fn get_id(&self) -> String;
+
+    /// Find widget by with specified id
+    /// Returns the first widget witt specified id
+    /// - `id`: widget id
+    fn find(&self, id: &str) -> Option<WRef>;
 }
