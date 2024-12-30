@@ -166,6 +166,7 @@ impl Manager {
     }
 
     /// Find widget by specified identification
+    #[must_use]
     pub fn get_by_id(&self, id: &str) -> Option<WRef> {
         self.root.borrow().find(id)
     }

@@ -4,6 +4,7 @@ use std::{
     any::{Any, TypeId},
     cell::RefCell,
     ops::{Deref, DerefMut},
+    ptr::from_ref,
     rc::Rc,
 };
 
@@ -20,10 +21,11 @@ impl WRef {
     }
 
     /// Try cast widget reference to concrete widget
+    #[must_use]
     pub fn try_cast<T: Any>(self) -> Option<Rc<RefCell<T>>> {
         if TypeId::of::<T>() == (*self.0.borrow()).type_id() {
             unsafe {
-                let r = (&*(&self.0 as *const Rc<RefCell<dyn Widget>> as *const Rc<RefCell<T>>))
+                let r = (*from_ref::<Rc<RefCell<dyn Widget>>>(&self.0).cast::<Rc<RefCell<T>>>())
                     .clone();
                 Some(r)
             }

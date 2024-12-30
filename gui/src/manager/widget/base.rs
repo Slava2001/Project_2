@@ -58,7 +58,7 @@ impl Base {
                 "Failed to parse \"id\" field widget identifier",
             ))?
         } else {
-            "".into()
+            String::new()
         };
         Ok(Self { rect, childs: Vec::new(), parent: None, debug, id })
     }
