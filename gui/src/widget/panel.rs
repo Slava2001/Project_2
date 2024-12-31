@@ -12,7 +12,7 @@ use crate::{
             builder::{self, BuildFromCfg},
             Base, Error, Event, WRef, Widget,
         },
-        Caught, State,
+        State,
     },
     renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer},
     resources::TextureId,
@@ -26,6 +26,8 @@ pub struct Panel {
     texture: TextureId,
     /// Background texture rectangle
     texture_rect: Rect<f64>,
+    /// Offset, used when widget cached
+    offset: Vec2f,
 }
 
 impl Widget for Panel {
@@ -41,13 +43,14 @@ impl Widget for Panel {
                     if state.caught.is_none() {
                         self.get_parent()
                             .map(|p| p.upgrade().map(|p| p.borrow_mut().erase_widget(&self_rc)));
-                        let offset = self.get_global_position() - state.mouse;
-                        state.caught = Some(Caught { widget: self_rc, offset });
+                        self.offset = self.get_global_position() - state.mouse;
+                        self.set_position(state.mouse + self.offset);
+                        state.caught = Some(self_rc);
                     }
                 }
                 InputEvent::MouseRelease(MouseButton::Left) => {
-                    if let Some(ref caught) = state.caught {
-                        if caught.widget == self_rc {
+                    if let Some(caught) = state.caught.clone() {
+                        if caught == self_rc {
                             self.get_parent().map(|p| {
                                 p.upgrade().map(|p| {
                                     p.clone().borrow_mut().add_widget(p.into(), self, self_rc);
@@ -56,6 +59,11 @@ impl Widget for Panel {
                             state.caught = None;
                             self.set_global_position(self.get_position());
                         }
+                    }
+                }
+                InputEvent::MouseMove( .. ) => {
+                    if state.caught == Some(self_rc) {
+                        self.set_position(state.mouse + self.offset);
                     }
                 }
                 _ => {}
@@ -152,6 +160,11 @@ impl BuildFromCfg for Panel {
                 "Failed deserialize filed \"background_rect\" as rectangle",
             ))?
             .into();
-        Ok(WRef::new(Self { base: Base::new(cfg)?, texture, texture_rect }))
+        Ok(WRef::new(Self {
+            base: Base::new(cfg)?,
+            texture,
+            texture_rect,
+            offset: Vec2f::new(0.0, 0.0),
+        }))
     }
 }
