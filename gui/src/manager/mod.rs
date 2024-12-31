@@ -23,18 +23,10 @@ impl Error {
     }
 }
 
-/// The coughed widget, that follows the cursor
-pub struct Caught {
-    /// Reference on coughed widget
-    pub widget: WRef,
-    /// Coughed widget offset. Widget position calculated as cursor position + `offset`
-    pub offset: Vec2f,
-}
-
 /// Manager state
 pub struct State {
     /// Coughed widget
-    pub caught: Option<Caught>,
+    pub caught: Option<WRef>,
     /// Cursor position
     pub mouse: Vec2f,
 }
@@ -131,19 +123,15 @@ impl Manager {
             self.state.mouse = (x, y).into();
         }
 
-        if let Some(ref c) = self.state.caught {
-            let w = c.widget.clone();
-            w.borrow_mut()
-                .handle_event(w.clone(), Event::InputEvent(event), &mut self.state)
+        if let Some(c) = self.state.caught.clone() {
+            c.borrow_mut()
+                .handle_event(c.clone(), Event::InputEvent(event), &mut self.state)
                 .change_context(Error::msg("Couched widget failed when handle event"))?;
         }
         self.hovered
             .borrow_mut()
             .handle_event(self.hovered.clone(), Event::InputEvent(event), &mut self.state)
             .change_context(Error::msg("Hovered widget failed when handle event"))?;
-        if let Some(ref c) = self.state.caught {
-            c.widget.borrow_mut().set_position(self.state.mouse + c.offset);
-        }
         self.update_hovered(self.state.mouse)?;
         Ok(())
     }
@@ -177,7 +165,7 @@ impl Drawable for Manager {
     fn draw(&self, renderer: &mut dyn Renderer) {
         self.root.borrow().draw(renderer);
         if let Some(ref c) = self.state.caught {
-            c.widget.borrow().draw(renderer);
+            c.borrow().draw(renderer);
         }
     }
 }

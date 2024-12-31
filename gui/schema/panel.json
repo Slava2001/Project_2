@@ -6,9 +6,9 @@
                 "panel"
             ]
         },
-        "background_texture": {
+        "background": {
             "type": "string",
-            "description": "Panel background texture"
+            "description": "Panel background texture name"
         },
         "background_rect": {
             "$ref": "./defines/rect.json",

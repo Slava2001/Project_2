@@ -1,0 +1,30 @@
+{
+    "properties": {
+        "type": {
+            "type": "string",
+            "enum": [
+                "flag"
+            ]
+        },
+        "background": {
+            "type": "string",
+            "description": "Panel background texture name"
+        },
+        "texture_rect_on": {
+            "$ref": "./defines/rect.json",
+            "description": "Background texture rectangle on on state"
+        },
+        "texture_rect_off": {
+            "$ref": "./defines/rect.json",
+            "description": "Background texture rectangle on off state"
+        },
+        "texture_rect_hovered_on": {
+            "$ref": "./defines/rect.json",
+            "description": "Background texture rectangle on hovered and on state"
+        },
+        "texture_rect_hovered_off": {
+            "$ref": "./defines/rect.json",
+            "description": "Background texture rectangle on hovered and off state"
+        }
+    }
+}

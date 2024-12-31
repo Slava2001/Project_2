@@ -12,7 +12,6 @@
             "recourses": [
                 {
                     "name": "default",
-                    "debug": false,
                     "type": "texture",
                     "path": "./frame.png"
                 }
@@ -35,13 +34,39 @@
             "childs": [
                 {
                     "debug": false,
-                    "type": "panel",
-                    "background": "default",
-                    "background_rect": [
+                    "type": "flag",
+                    "id": "hello_flag",
+                    "recourses": [
+                        {
+                            "name": "flag_tiles",
+                            "type": "texture",
+                            "path": "./flag.png"
+                        }
+                    ],
+                    "background": "flag_tiles",
+                    "texture_rect_off": [
                         0,
                         0,
-                        25,
-                        25
+                        32,
+                        32
+                    ],
+                    "texture_rect_on": [
+                        0,
+                        32,
+                        32,
+                        32
+                    ],
+                    "texture_rect_hovered_off": [
+                        0,
+                        64,
+                        32,
+                        32
+                    ],
+                    "texture_rect_hovered_on": [
+                        0,
+                        96,
+                        32,
+                        32
                     ],
                     "rect": [
                         10,

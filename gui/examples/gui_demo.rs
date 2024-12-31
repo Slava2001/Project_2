@@ -9,12 +9,13 @@ use glutin_window::GlutinWindow as Window;
 use graphics::{clear, line, Context, DrawState, Image, Rectangle, Transformed};
 use gui::manager::input_event::{self, InputEvent};
 use gui::manager::widget::builder::Builder;
+use gui::manager::widget::Widget;
 use gui::manager::Manager;
 use gui::renderer::vec2::Vec2f;
 use gui::renderer::Drawable;
 use gui::renderer::{color::Color, rect::Rect, Renderer};
 use gui::resources::{self, Manger, TextureId};
-use gui::widget::Panel;
+use gui::widget::{Flag, Panel};
 use opengl_graphics::{GlGraphics, OpenGL, Texture, TextureSettings};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::RenderEvent;
@@ -177,6 +178,14 @@ fn run() -> Result<(), Error> {
         .ok_or(Error::msg(
             "GUI element \"middle_panel\" has unexpected type. Expected: \"panel\"",
         ))?;
+    gui.get_by_id("hello_flag")
+        .ok_or_else(|| Error::msg("Required GUI element \"hello_flag\" not found"))?
+        .try_cast::<Flag>()
+        .ok_or(Error::msg("GUI element \"hello_flag\" has unexpected type. Expected: \"flag\""))?
+        .borrow_mut()
+        .change_state_cb(|flag, state| {
+            println!("Flag \"{}\" change state: {}", flag.get_id(), state);
+        });
 
     while let Some(e) = events.next(&mut window) {
         if let Some(args) = e.render_args() {
