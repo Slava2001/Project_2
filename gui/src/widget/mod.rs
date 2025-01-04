@@ -1,7 +1,7 @@
 //! Implementations of widget
 
-mod panel;
 mod flag;
+mod panel;
 
-pub use panel::Panel;
 pub use flag::Flag;
+pub use panel::Panel;

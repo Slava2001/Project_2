@@ -18,6 +18,9 @@ use crate::{
     resources::TextureId,
 };
 
+/// Change state callback. Args: flag and it is state
+type FlagCb = dyn FnMut(&mut Flag, bool);
+
 /// Flag widget
 pub struct Flag {
     /// Base widget
@@ -37,11 +40,12 @@ pub struct Flag {
     /// Flag state
     state: bool,
     /// Change state cb
-    cb: Option<Box<dyn FnMut(&mut Flag, bool)>>
+    cb: Option<Box<FlagCb>>,
 }
 
 impl Flag {
-    pub fn change_state_cb<F: 'static + FnMut(&mut Flag, bool)>(&mut self, cb: F) {
+    /// Set change state callback. This callback will be called when flag change state.
+    pub fn change_state_cb<F: 'static + FnMut(&mut Self, bool)>(&mut self, cb: F) {
         self.cb = Some(Box::new(cb));
     }
 }
@@ -56,41 +60,38 @@ impl Widget for Flag {
         match event {
             Event::InputEvent(input_event) => match input_event {
                 InputEvent::MousePress(mouse_button) => {
-                    if let MouseButton::Left = mouse_button {
-                        if state.caught.is_none() {
-                            self.set_position(self.get_global_position());
-                            self.get_parent().map(|p| {
-                                p.upgrade().map(|p| p.borrow_mut().erase_widget(&self_rc))
-                            });
-                            state.caught = Some(self_rc);
-                        }
+                    if matches!(mouse_button, MouseButton::Left) && state.caught.is_none() {
+                        self.set_position(self.get_global_position());
+                        self.get_parent()
+                            .map(|p| p.upgrade().map(|p| p.borrow_mut().erase_widget(&self_rc)));
+                        state.caught = Some(self_rc);
                     }
                 }
                 InputEvent::MouseRelease(mouse_button) => {
-                    if let MouseButton::Left = mouse_button {
-                        if state.caught == Some(self_rc.clone()) {
-                            if self.check_bounds(state.mouse) {
-                                self.state = !self.state;
-                                if let Some(mut cb) = self.cb.take() {
-                                    cb(self, self.state);
-                                    self.cb = Some(cb);
-                                }
+                    if matches!(mouse_button, MouseButton::Left)
+                        && state.caught == Some(self_rc.clone())
+                    {
+                        if self.check_bounds(state.mouse) {
+                            self.state = !self.state;
+                            if let Some(mut cb) = self.cb.take() {
+                                cb(self, self.state);
+                                self.cb = Some(cb);
                             }
-                            state.caught = None;
-                            self.get_parent().map(|p| {
-                                p.upgrade().map(|p| {
-                                    p.clone().borrow_mut().add_widget(p.into(), self, self_rc);
-                                })
-                            });
-                            self.hovered = self.check_bounds(state.mouse);
-                            self.set_global_position(self.get_position());
                         }
+                        state.caught = None;
+                        self.get_parent().map(|p| {
+                            p.upgrade().map(|p| {
+                                p.clone().borrow_mut().add_widget(p.into(), self, self_rc);
+                            })
+                        });
+                        self.hovered = self.check_bounds(state.mouse);
+                        self.set_global_position(self.get_position());
                     }
                 }
-                _ => {}
+                InputEvent::MouseMove(..) => {}
             },
             Event::MouseEnter => self.hovered = true,
-            Event::MouseLeave =>  self.hovered = state.caught == Some(self_rc.clone()),
+            Event::MouseLeave => self.hovered = state.caught == Some(self_rc),
         }
         Ok(())
     }
@@ -202,7 +203,7 @@ impl BuildFromCfg for Flag {
             texture_rect_hovered_on: get_rect("texture_rect_hovered_on")?,
             texture_rect_off: get_rect("texture_rect_off")?,
             base: Base::new(cfg)?,
-            cb: None
+            cb: None,
         }))
     }
 }

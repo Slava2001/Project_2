@@ -61,7 +61,7 @@ impl Widget for Panel {
                         }
                     }
                 }
-                InputEvent::MouseMove( .. ) => {
+                InputEvent::MouseMove(..) => {
                     if state.caught == Some(self_rc) {
                         self.set_position(state.mouse + self.offset);
                     }
