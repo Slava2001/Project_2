@@ -1,0 +1,30 @@
+{
+    "properties": {
+        "type": {
+            "type": "string",
+            "enum": [
+                "button"
+            ]
+        },
+        "background": {
+            "type": "string",
+            "description": "Button background texture name"
+        },
+        "texture_rect_pressed": {
+            "$ref": "./defines/rect.json",
+            "description": "Background texture rectangle when button is preset"
+        },
+        "texture_rect": {
+            "$ref": "./defines/rect.json",
+            "description": "Background texture rectangle when button is released"
+        },
+        "texture_rect_hovered_pressed": {
+            "$ref": "./defines/rect.json",
+            "description": "Background texture rectangle when button is hovered and preset"
+        },
+        "texture_rect_hovered": {
+            "$ref": "./defines/rect.json",
+            "description": "Background texture rectangle when button is hovered and released"
+        }
+    }
+}

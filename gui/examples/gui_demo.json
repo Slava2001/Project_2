@@ -14,6 +14,11 @@
                     "name": "default",
                     "type": "texture",
                     "path": "./frame.png"
+                },
+                {
+                    "name": "flag_tiles",
+                    "type": "texture",
+                    "path": "./flag.png"
                 }
             ],
             "debug": false,
@@ -36,13 +41,6 @@
                     "debug": false,
                     "type": "flag",
                     "id": "hello_flag",
-                    "recourses": [
-                        {
-                            "name": "flag_tiles",
-                            "type": "texture",
-                            "path": "./flag.png"
-                        }
-                    ],
                     "background": "flag_tiles",
                     "texture_rect_off": [
                         0,
@@ -77,19 +75,39 @@
                 },
                 {
                     "debug": false,
-                    "type": "panel",
-                    "background": "default",
-                    "background_rect": [
-                        0,
-                        0,
-                        25,
-                        25
-                    ],
+                    "type": "button",
+                    "background": "flag_tiles",
                     "rect": [
                         70,
                         10,
                         50,
                         50
+                    ],
+                    "id": "hello_button",
+                    "texture": "flag_tiles",
+                    "texture_rect": [
+                        0,
+                        0,
+                        32,
+                        32
+                    ],
+                    "texture_rect_pressed": [
+                        0,
+                        32,
+                        32,
+                        32
+                    ],
+                    "texture_rect_hovered": [
+                        0,
+                        64,
+                        32,
+                        32
+                    ],
+                    "texture_rect_hovered_pressed": [
+                        0,
+                        96,
+                        32,
+                        32
                     ]
                 },
                 {

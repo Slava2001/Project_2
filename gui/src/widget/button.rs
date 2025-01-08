@@ -1,6 +1,6 @@
-//! Flag
+//! Button
 //!
-//! Flag widget, that change state by click
+//! Button widget
 
 use error_stack::{Result, ResultExt};
 use std::{cell::RefCell, rc::Weak};
@@ -18,39 +18,39 @@ use crate::{
     resources::TextureId,
 };
 
-/// Change state callback. Args: flag and it is state
-type FlagCb = dyn FnMut(&mut Flag, bool);
+/// Button click callback. Called then user click on button
+type ButtonCb = dyn FnMut(&mut Button);
 
-/// Flag widget
-pub struct Flag {
+/// Button widget
+pub struct Button {
     /// Base widget
     base: Base,
     /// Background texture
     texture: TextureId,
-    /// Background texture rectangle on on state
-    texture_rect_on: Rect<f64>,
-    /// Background texture rectangle on off state
-    texture_rect_off: Rect<f64>,
-    /// Background texture rectangle on hovered and on state
-    texture_rect_hovered_on: Rect<f64>,
-    /// Background texture rectangle on hovered and off state
-    texture_rect_hovered_off: Rect<f64>,
+    /// Background texture rectangle when button is preset
+    texture_rect_pressed: Rect<f64>,
+    /// Background texture rectangle when button is released
+    texture_rect: Rect<f64>,
+    /// Background texture rectangle when button is hovered and preset
+    texture_rect_hovered_pressed: Rect<f64>,
+    /// Background texture rectangle when button is hovered and released
+    texture_rect_hovered: Rect<f64>,
     /// Is widget hovered
     hovered: bool,
-    /// Flag state
+    /// Button is pressed
     state: bool,
-    /// Change state cb
-    cb: Option<Box<FlagCb>>,
+    /// Pressed cb
+    cb: Option<Box<ButtonCb>>,
 }
 
-impl Flag {
-    /// Set change state callback. This callback will be called when flag change state.
-    pub fn change_state_cb<F: 'static + FnMut(&mut Self, bool)>(&mut self, cb: F) {
+impl Button {
+    /// Set click callback. This callback will be called when user click on button.
+    pub fn click_cb<F: 'static + FnMut(&mut Self)>(&mut self, cb: F) {
         self.cb = Some(Box::new(cb));
     }
 }
 
-impl Widget for Flag {
+impl Widget for Button {
     fn handle_event(
         &mut self,
         self_rc: WRef,
@@ -74,7 +74,7 @@ impl Widget for Flag {
                         if self.check_bounds(state.mouse) {
                             self.state = !self.state;
                             if let Some(mut cb) = self.cb.take() {
-                                cb(self, self.state);
+                                cb(self);
                                 self.cb = Some(cb);
                             }
                         }
@@ -153,39 +153,39 @@ impl Widget for Flag {
     }
 }
 
-impl Drawable for Flag {
+impl Drawable for Button {
     fn draw(&self, renderer: &mut dyn Renderer) {
         let rect = match (self.hovered, self.state) {
-            (true, true) => &self.texture_rect_hovered_on,
-            (true, false) => &self.texture_rect_hovered_off,
-            (false, true) => &self.texture_rect_on,
-            (false, false) => &self.texture_rect_off,
+            (true, true) => &self.texture_rect_hovered_pressed,
+            (true, false) => &self.texture_rect_hovered,
+            (false, true) => &self.texture_rect_pressed,
+            (false, false) => &self.texture_rect,
         };
         renderer.draw_img(self.base.get_rect(), self.texture, rect);
         self.base.draw(renderer);
     }
 }
 
-impl BuildFromCfg for Flag {
+impl BuildFromCfg for Button {
     fn build(
         mut cfg: config::Map<String, config::Value>,
         res: &mut dyn crate::resources::Manger,
     ) -> Result<WRef, builder::Error> {
         let bg_texture = cfg
             .remove("background")
-            .ok_or_else(|| builder::Error::msg("Failed to init flag, no filed \"background\""))?;
+            .ok_or_else(|| builder::Error::msg("Failed to init button, no filed \"background\""))?;
         let bg_name = bg_texture.into_string().change_context(builder::Error::msg(
-            "Failed to init flag, filed \"background\" is not a string",
+            "Failed to init button, filed \"background\" is not a string",
         ))?;
         let texture = res.get_texture(&bg_name).change_context(builder::Error::msg(format!(
-            "Failed to init flag, texture: \"{bg_name}\" not found"
+            "Failed to init button, texture: \"{bg_name}\" not found"
         )))?;
 
         let mut get_rect = |name| -> Result<Rect<f64>, builder::Error> {
             Ok(cfg
                 .remove(name)
                 .ok_or_else(|| {
-                    builder::Error::msg(format!("Failed to init flag, no filed \"{name}\""))
+                    builder::Error::msg(format!("Failed to init button, no filed \"{name}\""))
                 })?
                 .try_deserialize::<[f64; 4]>()
                 .change_context(builder::Error::msg(format!(
@@ -198,10 +198,10 @@ impl BuildFromCfg for Flag {
             hovered: false,
             state: false,
             texture,
-            texture_rect_on: get_rect("texture_rect_on")?,
-            texture_rect_hovered_off: get_rect("texture_rect_hovered_off")?,
-            texture_rect_hovered_on: get_rect("texture_rect_hovered_on")?,
-            texture_rect_off: get_rect("texture_rect_off")?,
+            texture_rect_pressed: get_rect("texture_rect_pressed")?,
+            texture_rect_hovered: get_rect("texture_rect_hovered")?,
+            texture_rect_hovered_pressed: get_rect("texture_rect_hovered_pressed")?,
+            texture_rect: get_rect("texture_rect")?,
             base: Base::new(cfg)?,
             cb: None,
         }))
