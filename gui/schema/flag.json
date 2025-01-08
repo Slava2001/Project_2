@@ -8,7 +8,7 @@
         },
         "background": {
             "type": "string",
-            "description": "Panel background texture name"
+            "description": "Flag background texture name"
         },
         "texture_rect_on": {
             "$ref": "./defines/rect.json",

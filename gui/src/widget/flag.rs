@@ -173,19 +173,19 @@ impl BuildFromCfg for Flag {
     ) -> Result<WRef, builder::Error> {
         let bg_texture = cfg
             .remove("background")
-            .ok_or_else(|| builder::Error::msg("Failed to init panel, no filed \"background\""))?;
+            .ok_or_else(|| builder::Error::msg("Failed to init flag, no filed \"background\""))?;
         let bg_name = bg_texture.into_string().change_context(builder::Error::msg(
-            "Failed to init panel, filed \"background\" is not a string",
+            "Failed to init flag, filed \"background\" is not a string",
         ))?;
         let texture = res.get_texture(&bg_name).change_context(builder::Error::msg(format!(
-            "Failed to init panel, texture: \"{bg_name}\" not found"
+            "Failed to init flag, texture: \"{bg_name}\" not found"
         )))?;
 
         let mut get_rect = |name| -> Result<Rect<f64>, builder::Error> {
             Ok(cfg
                 .remove(name)
                 .ok_or_else(|| {
-                    builder::Error::msg(format!("Failed to init panel, no filed \"{name}\""))
+                    builder::Error::msg(format!("Failed to init flag, no filed \"{name}\""))
                 })?
                 .try_deserialize::<[f64; 4]>()
                 .change_context(builder::Error::msg(format!(
