@@ -76,6 +76,7 @@ impl Default for Builder {
         let mut builder = Self::new();
         builder.reg_widget_builder("base".into(), super::Base::build);
         builder.reg_widget_builder("panel".into(), crate::widget::Panel::build);
+        builder.reg_widget_builder("flag".into(), crate::widget::Flag::build);
         builder
     }
 }

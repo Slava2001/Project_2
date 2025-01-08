@@ -8,6 +8,10 @@
             "type": "boolean",
             "default": false,
             "description": "Enable debug mode"
+        },
+        "id": {
+            "type": "string",
+            "description": "Widget identifier"
         }
     }
 }
