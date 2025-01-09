@@ -1,5 +1,5 @@
 {
-    "debug": false,
+    "debug": true,
     "type": "base",
     "rect": [
         0,
@@ -16,7 +16,7 @@
                     "path": "./frame.png"
                 }
             ],
-            "debug": false,
+            "debug": true,
             "type": "panel",
             "background": "default",
             "background_rect": [
@@ -33,7 +33,7 @@
             ],
             "childs": [
                 {
-                    "debug": false,
+                    "debug": true,
                     "type": "flag",
                     "id": "hello_flag",
                     "recourses": [
@@ -76,24 +76,27 @@
                     ]
                 },
                 {
-                    "debug": false,
-                    "type": "panel",
-                    "background": "default",
-                    "background_rect": [
-                        0,
-                        0,
-                        25,
-                        25
+                    "debug": true,
+                    "type": "label",
+                    "text": "AgjL\u00f8\u00f8\u00f8",
+                    "font_size": 12,
+                    "recourses": [
+                        {
+                            "name": "default",
+                            "type": "font",
+                            "path": "./ubuntu.mono.ttf"
+                        }
                     ],
+                    "font": "default",
                     "rect": [
                         70,
-                        10,
+                        50,
                         50,
                         50
                     ]
                 },
                 {
-                    "debug": false,
+                    "debug": true,
                     "type": "panel",
                     "background": "default",
                     "background_rect": [
@@ -110,7 +113,7 @@
                     ]
                 },
                 {
-                    "debug": false,
+                    "debug": true,
                     "type": "panel",
                     "background": "default",
                     "background_rect": [
@@ -127,7 +130,7 @@
                     ]
                 },
                 {
-                    "debug": false,
+                    "debug": true,
                     "type": "panel",
                     "id": "middle_panel",
                     "background": "default",
@@ -145,7 +148,7 @@
                     ]
                 },
                 {
-                    "debug": false,
+                    "debug": true,
                     "type": "panel",
                     "background": "default",
                     "background_rect": [
@@ -162,7 +165,7 @@
                     ]
                 },
                 {
-                    "debug": false,
+                    "debug": true,
                     "type": "panel",
                     "background": "default",
                     "background_rect": [
@@ -179,7 +182,7 @@
                     ]
                 },
                 {
-                    "debug": false,
+                    "debug": true,
                     "type": "panel",
                     "background": "default",
                     "background_rect": [
@@ -196,7 +199,7 @@
                     ]
                 },
                 {
-                    "debug": false,
+                    "debug": true,
                     "type": "panel",
                     "background": "default",
                     "background_rect": [

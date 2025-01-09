@@ -1,0 +1,19 @@
+{
+    "properties": {
+        "type": {
+            "type": "string",
+            "enum": [
+                "label"
+            ]
+        },
+        "text": {
+            "type": "string",
+            "description": "Label text"
+        },
+        "font_size": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Font size"
+        }
+    }
+}

@@ -77,6 +77,7 @@ impl Default for Builder {
         builder.reg_widget_builder("base".into(), super::Base::build);
         builder.reg_widget_builder("panel".into(), crate::widget::Panel::build);
         builder.reg_widget_builder("flag".into(), crate::widget::Flag::build);
+        builder.reg_widget_builder("label".into(), crate::widget::Label::build);
         builder
     }
 }
