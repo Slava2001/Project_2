@@ -58,6 +58,9 @@
                     "$ref": "./flag.json"
                 },
                 {
+                    "$ref": "./button.json"
+                },
+                {
                     "$ref": "./label.json"
                 }
             ]

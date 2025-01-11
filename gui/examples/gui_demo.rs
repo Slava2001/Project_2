@@ -16,12 +16,12 @@ use gui::renderer::vec2::Vec2f;
 use gui::renderer::Drawable;
 use gui::renderer::{color::Color, rect::Rect, Renderer};
 use gui::resources::{self, FontId, Manger, TextureId};
-use gui::widget::{Flag, Label, Panel};
+use gui::widget::{Button, Flag, Label, Panel};
 use opengl_graphics::{GlGraphics, GlyphCache, OpenGL, Texture, TextureSettings};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::RenderEvent;
 use piston::window::WindowSettings;
-use piston::{Button, MouseCursorEvent, PressEvent, ReleaseEvent};
+use piston::{MouseCursorEvent, PressEvent, ReleaseEvent};
 
 /// Window hight
 const WINDOW_H: f64 = 480.0;
@@ -215,6 +215,16 @@ fn run() -> Result<(), Error> {
         .ok_or(Error::msg(
             "GUI element \"middle_panel\" has unexpected type. Expected: \"panel\"",
         ))?;
+    gui.get_by_id("hello_button")
+        .ok_or_else(|| Error::msg("Required GUI element \"hello_button\" not found"))?
+        .try_cast::<Button>()
+        .ok_or(Error::msg(
+            "GUI element \"hello_button\" has unexpected type. Expected: \"button\"",
+        ))?
+        .borrow_mut()
+        .click_cb(|button| {
+            println!("Button \"{}\" clicked!", button.get_id());
+        });
     let debug_label_1 = gui
         .get_by_id("debug_label_1")
         .ok_or_else(|| Error::msg("Required GUI element \"debug_label_1\" not found"))?
@@ -258,7 +268,7 @@ fn run() -> Result<(), Error> {
 
         let event = e.mouse_cursor_args().map_or_else(
             || {
-                if let Some(Button::Mouse(args)) = e.press_args() {
+                if let Some(piston::Button::Mouse(args)) = e.press_args() {
                     match args {
                         piston::MouseButton::Left => Some(input_event::MouseButton::Left),
                         piston::MouseButton::Right => Some(input_event::MouseButton::Right),
@@ -266,7 +276,7 @@ fn run() -> Result<(), Error> {
                         _ => None,
                     }
                     .map(InputEvent::MousePress)
-                } else if let Some(Button::Mouse(args)) = e.release_args() {
+                } else if let Some(piston::Button::Mouse(args)) = e.release_args() {
                     match args {
                         piston::MouseButton::Left => Some(input_event::MouseButton::Left),
                         piston::MouseButton::Right => Some(input_event::MouseButton::Right),

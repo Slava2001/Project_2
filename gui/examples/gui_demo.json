@@ -63,6 +63,16 @@
                     "name": "default",
                     "type": "texture",
                     "path": "./frame.png"
+                },
+                {
+                    "name": "flag_tiles",
+                    "type": "texture",
+                    "path": "./flag.png"
+                },
+                {
+                    "name": "button_tiles",
+                    "type": "texture",
+                    "path": "./button.png"
                 }
             ],
             "debug": false,
@@ -190,6 +200,39 @@
                         10,
                         50,
                         50
+                    ],
+                    "childs": [
+                        {
+                            "debug": false,
+                            "type": "button",
+                            "background": "button_tiles",
+                            "rect": [
+                                10,
+                                10,
+                                30,
+                                30
+                            ],
+                            "id": "hello_button",
+                            "texture": "flag_tiles",
+                            "texture_rect": [
+                                0,
+                                0,
+                                32,
+                                32
+                            ],
+                            "texture_rect_hovered": [
+                                0,
+                                32,
+                                32,
+                                32
+                            ],
+                            "texture_rect_pressed": [
+                                0,
+                                64,
+                                32,
+                                32
+                            ]
+                        }
                     ]
                 },
                 {
