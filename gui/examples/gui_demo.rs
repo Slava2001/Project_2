@@ -16,7 +16,7 @@ use gui::renderer::vec2::Vec2f;
 use gui::renderer::Drawable;
 use gui::renderer::{color::Color, rect::Rect, Renderer};
 use gui::resources::{self, FontId, Manger, TextureId};
-use gui::widget::{Flag, Panel};
+use gui::widget::{Flag, Label, Panel};
 use opengl_graphics::{GlGraphics, GlyphCache, OpenGL, Texture, TextureSettings};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::RenderEvent;
@@ -121,11 +121,7 @@ struct PistonRenderer<'a> {
 
 impl Renderer for PistonRenderer<'_> {
     fn draw_rect(&mut self, rect: &Rect<f64>, color: &Color) {
-        Rectangle::new([0.0; 4]).border(Border {
-            color: color.into(),
-            radius: 1.0
-        })
-        .draw(
+        Rectangle::new([0.0; 4]).border(Border { color: color.into(), radius: 1.0 }).draw(
             [rect.x, rect.y, rect.h, rect.w],
             &DrawState::default(),
             self.ctx.last().unwrap().transform,
@@ -179,15 +175,15 @@ impl Renderer for PistonRenderer<'_> {
     }
 
     fn draw_text(&mut self, txt: &str, size: f64, pos: Vec2f, font: resources::FontId) {
-        text(
-            [0.0, 0.0, 0.0, 1.0],
-            size as u32,
-            txt,
-            self.res.fonts.get_mut(font.0).unwrap(),
-            self.ctx.last().unwrap().transform.trans(pos.x, pos.y),
-            self.g,
-        )
-        .unwrap();
+        let font = self.res.fonts.get_mut(font.0).unwrap();
+        let scale = font.font.scale_for_pixel_height(size as f32) as f64;
+        let transform = self
+            .ctx
+            .last()
+            .unwrap()
+            .transform
+            .trans(pos.x, pos.y + font.font.v_metrics_unscaled().ascent as f64 * scale);
+        text([0.0, 0.0, 0.0, 1.0], size as u32, txt, font, transform, self.g).unwrap();
     }
 }
 
@@ -219,14 +215,37 @@ fn run() -> Result<(), Error> {
         .ok_or(Error::msg(
             "GUI element \"middle_panel\" has unexpected type. Expected: \"panel\"",
         ))?;
+    let debug_label_1 = gui
+        .get_by_id("debug_label_1")
+        .ok_or_else(|| Error::msg("Required GUI element \"debug_label_1\" not found"))?
+        .try_cast::<Label>()
+        .ok_or(Error::msg(
+            "GUI element \"debug_label_1\" has unexpected type. Expected: \"label\"",
+        ))?;
+    let debug_label_2 = gui
+        .get_by_id("debug_label_2")
+        .ok_or_else(|| Error::msg("Required GUI element \"debug_label_2\" not found"))?
+        .try_cast::<Label>()
+        .ok_or(Error::msg(
+            "GUI element \"debug_label_2\" has unexpected type. Expected: \"label\"",
+        ))?;
+    let debug_label_3 = gui
+        .get_by_id("debug_label_3")
+        .ok_or_else(|| Error::msg("Required GUI element \"debug_label_3\" not found"))?
+        .try_cast::<Label>()
+        .ok_or(Error::msg(
+            "GUI element \"debug_label_3\" has unexpected type. Expected: \"label\"",
+        ))?;
     gui.get_by_id("hello_flag")
         .ok_or_else(|| Error::msg("Required GUI element \"hello_flag\" not found"))?
         .try_cast::<Flag>()
         .ok_or(Error::msg("GUI element \"hello_flag\" has unexpected type. Expected: \"flag\""))?
         .borrow_mut()
-        .change_state_cb(|flag, state| {
+        .change_state_cb(move |flag, state| {
+            debug_label_3.borrow_mut().set_text(format!("Flag state: {}", state));
             println!("Flag \"{}\" change state: {}", flag.get_id(), state);
         });
+    debug_label_1.borrow_mut().set_text("Debug text:");
 
     while let Some(e) = events.next(&mut window) {
         if let Some(args) = e.render_args() {
@@ -259,7 +278,12 @@ fn run() -> Result<(), Error> {
                     None
                 }
             },
-            |args| Some(InputEvent::MouseMove(args[0], args[1])),
+            |args| {
+                debug_label_2
+                    .borrow_mut()
+                    .set_text(format!("Cursor pos: ({}, {})", args[0], args[1]));
+                Some(InputEvent::MouseMove(args[0], args[1]))
+            },
         );
         if let Some(e) = event {
             gui.handle_event(e).change_context(Error::msg("GUI failed to handle event"))?;

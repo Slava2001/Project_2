@@ -29,6 +29,12 @@ pub struct Label {
     font: FontId,
 }
 
+impl  Label {
+    pub fn set_text<T: Into<String>>(&mut self, text: T)  {
+        self.text = text.into();
+    }
+}
+
 impl Widget for Label {
     fn handle_event(
         &mut self,
