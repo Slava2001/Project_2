@@ -25,7 +25,8 @@
                             "type": {
                                 "type": "string",
                                 "enum": [
-                                    "texture"
+                                    "texture",
+                                    "font"
                                 ]
                             },
                             "path": {
@@ -58,6 +59,9 @@
                 },
                 {
                     "$ref": "./button.json"
+                },
+                {
+                    "$ref": "./label.json"
                 }
             ]
         }

@@ -65,14 +65,15 @@ impl Widget for Button {
                         self.get_parent()
                             .map(|p| p.upgrade().map(|p| p.borrow_mut().erase_widget(&self_rc)));
                         state.caught = Some(self_rc);
+                        self.state = true;
                     }
                 }
                 InputEvent::MouseRelease(mouse_button) => {
                     if matches!(mouse_button, MouseButton::Left)
                         && state.caught == Some(self_rc.clone())
                     {
+                        self.state = false;
                         if self.check_bounds(state.mouse) {
-                            self.state = !self.state;
                             if let Some(mut cb) = self.cb.take() {
                                 cb(self);
                                 self.cb = Some(cb);

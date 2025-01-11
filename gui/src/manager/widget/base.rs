@@ -166,6 +166,9 @@ impl Widget for Base {
 impl Drawable for Base {
     fn draw(&self, renderer: &mut dyn Renderer) {
         renderer.push_state();
+        if self.debug {
+            renderer.draw_rect(&self.rect, &color::RED);
+        }
         renderer.translate(self.rect.x, self.rect.y);
         for c in &self.childs {
             c.borrow().draw(renderer);
