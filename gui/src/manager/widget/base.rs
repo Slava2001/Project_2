@@ -6,7 +6,7 @@ use std::{
     rc::{Rc, Weak},
 };
 
-use crate::{renderer::color::Color, resources::Manger};
+use crate::resources::Manger;
 
 use super::{
     super::{

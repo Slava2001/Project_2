@@ -29,8 +29,9 @@ pub struct Label {
     font: FontId,
 }
 
-impl  Label {
-    pub fn set_text<T: Into<String>>(&mut self, text: T)  {
+impl Label {
+    /// Set label text
+    pub fn set_text<T: Into<String>>(&mut self, text: T) {
         self.text = text.into();
     }
 }
@@ -104,7 +105,6 @@ impl Widget for Label {
 
 impl Drawable for Label {
     fn draw(&self, renderer: &mut dyn Renderer) {
-
         renderer.draw_text(&self.text, self.size, self.base.get_position(), self.font);
         self.base.draw(renderer);
     }
