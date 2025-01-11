@@ -25,7 +25,8 @@
                             "type": {
                                 "type": "string",
                                 "enum": [
-                                    "texture"
+                                    "texture",
+                                    "font"
                                 ]
                             },
                             "path": {
@@ -55,6 +56,9 @@
                 },
                 {
                     "$ref": "./flag.json"
+                },
+                {
+                    "$ref": "./label.json"
                 }
             ]
         }

@@ -7,7 +7,56 @@
         0,
         0
     ],
+    "recourses": [
+        {
+            "name": "default",
+            "type": "font",
+            "path": "./ubuntu.mono.ttf"
+        }
+    ],
     "childs": [
+        {
+            "debug": false,
+            "type": "label",
+            "text": "",
+            "font_size": 20,
+            "font": "default",
+            "rect": [
+                0,
+                0,
+                0,
+                0
+            ],
+            "id": "debug_label_1"
+        },
+        {
+            "debug": false,
+            "type": "label",
+            "text": "Cursor pos: (0, 0)",
+            "font_size": 20,
+            "font": "default",
+            "rect": [
+                0,
+                20,
+                0,
+                0
+            ],
+            "id": "debug_label_2"
+        },
+        {
+            "debug": false,
+            "type": "label",
+            "text": "Flag state: false",
+            "font_size": 20,
+            "font": "default",
+            "rect": [
+                0,
+                40,
+                0,
+                0
+            ],
+            "id": "debug_label_3"
+        },
         {
             "recourses": [
                 {
@@ -26,53 +75,72 @@
                 25
             ],
             "rect": [
-                10,
-                10,
+                100,
+                100,
                 190,
                 190
             ],
             "childs": [
                 {
                     "debug": false,
-                    "type": "flag",
-                    "id": "hello_flag",
-                    "recourses": [
-                        {
-                            "name": "flag_tiles",
-                            "type": "texture",
-                            "path": "./flag.png"
-                        }
-                    ],
-                    "background": "flag_tiles",
-                    "texture_rect_off": [
+                    "type": "panel",
+                    "background": "default",
+                    "background_rect": [
                         0,
                         0,
-                        32,
-                        32
-                    ],
-                    "texture_rect_on": [
-                        0,
-                        32,
-                        32,
-                        32
-                    ],
-                    "texture_rect_hovered_off": [
-                        0,
-                        64,
-                        32,
-                        32
-                    ],
-                    "texture_rect_hovered_on": [
-                        0,
-                        96,
-                        32,
-                        32
+                        25,
+                        25
                     ],
                     "rect": [
                         10,
                         10,
                         50,
                         50
+                    ],
+                    "childs": [
+                        {
+                            "debug": false,
+                            "type": "flag",
+                            "id": "hello_flag",
+                            "recourses": [
+                                {
+                                    "name": "flag_tiles",
+                                    "type": "texture",
+                                    "path": "./flag.png"
+                                }
+                            ],
+                            "background": "flag_tiles",
+                            "texture_rect_off": [
+                                0,
+                                0,
+                                32,
+                                32
+                            ],
+                            "texture_rect_on": [
+                                0,
+                                32,
+                                32,
+                                32
+                            ],
+                            "texture_rect_hovered_off": [
+                                0,
+                                64,
+                                32,
+                                32
+                            ],
+                            "texture_rect_hovered_on": [
+                                0,
+                                96,
+                                32,
+                                32
+                            ],
+                            "rect": [
+                                10,
+                                10,
+                                30,
+                                30
+                            ]
+                        }
                     ]
                 },
                 {
@@ -90,6 +158,21 @@
                         10,
                         50,
                         50
+                    ],
+                    "childs": [
+                        {
+                            "debug": false,
+                            "type": "label",
+                            "text": "A",
+                            "font_size": 50,
+                            "font": "default",
+                            "rect": [
+                                7,
+                                5,
+                                0,
+                                0
+                            ]
+                        }
                     ]
                 },
                 {
