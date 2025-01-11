@@ -220,21 +220,15 @@
                                 32,
                                 32
                             ],
-                            "texture_rect_pressed": [
-                                0,
-                                32,
-                                32,
-                                32
-                            ],
                             "texture_rect_hovered": [
                                 0,
-                                64,
+                                32,
                                 32,
                                 32
                             ],
-                            "texture_rect_hovered_pressed": [
+                            "texture_rect_pressed": [
                                 0,
-                                96,
+                                64,
                                 32,
                                 32
                             ]

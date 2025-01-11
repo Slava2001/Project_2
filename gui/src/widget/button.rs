@@ -31,8 +31,6 @@ pub struct Button {
     texture_rect_pressed: Rect<f64>,
     /// Background texture rectangle when button is released
     texture_rect: Rect<f64>,
-    /// Background texture rectangle when button is hovered and preset
-    texture_rect_hovered_pressed: Rect<f64>,
     /// Background texture rectangle when button is hovered and released
     texture_rect_hovered: Rect<f64>,
     /// Is widget hovered
@@ -156,11 +154,12 @@ impl Widget for Button {
 
 impl Drawable for Button {
     fn draw(&self, renderer: &mut dyn Renderer) {
-        let rect = match (self.hovered, self.state) {
-            (true, true) => &self.texture_rect_hovered_pressed,
-            (true, false) => &self.texture_rect_hovered,
-            (false, true) => &self.texture_rect_pressed,
-            (false, false) => &self.texture_rect,
+        let rect = if self.state {
+            &self.texture_rect_pressed
+        } else if self.hovered {
+            &self.texture_rect_hovered
+        } else {
+            &self.texture_rect
         };
         renderer.draw_img(self.base.get_rect(), self.texture, rect);
         self.base.draw(renderer);
@@ -201,7 +200,6 @@ impl BuildFromCfg for Button {
             texture,
             texture_rect_pressed: get_rect("texture_rect_pressed")?,
             texture_rect_hovered: get_rect("texture_rect_hovered")?,
-            texture_rect_hovered_pressed: get_rect("texture_rect_hovered_pressed")?,
             texture_rect: get_rect("texture_rect")?,
             base: Base::new(cfg)?,
             cb: None,

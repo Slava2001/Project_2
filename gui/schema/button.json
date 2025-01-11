@@ -18,10 +18,6 @@
             "$ref": "./defines/rect.json",
             "description": "Background texture rectangle when button is released"
         },
-        "texture_rect_hovered_pressed": {
-            "$ref": "./defines/rect.json",
-            "description": "Background texture rectangle when button is hovered and preset"
-        },
         "texture_rect_hovered": {
             "$ref": "./defines/rect.json",
             "description": "Background texture rectangle when button is hovered and released"
