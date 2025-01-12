@@ -6,13 +6,11 @@ use std::{
     rc::{Rc, Weak},
 };
 
-use crate::resources::Manger;
+use renderer::{color, rect::Rect, vec2::Vec2f, Drawable, Renderer};
+use resources::Manger;
 
 use super::{
-    super::{
-        super::renderer::{color, rect::Rect, vec2::Vec2f, Drawable, Renderer},
-        State,
-    },
+    super::State,
     builder::{self, BuildFromCfg},
     event::Event,
     wref::WRef,

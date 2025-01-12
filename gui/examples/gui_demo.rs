@@ -12,16 +12,16 @@ use gui::manager::input_event::{self, InputEvent};
 use gui::manager::widget::builder::Builder;
 use gui::manager::widget::Widget;
 use gui::manager::Manager;
-use gui::renderer::vec2::Vec2f;
-use gui::renderer::Drawable;
-use gui::renderer::{color::Color, rect::Rect, Renderer};
-use gui::resources::{self, FontId, Manger, TextureId};
 use gui::widget::{Button, Flag, Label, Panel};
 use opengl_graphics::{GlGraphics, GlyphCache, OpenGL, Texture, TextureSettings};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::RenderEvent;
 use piston::window::WindowSettings;
 use piston::{MouseCursorEvent, PressEvent, ReleaseEvent};
+use renderer::vec2::Vec2f;
+use renderer::Drawable;
+use renderer::{color::Color, rect::Rect, Renderer};
+use resources::{self, FontId, Manger, TextureId};
 
 /// Window hight
 const WINDOW_H: f64 = 480.0;
@@ -155,7 +155,7 @@ impl Renderer for PistonRenderer<'_> {
     fn draw_img(
         &mut self,
         rect: &Rect<f64>,
-        texture: gui::resources::TextureId,
+        texture: resources::TextureId,
         texture_rect: &Rect<f64>,
     ) {
         Image::new()

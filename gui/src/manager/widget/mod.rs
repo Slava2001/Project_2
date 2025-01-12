@@ -9,9 +9,9 @@ mod event;
 mod wref;
 
 use super::State;
-use crate::renderer::{rect::Rect, vec2::Vec2f, Drawable};
 pub use base::Base;
 pub use event::Event;
+use renderer::{rect::Rect, vec2::Vec2f, Drawable};
 pub use wref::WRef;
 
 /// Widget error

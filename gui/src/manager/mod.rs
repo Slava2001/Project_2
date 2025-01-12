@@ -5,8 +5,8 @@
 use error_stack::{Result, ResultExt};
 use input_event::InputEvent;
 
-use super::renderer::{vec2::Vec2f, Drawable, Renderer};
-use super::resources::Manger;
+use renderer::{vec2::Vec2f, Drawable, Renderer};
+use resources::Manger;
 use widget::{builder::Builder, Event, WRef};
 
 pub mod input_event;

@@ -5,18 +5,16 @@
 use error_stack::{Result, ResultExt};
 use std::{cell::RefCell, rc::Weak};
 
-use crate::{
-    manager::{
-        input_event::{InputEvent, MouseButton},
-        widget::{
-            builder::{self, BuildFromCfg},
-            Base, Error, Event, WRef, Widget,
-        },
-        State,
+use crate::manager::{
+    input_event::{InputEvent, MouseButton},
+    widget::{
+        builder::{self, BuildFromCfg},
+        Base, Error, Event, WRef, Widget,
     },
-    renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer},
-    resources::TextureId,
+    State,
 };
+use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
+use resources::TextureId;
 
 /// Button click callback. Called then user click on button
 type ButtonCb = dyn FnMut(&mut Button);
@@ -169,7 +167,7 @@ impl Drawable for Button {
 impl BuildFromCfg for Button {
     fn build(
         mut cfg: config::Map<String, config::Value>,
-        res: &mut dyn crate::resources::Manger,
+        res: &mut dyn resources::Manger,
     ) -> Result<WRef, builder::Error> {
         let bg_texture = cfg
             .remove("background")

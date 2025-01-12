@@ -5,18 +5,16 @@
 use error_stack::{Result, ResultExt};
 use std::{cell::RefCell, rc::Weak};
 
-use crate::{
-    manager::{
-        input_event::{InputEvent, MouseButton},
-        widget::{
-            builder::{self, BuildFromCfg},
-            Base, Error, Event, WRef, Widget,
-        },
-        State,
+use crate::manager::{
+    input_event::{InputEvent, MouseButton},
+    widget::{
+        builder::{self, BuildFromCfg},
+        Base, Error, Event, WRef, Widget,
     },
-    renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer},
-    resources::TextureId,
+    State,
 };
+use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
+use resources::TextureId;
 
 /// Panel widget
 pub struct Panel {
@@ -139,7 +137,7 @@ impl Drawable for Panel {
 impl BuildFromCfg for Panel {
     fn build(
         mut cfg: config::Map<String, config::Value>,
-        res: &mut dyn crate::resources::Manger,
+        res: &mut dyn resources::Manger,
     ) -> Result<WRef, builder::Error> {
         let bg_texture = cfg
             .remove("background")

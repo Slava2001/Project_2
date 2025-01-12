@@ -10,9 +10,9 @@ pub trait Drawable {
     fn draw(&self, renderer: &mut dyn Renderer);
 }
 
-use crate::resources::{FontId, TextureId};
 use color::Color;
 use rect::Rect;
+use resources::{FontId, TextureId};
 use vec2::Vec2f;
 
 /// GUI rendered interface

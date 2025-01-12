@@ -5,7 +5,7 @@ use error_stack::{bail, Result, ResultExt};
 use std::collections::HashMap;
 
 use super::WRef;
-use crate::resources::Manger;
+use resources::Manger;
 
 /// Builder error
 #[derive(Debug, thiserror::Error)]

@@ -5,17 +5,15 @@
 use error_stack::{Result, ResultExt};
 use std::{cell::RefCell, rc::Weak};
 
-use crate::{
-    manager::{
-        widget::{
-            builder::{self, BuildFromCfg},
-            Base, Error, Event, WRef, Widget,
-        },
-        State,
+use crate::manager::{
+    widget::{
+        builder::{self, BuildFromCfg},
+        Base, Error, Event, WRef, Widget,
     },
-    renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer},
-    resources::FontId,
+    State,
 };
+use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
+use resources::FontId;
 
 /// Label widget
 pub struct Label {
@@ -113,7 +111,7 @@ impl Drawable for Label {
 impl BuildFromCfg for Label {
     fn build(
         mut cfg: config::Map<String, config::Value>,
-        res: &mut dyn crate::resources::Manger,
+        res: &mut dyn resources::Manger,
     ) -> Result<WRef, builder::Error> {
         Ok(WRef::new(Self {
             text: cfg
