@@ -13,7 +13,7 @@ pub enum MouseButton {
 
 /// GUI input event
 #[derive(Clone, Copy)]
-pub enum InputEvent {
+pub enum Event {
     /// Mouse press button event
     MousePress(MouseButton),
     /// Mouse release button event

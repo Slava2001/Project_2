@@ -3,13 +3,11 @@
 //! This module manages the life cycle of GUI elements
 
 use error_stack::{Result, ResultExt};
-use input_event::InputEvent;
-
+use scene::event::Event as SceneEvent;
 use renderer::{vec2::Vec2f, Drawable, Renderer};
 use resources::Manger;
-use widget::{builder::Builder, Event, WRef};
+use widget::{builder::Builder, event::Event, WRef};
 
-pub mod input_event;
 pub mod widget;
 
 /// Manager error
@@ -118,19 +116,23 @@ impl Manager {
     ///
     /// # Errors
     /// Return error if widget failed to handle event
-    pub fn handle_event(&mut self, event: InputEvent) -> Result<(), Error> {
-        if let InputEvent::MouseMove(x, y) = event {
+    pub fn handle_event(&mut self, event: SceneEvent) -> Result<(), Error> {
+        if let SceneEvent::MouseMove(x, y) = event {
             self.state.mouse = (x, y).into();
         }
 
+        let Ok(event) = TryInto::<widget::event::Event>::try_into(event) else {
+            return Ok(());
+        };
+
         if let Some(c) = self.state.caught.clone() {
             c.borrow_mut()
-                .handle_event(c.clone(), Event::InputEvent(event), &mut self.state)
+                .handle_event(c.clone(), event, &mut self.state)
                 .change_context(Error::msg("Couched widget failed when handle event"))?;
         }
         self.hovered
             .borrow_mut()
-            .handle_event(self.hovered.clone(), Event::InputEvent(event), &mut self.state)
+            .handle_event(self.hovered.clone(), event, &mut self.state)
             .change_context(Error::msg("Hovered widget failed when handle event"))?;
         self.update_hovered(self.state.mouse)?;
         Ok(())

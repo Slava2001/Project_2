@@ -6,10 +6,10 @@ use error_stack::{Result, ResultExt};
 use std::{cell::RefCell, rc::Weak};
 
 use crate::manager::{
-    input_event::{InputEvent, MouseButton},
     widget::{
         builder::{self, BuildFromCfg},
-        Base, Error, Event, WRef, Widget,
+        event::{Event, MouseButton},
+        Base, Error, WRef, Widget,
     },
     State,
 };
@@ -56,40 +56,38 @@ impl Widget for Flag {
         state: &mut State,
     ) -> Result<(), Error> {
         match event {
-            Event::InputEvent(input_event) => match input_event {
-                InputEvent::MousePress(mouse_button) => {
-                    if matches!(mouse_button, MouseButton::Left) && state.caught.is_none() {
-                        self.set_position(self.get_global_position());
-                        self.get_parent()
-                            .map(|p| p.upgrade().map(|p| p.borrow_mut().erase_widget(&self_rc)));
-                        state.caught = Some(self_rc);
-                    }
+            Event::MousePress(mouse_button) => {
+                if matches!(mouse_button, MouseButton::Left) && state.caught.is_none() {
+                    self.set_position(self.get_global_position());
+                    self.get_parent()
+                        .map(|p| p.upgrade().map(|p| p.borrow_mut().erase_widget(&self_rc)));
+                    state.caught = Some(self_rc);
                 }
-                InputEvent::MouseRelease(mouse_button) => {
-                    if matches!(mouse_button, MouseButton::Left)
-                        && state.caught == Some(self_rc.clone())
-                    {
-                        if self.check_bounds(state.mouse) {
-                            self.state = !self.state;
-                            if let Some(mut cb) = self.cb.take() {
-                                cb(self, self.state);
-                                self.cb = Some(cb);
-                            }
+            }
+            Event::MouseRelease(mouse_button) => {
+                if matches!(mouse_button, MouseButton::Left)
+                    && state.caught == Some(self_rc.clone())
+                {
+                    if self.check_bounds(state.mouse) {
+                        self.state = !self.state;
+                        if let Some(mut cb) = self.cb.take() {
+                            cb(self, self.state);
+                            self.cb = Some(cb);
                         }
-                        state.caught = None;
-                        self.get_parent().map(|p| {
-                            p.upgrade().map(|p| {
-                                p.clone().borrow_mut().add_widget(p.into(), self, self_rc);
-                            })
-                        });
-                        self.hovered = self.check_bounds(state.mouse);
-                        self.set_global_position(self.get_position());
                     }
+                    state.caught = None;
+                    self.get_parent().map(|p| {
+                        p.upgrade().map(|p| {
+                            p.clone().borrow_mut().add_widget(p.into(), self, self_rc);
+                        })
+                    });
+                    self.hovered = self.check_bounds(state.mouse);
+                    self.set_global_position(self.get_position());
                 }
-                InputEvent::MouseMove(..) => {}
-            },
+            }
             Event::MouseEnter => self.hovered = true,
             Event::MouseLeave => self.hovered = state.caught == Some(self_rc),
+            Event::MouseMove => {}
         }
         Ok(())
     }

@@ -8,7 +8,7 @@ use std::{cell::RefCell, rc::Weak};
 use crate::manager::{
     widget::{
         builder::{self, BuildFromCfg},
-        Base, Error, Event, WRef, Widget,
+        Base, Error, event::Event, WRef, Widget,
     },
     State,
 };

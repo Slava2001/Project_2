@@ -5,14 +5,14 @@ use std::{any::Any, cell::RefCell, rc::Weak};
 
 mod base;
 pub mod builder;
-mod event;
+pub mod event;
 mod wref;
 
 use super::State;
 pub use base::Base;
-pub use event::Event;
 use renderer::{rect::Rect, vec2::Vec2f, Drawable};
 pub use wref::WRef;
+use event::Event;
 
 /// Widget error
 #[derive(Debug, thiserror::Error)]

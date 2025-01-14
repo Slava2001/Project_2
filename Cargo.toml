@@ -1,3 +1,5 @@
+# TODO нужен нормальный интерфейс создания сцен и не забыть вырезать билдер из gui
+
 [workspace]
 resolver = "2"
 members = [ "builder","gui", "project_2", "renderer", "resources", "scene"]

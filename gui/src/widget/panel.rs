@@ -6,10 +6,10 @@ use error_stack::{Result, ResultExt};
 use std::{cell::RefCell, rc::Weak};
 
 use crate::manager::{
-    input_event::{InputEvent, MouseButton},
     widget::{
         builder::{self, BuildFromCfg},
-        Base, Error, Event, WRef, Widget,
+        event::{Event, MouseButton},
+        Base, Error, WRef, Widget,
     },
     State,
 };
@@ -35,37 +35,35 @@ impl Widget for Panel {
         event: Event,
         state: &mut State,
     ) -> Result<(), Error> {
-        if let Event::InputEvent(i) = event {
-            match i {
-                InputEvent::MousePress(MouseButton::Left) => {
-                    if state.caught.is_none() {
-                        self.get_parent()
-                            .map(|p| p.upgrade().map(|p| p.borrow_mut().erase_widget(&self_rc)));
-                        self.offset = self.get_global_position() - state.mouse;
-                        self.set_position(state.mouse + self.offset);
-                        state.caught = Some(self_rc);
-                    }
+        match event {
+            Event::MousePress(MouseButton::Left) => {
+                if state.caught.is_none() {
+                    self.get_parent()
+                        .map(|p| p.upgrade().map(|p| p.borrow_mut().erase_widget(&self_rc)));
+                    self.offset = self.get_global_position() - state.mouse;
+                    self.set_position(state.mouse + self.offset);
+                    state.caught = Some(self_rc);
                 }
-                InputEvent::MouseRelease(MouseButton::Left) => {
-                    if let Some(caught) = state.caught.clone() {
-                        if caught == self_rc {
-                            self.get_parent().map(|p| {
-                                p.upgrade().map(|p| {
-                                    p.clone().borrow_mut().add_widget(p.into(), self, self_rc);
-                                })
-                            });
-                            state.caught = None;
-                            self.set_global_position(self.get_position());
-                        }
-                    }
-                }
-                InputEvent::MouseMove(..) => {
-                    if state.caught == Some(self_rc) {
-                        self.set_position(state.mouse + self.offset);
-                    }
-                }
-                _ => {}
             }
+            Event::MouseRelease(MouseButton::Left) => {
+                if let Some(caught) = state.caught.clone() {
+                    if caught == self_rc {
+                        self.get_parent().map(|p| {
+                            p.upgrade().map(|p| {
+                                p.clone().borrow_mut().add_widget(p.into(), self, self_rc);
+                            })
+                        });
+                        state.caught = None;
+                        self.set_global_position(self.get_position());
+                    }
+                }
+            }
+            Event::MouseMove => {
+                if state.caught == Some(self_rc) {
+                    self.set_position(state.mouse + self.offset);
+                }
+            }
+            _ => {}
         }
         Ok(())
     }

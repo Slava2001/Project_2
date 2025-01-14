@@ -1,5 +1,9 @@
 //! Scene manager
+pub mod event;
+pub mod runtime;
+
 use renderer::Drawable;
+use error_stack::Result;
 
 /// Scene error
 #[derive(Debug, thiserror::Error)]
@@ -7,14 +11,11 @@ use renderer::Drawable;
 pub struct Error(String);
 impl Error {
     /// Make error from message
-    fn msg<T: Into<String>>(msg: T) -> Self {
+    pub fn msg<T: Into<String>>(msg: T) -> Self {
         Self(msg.into())
     }
 }
 
-pub enum Event {}
-
-
 pub trait Scene: Drawable {
-    fn handle_event(e: Event) -> Result<(), Error>;
+    fn handle_event(&mut self, e: event::Event) -> Result<(), Error>;
 }

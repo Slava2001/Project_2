@@ -6,10 +6,9 @@ use error_stack::{Result, ResultExt};
 use std::{cell::RefCell, rc::Weak};
 
 use crate::manager::{
-    input_event::{InputEvent, MouseButton},
     widget::{
         builder::{self, BuildFromCfg},
-        Base, Error, Event, WRef, Widget,
+        Base, Error, event::{Event, MouseButton} , WRef, Widget,
     },
     State,
 };
@@ -54,8 +53,7 @@ impl Widget for Button {
         state: &mut State,
     ) -> Result<(), Error> {
         match event {
-            Event::InputEvent(input_event) => match input_event {
-                InputEvent::MousePress(mouse_button) => {
+            Event::MousePress(mouse_button) => {
                     if matches!(mouse_button, MouseButton::Left) && state.caught.is_none() {
                         self.set_position(self.get_global_position());
                         self.get_parent()
@@ -63,8 +61,8 @@ impl Widget for Button {
                         state.caught = Some(self_rc);
                         self.state = true;
                     }
-                }
-                InputEvent::MouseRelease(mouse_button) => {
+            }
+            Event::MouseRelease(mouse_button) => {
                     if matches!(mouse_button, MouseButton::Left)
                         && state.caught == Some(self_rc.clone())
                     {
@@ -84,11 +82,10 @@ impl Widget for Button {
                         self.hovered = self.check_bounds(state.mouse);
                         self.set_global_position(self.get_position());
                     }
-                }
-                InputEvent::MouseMove(..) => {}
-            },
+            }
             Event::MouseEnter => self.hovered = true,
             Event::MouseLeave => self.hovered = state.caught == Some(self_rc),
+            Event::MouseMove => {}
         }
         Ok(())
     }
