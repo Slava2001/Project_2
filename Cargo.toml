@@ -1,11 +1,22 @@
-# TODO нужен нормальный интерфейс создания сцен и не забыть вырезать билдер из gui
+# ввести абстрактный тип для конфига
+# добавить возможность инклюдить конфиги
 
 [workspace]
 resolver = "2"
-members = [ "builder","gui", "project_2", "renderer", "resources", "scene"]
+members = [
+    "builder",
+    "gui",
+    "project_2",
+    "renderer",
+    "resources",
+    "runtime",
+    "scene",
+]
 
 [workspace.dependencies]
+builder = { path = "./builder" }
 gui = { path = "./gui" }
+runtime = { path = "./runtime" }
 renderer = { path = "./renderer" }
 resources = { path = "./resources" }
 scene = { path = "./scene" }

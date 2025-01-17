@@ -1,4 +1,4 @@
-//! GUI input events
+//! Scene events
 
 /// Mouse buttons
 #[derive(Clone, Copy)]
@@ -11,7 +11,7 @@ pub enum MouseButton {
     Middle,
 }
 
-/// GUI input event
+/// Scene events
 #[derive(Clone, Copy)]
 pub enum Event {
     /// Mouse press button event

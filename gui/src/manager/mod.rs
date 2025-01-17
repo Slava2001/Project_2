@@ -2,11 +2,14 @@
 //!
 //! This module manages the life cycle of GUI elements
 
+use std::{cell::RefCell, rc::Rc};
+
+use crate::widget::Builder;
 use error_stack::{Result, ResultExt};
-use scene::event::Event as SceneEvent;
 use renderer::{vec2::Vec2f, Drawable, Renderer};
 use resources::Manger;
-use widget::{builder::Builder, event::Event, WRef};
+use scene::event::Event as SceneEvent;
+use widget::{event::Event, WRef};
 
 pub mod widget;
 
@@ -159,6 +162,23 @@ impl Manager {
     #[must_use]
     pub fn get_by_id(&self, id: &str) -> Option<WRef> {
         self.root.borrow().find(id)
+    }
+
+    /// Find widget by specified identification and downcast it
+    ///
+    /// # Errors
+    /// Return error if widget not found or can not be casted to specified type.
+    #[must_use]
+    pub fn get_by_id_cast<T: 'static>(&self, id: &str) -> Result<Rc<RefCell<T>>, Error> {
+        Ok(self
+            .get_by_id(id)
+            .ok_or(Error::msg(format!("Failed to find requested widget: id: \"{id}\"")))?
+            .try_cast::<T>()
+            .ok_or(Error::msg(format!(
+                "Widget \"{}\" has unexpected type. Expected: {}",
+                id,
+                std::any::type_name::<T>()
+            )))?)
     }
 }
 

@@ -1,6 +1,7 @@
 //! Scene manager
 pub mod event;
-pub mod runtime;
+mod builder;
+pub use builder::Builder;
 
 use renderer::Drawable;
 use error_stack::Result;

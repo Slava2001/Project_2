@@ -4,17 +4,18 @@
 
 use error_stack::{Result, ResultExt};
 use std::{cell::RefCell, rc::Weak};
-
+use builder::{self, BuildFromCfg};
 use crate::manager::{
     widget::{
-        builder::{self, BuildFromCfg},
         event::{Event, MouseButton},
-        Base, Error, WRef, Widget,
+        Error, WRef, Widget,
     },
     State,
 };
 use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
 use resources::TextureId;
+
+use super::Base;
 
 /// Change state callback. Args: flag and it is state
 type FlagCb = dyn FnMut(&mut Flag, bool);
@@ -162,7 +163,7 @@ impl Drawable for Flag {
     }
 }
 
-impl BuildFromCfg for Flag {
+impl BuildFromCfg<WRef> for Flag {
     fn build(
         mut cfg: config::Map<String, config::Value>,
         res: &mut dyn resources::Manger,

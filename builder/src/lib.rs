@@ -64,7 +64,7 @@ impl<T> Builder<T> {
     }
 
     /// Register object builder function ([`BuildFromCfg::build`])
-    pub fn reg_builder(&mut self, widget_type: String, builder: BuildFunc<T>) {
-        self.builders_map.insert(widget_type, builder);
+    pub fn reg_builder<K: Into<String>>(&mut self, object_type: K, builder: BuildFunc<T>) {
+        self.builders_map.insert(object_type.into(), builder);
     }
 }

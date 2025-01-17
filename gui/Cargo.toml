@@ -4,9 +4,13 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+builder = { workspace = true }
 scene = { workspace = true }
 renderer = { workspace = true }
 resources = { workspace = true }
 error-stack = { workspace = true }
 thiserror = { workspace = true }
 config = { workspace = true }
+
+[dev-dependencies]
+runtime = { workspace = true }

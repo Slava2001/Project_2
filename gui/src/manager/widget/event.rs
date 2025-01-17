@@ -1,7 +1,5 @@
 //! Widget events
 
-use error_stack::ResultExt;
-
 #[derive(Clone, Copy)]
 pub enum MouseButton {
     /// Mouse left button

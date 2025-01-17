@@ -5,16 +5,17 @@
 use error_stack::{Result, ResultExt};
 use std::{cell::RefCell, rc::Weak};
 
+use builder::{self, BuildFromCfg};
 use crate::manager::{
     widget::{
-        builder::{self, BuildFromCfg},
         event::{Event, MouseButton},
-        Base, Error, WRef, Widget,
+        Error, WRef, Widget,
     },
     State,
 };
 use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
 use resources::TextureId;
+use super::Base;
 
 /// Panel widget
 pub struct Panel {
@@ -132,7 +133,7 @@ impl Drawable for Panel {
     }
 }
 
-impl BuildFromCfg for Panel {
+impl BuildFromCfg<WRef> for Panel {
     fn build(
         mut cfg: config::Map<String, config::Value>,
         res: &mut dyn resources::Manger,

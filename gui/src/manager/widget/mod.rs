@@ -3,13 +3,10 @@
 use error_stack::Result;
 use std::{any::Any, cell::RefCell, rc::Weak};
 
-mod base;
-pub mod builder;
 pub mod event;
 mod wref;
 
 use super::State;
-pub use base::Base;
 use renderer::{rect::Rect, vec2::Vec2f, Drawable};
 pub use wref::WRef;
 use event::Event;

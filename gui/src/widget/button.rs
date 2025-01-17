@@ -5,15 +5,16 @@
 use error_stack::{Result, ResultExt};
 use std::{cell::RefCell, rc::Weak};
 
+use builder::{self, BuildFromCfg};
 use crate::manager::{
     widget::{
-        builder::{self, BuildFromCfg},
-        Base, Error, event::{Event, MouseButton} , WRef, Widget,
+        Error, event::{Event, MouseButton} , WRef, Widget,
     },
     State,
 };
 use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
 use resources::TextureId;
+use super::Base;
 
 /// Button click callback. Called then user click on button
 type ButtonCb = dyn FnMut(&mut Button);
@@ -161,7 +162,7 @@ impl Drawable for Button {
     }
 }
 
-impl BuildFromCfg for Button {
+impl BuildFromCfg<WRef> for Button {
     fn build(
         mut cfg: config::Map<String, config::Value>,
         res: &mut dyn resources::Manger,

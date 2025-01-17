@@ -651,10 +651,12 @@ dependencies = [
 name = "gui"
 version = "0.1.0"
 dependencies = [
+ "builder",
  "config",
  "error-stack",
  "renderer",
  "resources",
+ "runtime",
  "scene",
  "thiserror 2.0.11",
 ]
@@ -1411,6 +1413,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "runtime"
+version = "0.1.0"
+dependencies = [
+ "config",
+ "error-stack",
+ "piston",
+ "piston2d-graphics",
+ "piston2d-opengl_graphics",
+ "pistoncore-glutin_window",
+ "renderer",
+ "resources",
+ "scene",
+ "thiserror 2.0.11",
+]
+
+[[package]]
 name = "rust-ini"
 version = "0.21.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1456,11 +1474,8 @@ checksum = "f3cb5ba0dc43242ce17de99c180e96db90b235b8a9fdc9543c96d2209116bd9f"
 name = "scene"
 version = "0.1.0"
 dependencies = [
+ "builder",
  "error-stack",
- "piston",
- "piston2d-graphics",
- "piston2d-opengl_graphics",
- "pistoncore-glutin_window",
  "renderer",
  "resources",
  "thiserror 2.0.11",

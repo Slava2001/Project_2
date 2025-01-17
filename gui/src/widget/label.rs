@@ -4,16 +4,17 @@
 
 use error_stack::{Result, ResultExt};
 use std::{cell::RefCell, rc::Weak};
-
+use builder::{self, BuildFromCfg};
 use crate::manager::{
     widget::{
-        builder::{self, BuildFromCfg},
-        Base, Error, event::Event, WRef, Widget,
+         Error, event::Event, WRef, Widget,
     },
     State,
 };
 use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
 use resources::FontId;
+
+use super::Base;
 
 /// Label widget
 pub struct Label {
@@ -108,7 +109,7 @@ impl Drawable for Label {
     }
 }
 
-impl BuildFromCfg for Label {
+impl BuildFromCfg<WRef> for Label {
     fn build(
         mut cfg: config::Map<String, config::Value>,
         res: &mut dyn resources::Manger,

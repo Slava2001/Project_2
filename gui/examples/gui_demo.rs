@@ -2,17 +2,16 @@
 
 use std::{cell::RefCell, rc::Rc};
 
+use builder::BuildFromCfg;
 use config::{Config, File};
 use error_stack::{Result, ResultExt};
 use gui::{
-    manager::{
-        widget::{builder::Builder, Widget},
-        Manager,
-    },
-    widget::{Button, Flag, Label, Panel},
+    manager::{widget::Widget, Manager},
+    widget::{Builder, Button, Flag, Label, Panel},
 };
 use renderer::Drawable;
-use scene::{event::Event, runtime::Runtime, Scene};
+use runtime::Runtime;
+use scene::{event::Event, Scene};
 
 /// Window hight
 const WINDOW_H: u32 = 480;
@@ -37,56 +36,30 @@ fn main() {
 }
 
 fn run() -> Result<(), Error> {
-    let mut runtime =
+    let runtime =
         Runtime::new((WINDOW_H, WINDOW_W)).change_context(Error::msg("Failed to init runtime"))?;
-    let scene = MainScene::new(&mut runtime.resources)
-        .change_context(Error::msg("Failed to init main scene"))?;
-    runtime.run(Box::new(scene)).change_context(Error::msg("Runtime error"))?;
+    let mut builder = scene::Builder::new();
+    builder.reg_builder("main", MainScene::build);
+
+    let scene_cfg = Config::builder()
+        .add_source(File::with_name("./gui_demo.json"))
+        .build()
+        .change_context(Error::msg("Failed to build scene config"))?
+        .try_deserialize::<config::Map<String, config::Value>>()
+        .change_context(Error::msg("Failed to deserialize scene config as table"))?;
+    runtime.run(builder, scene_cfg).change_context(Error::msg("Runtime error"))?;
     Ok(())
 }
 
 struct MainScene {
     gui: Manager,
-    cursor_pos_lable: Rc<RefCell<Label>>,
-}
-
-fn get_gui_el<T: 'static>(gui: &gui::manager::Manager, id: &str) -> Result<Rc<RefCell<T>>, Error> {
-    Ok(gui
-        .get_by_id(id)
-        .ok_or_else(|| Error::msg(format!("Required GUI element \"{id}\" not found")))?
-        .try_cast::<T>()
-        .ok_or(Error::msg(format!("GUI element \"{id}\" has unexpected type")))?)
-}
-
-impl MainScene {
-    fn new(res: &mut dyn resources::Manger) -> Result<Self, Error> {
-        let gui_cfg = Config::builder()
-            .add_source(File::with_name("./gui_demo.json"))
-            .build()
-            .change_context(Error::msg("Failed to build GUI config"))?
-            .try_deserialize::<config::Map<String, config::Value>>()
-            .change_context(Error::msg("Failed to deserialize GUI config as table"))?;
-        let gui = Manager::new(&Builder::default(), res, gui_cfg)
-            .change_context(Error::msg("Failed to init GUI manager"))?;
-        get_gui_el::<Panel>(&gui, "middle_panel")?;
-        get_gui_el::<Button>(&gui, "hello_button")?.borrow_mut().click_cb(|button| {
-            println!("Button \"{}\" clicked!", button.get_id());
-        });
-        get_gui_el::<Label>(&gui, "debug_label_1")?.borrow_mut().set_text("Debug text:");
-        let cursor_pos_lable = get_gui_el::<Label>(&gui, "debug_label_2")?;
-        let debug_label_3 = get_gui_el::<Label>(&gui, "debug_label_3")?;
-        get_gui_el::<Flag>(&gui, "hello_flag")?.borrow_mut().change_state_cb(move |flag, state| {
-            debug_label_3.borrow_mut().set_text(format!("Flag state: {}", state));
-            println!("Flag \"{}\" change state: {}", flag.get_id(), state);
-        });
-        Ok(Self { gui, cursor_pos_lable })
-    }
+    cursor_pos_label: Rc<RefCell<Label>>,
 }
 
 impl Scene for MainScene {
     fn handle_event(&mut self, e: scene::event::Event) -> Result<(), scene::Error> {
         if let Event::MouseMove(x, y) = e {
-            self.cursor_pos_lable.borrow_mut().set_text(format!("Cursor pos: ({x}, {y})"));
+            self.cursor_pos_label.borrow_mut().set_text(format!("Cursor pos: ({x}, {y})"));
         }
         self.gui.handle_event(e).change_context(scene::Error::msg("Failed to update gui"))?;
         Ok(())
@@ -96,5 +69,39 @@ impl Scene for MainScene {
 impl Drawable for MainScene {
     fn draw(&self, renderer: &mut dyn renderer::Renderer) {
         self.gui.draw(renderer);
+    }
+}
+
+impl BuildFromCfg<Box<dyn Scene>> for MainScene {
+    fn build(
+        mut cfg: config::Map<String, config::Value>,
+        res: &mut dyn resources::Manger,
+    ) -> Result<Box<dyn Scene>, builder::Error> {
+        let gui_cfg = cfg
+            .remove("gui")
+            .ok_or_else(|| builder::Error::msg("Failed to build scene, GUI config not found"))?
+            .into_table()
+            .change_context(builder::Error::msg(
+                "Failed to build scene, GUI config is not a table",
+            ))?;
+        let gui = Manager::new(&Builder::default(), res, gui_cfg)
+            .change_context(builder::Error::msg("Failed to init GUI manager"))?;
+
+        let err = || builder::Error::msg("Failed to build scene, required widget not fount");
+        gui.get_by_id_cast::<Panel>("middle_panel").change_context_lazy(err)?;
+        let btn = gui.get_by_id_cast::<Button>("hello_button").change_context_lazy(err)?;
+        btn.borrow_mut().click_cb(|button| {
+            println!("Button \"{}\" clicked!", button.get_id());
+        });
+        let cursor_pos_label = gui.get_by_id_cast::<Label>("cursor_pos").change_context_lazy(err)?;
+
+        let flag_state = gui.get_by_id_cast::<Label>("flag_state").change_context_lazy(err)?;
+        let flag = gui.get_by_id_cast::<Flag>("hello_flag").change_context_lazy(err)?;
+        flag.borrow_mut().change_state_cb(move |flag, state| {
+            flag_state.borrow_mut().set_text(format!("Flag state: {}", state));
+            println!("Flag \"{}\" change state: {}", flag.get_id(), state);
+        });
+
+        Ok(Box::new(Self { gui, cursor_pos_label }))
     }
 }
