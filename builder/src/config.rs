@@ -143,11 +143,11 @@ impl<'de> Deserialize<'de> for Config {
 }
 
 #[cfg(test)]
+#[cfg(target_family = "unix")]
 mod tests {
     use super::Config;
 
     #[test]
-    #[cfg(target_family = "unix")]
     fn calc_path_test() {
         assert_eq!(Config::calc_path("./cfg/cfg.json", "oth.json").unwrap(), "./cfg/oth.json");
         assert_eq!(Config::calc_path("./cfg/cfg.json", "./oth.json").unwrap(), "./cfg/./oth.json");
