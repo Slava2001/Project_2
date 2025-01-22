@@ -2,8 +2,7 @@
 
 use std::{cell::RefCell, rc::Rc};
 
-use builder::BuildFromCfg;
-use config::{Config, File};
+use builder::{BuildFromCfg, Config};
 use error_stack::{Result, ResultExt};
 use gui::{
     manager::{widget::Widget, Manager},
@@ -13,10 +12,12 @@ use renderer::Drawable;
 use runtime::Runtime;
 use scene::{event::Event, Scene};
 
+/// Window scale
+const WINDOW_SCALE: u32 = 50;
 /// Window hight
-const WINDOW_H: u32 = 480;
+const WINDOW_H: u32 = 16 * WINDOW_SCALE;
 /// Window width
-const WINDOW_W: u32 = 480;
+const WINDOW_W: u32 = 9 * WINDOW_SCALE;
 
 /// Simple error
 #[derive(Debug, thiserror::Error)]
@@ -41,13 +42,9 @@ fn run() -> Result<(), Error> {
     let mut builder = scene::Builder::new();
     builder.reg_builder("main", MainScene::build);
 
-    let scene_cfg = Config::builder()
-        .add_source(File::with_name("./gui_demo.json"))
-        .build()
-        .change_context(Error::msg("Failed to build scene config"))?
-        .try_deserialize::<config::Map<String, config::Value>>()
-        .change_context(Error::msg("Failed to deserialize scene config as table"))?;
-    runtime.run(builder, scene_cfg).change_context(Error::msg("Runtime error"))?;
+    let scene_cfg =
+        Config::new("./gui_demo.json").change_context(Error::msg("Failed to load scene config"))?;
+    runtime.run(&builder, scene_cfg).change_context(Error::msg("Runtime error"))?;
     Ok(())
 }
 
@@ -74,16 +71,12 @@ impl Drawable for MainScene {
 
 impl BuildFromCfg<Box<dyn Scene>> for MainScene {
     fn build(
-        mut cfg: config::Map<String, config::Value>,
+        mut cfg: Config,
         res: &mut dyn resources::Manger,
     ) -> Result<Box<dyn Scene>, builder::Error> {
         let gui_cfg = cfg
-            .remove("gui")
-            .ok_or_else(|| builder::Error::msg("Failed to build scene, GUI config not found"))?
-            .into_table()
-            .change_context(builder::Error::msg(
-                "Failed to build scene, GUI config is not a table",
-            ))?;
+            .take::<Config>("gui")
+            .change_context(builder::Error::msg("Failed to build scene GUI"))?;
         let gui = Manager::new(&Builder::default(), res, gui_cfg)
             .change_context(builder::Error::msg("Failed to init GUI manager"))?;
 
@@ -93,7 +86,8 @@ impl BuildFromCfg<Box<dyn Scene>> for MainScene {
         btn.borrow_mut().click_cb(|button| {
             println!("Button \"{}\" clicked!", button.get_id());
         });
-        let cursor_pos_label = gui.get_by_id_cast::<Label>("cursor_pos").change_context_lazy(err)?;
+        let cursor_pos_label =
+            gui.get_by_id_cast::<Label>("cursor_pos").change_context_lazy(err)?;
 
         let flag_state = gui.get_by_id_cast::<Label>("flag_state").change_context_lazy(err)?;
         let flag = gui.get_by_id_cast::<Flag>("hello_flag").change_context_lazy(err)?;

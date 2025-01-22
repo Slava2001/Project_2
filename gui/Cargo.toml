@@ -10,7 +10,6 @@ renderer = { workspace = true }
 resources = { workspace = true }
 error-stack = { workspace = true }
 thiserror = { workspace = true }
-config = { workspace = true }
 
 [dev-dependencies]
 runtime = { workspace = true }

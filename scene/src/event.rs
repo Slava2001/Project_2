@@ -1,23 +1,23 @@
-//! Scene events
+//! Scene events.
 
-/// Mouse buttons
+/// Mouse buttons.
 #[derive(Clone, Copy)]
 pub enum MouseButton {
-    /// Mouse left button
+    /// Mouse left button.
     Left,
-    /// Mouse right button
+    /// Mouse right button.
     Right,
-    /// Mouse middle button
+    /// Mouse middle button.
     Middle,
 }
 
-/// Scene events
+/// Scene events.
 #[derive(Clone, Copy)]
 pub enum Event {
-    /// Mouse press button event
+    /// Mouse press button event.
     MousePress(MouseButton),
-    /// Mouse release button event
+    /// Mouse release button event.
     MouseRelease(MouseButton),
-    /// Mouse move event
+    /// Mouse move event.
     MouseMove(f64, f64),
 }

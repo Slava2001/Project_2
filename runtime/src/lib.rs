@@ -1,9 +1,9 @@
+//! Simple runtime implementation.
+
 mod renderer;
 mod resmgr;
 
-use std::collections::HashMap;
-
-use config::Value;
+use builder::Config;
 use error_stack::{Result, ResultExt};
 use glutin_window::GlutinWindow as Window;
 use graphics::clear;
@@ -16,23 +16,30 @@ use renderer::Renderer;
 use resmgr::ResMngr;
 use scene::event::{Event, MouseButton};
 
-/// Runtime error
+/// Runtime error.
 #[derive(Debug, thiserror::Error)]
 #[error("{0}")]
 pub struct Error(String);
 impl Error {
-    /// Make error from message
+    /// Make error from message.
     fn msg<T: Into<String>>(msg: T) -> Self {
         Self(msg.into())
     }
 }
 
+/// Simple runtime implementation.
 pub struct Runtime {
+    /// Window.
     window: Window,
+    /// OpenGL data.
     gl: GlGraphics,
 }
 
 impl Runtime {
+    /// Creates new runtime instance.
+    ///
+    /// # Errors
+    /// Return error if failed to init window.
     pub fn new(window_size: (u32, u32)) -> Result<Self, Error> {
         let window: Window = WindowSettings::new("GUI Demo", window_size)
             .graphics_api(OpenGL::V3_2)
@@ -42,11 +49,11 @@ impl Runtime {
         Ok(Self { window, gl })
     }
 
-    pub fn run(
-        mut self,
-        scene_builder: scene::Builder,
-        scene_cfg: HashMap<String, Value>,
-    ) -> Result<(), Error> {
+    /// Run runtime cycle.
+    ///
+    /// # Errors
+    /// Return error if some scene failed.
+    pub fn run(mut self, scene_builder: &scene::Builder, scene_cfg: Config) -> Result<(), Error> {
         let mut events = Events::new(EventSettings::new());
         let mut resources = ResMngr::new();
         let mut scene = scene_builder

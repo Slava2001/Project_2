@@ -1,16 +1,25 @@
-use std::collections::HashMap;
-use std::path::Path;
+//! Simple resource manager implementation.
+
 use error_stack::{bail, Result};
 use opengl_graphics::{GlyphCache, Texture, TextureSettings};
 use resources::{self, FontId, Manger, TextureId};
+use std::collections::HashMap;
+use std::path::Path;
 
+/// Simple resource manager implementation.
 pub struct ResMngr {
+    /// All loaded textures.
     pub textures: Vec<Texture>,
+    /// Map to associate texture string name with index in textures vector.
     textures_map: HashMap<String, TextureId>,
+    /// All loaded fonts.
     pub fonts: Vec<GlyphCache<'static>>,
+    /// Map to associate font string name with index in fonts vector.
     fonts_map: HashMap<String, FontId>,
 }
 impl ResMngr {
+    /// Creates new resource manager.
+    #[must_use]
     pub fn new() -> Self {
         Self {
             textures: Vec::new(),
@@ -56,13 +65,13 @@ impl Manger for ResMngr {
         Ok(*self
             .textures_map
             .get(name)
-            .ok_or(resources::Error::msg(format!("Failed to find texture: \"{name}\"")))?)
+            .ok_or_else(|| resources::Error::msg(format!("Failed to find texture: \"{name}\"")))?)
     }
 
     fn get_font(&self, name: &str) -> Result<resources::FontId, resources::Error> {
         Ok(*self
             .fonts_map
             .get(name)
-            .ok_or(resources::Error::msg(format!("Failed to find font: \"{name}\"")))?)
+            .ok_or_else(|| resources::Error::msg(format!("Failed to find font: \"{name}\"")))?)
     }
 }

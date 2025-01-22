@@ -1,10 +1,11 @@
-//! GUI manager
+//! GUI manager.
 //!
-//! This module manages the life cycle of GUI elements
+//! This module manages the life cycle of GUI elements.
 
 use std::{cell::RefCell, rc::Rc};
 
 use crate::widget::Builder;
+use builder::Config;
 use error_stack::{Result, ResultExt};
 use renderer::{vec2::Vec2f, Drawable, Renderer};
 use resources::Manger;
@@ -13,12 +14,12 @@ use widget::{event::Event, WRef};
 
 pub mod widget;
 
-/// Manager error
+/// Manager error.
 #[derive(Debug, thiserror::Error)]
 #[error("{0}")]
 pub struct Error(String);
 impl Error {
-    /// Make error from message
+    /// Make error from message.
     fn msg<T: Into<String>>(msg: T) -> Self {
         Self(msg.into())
     }
@@ -34,24 +35,20 @@ pub struct State {
 
 /// GUI manager
 pub struct Manager {
-    /// Reference on widget under cursor
+    /// Reference on widget under cursor.
     hovered: WRef,
-    /// Reference on root widget
+    /// Reference on root widget.
     root: WRef,
-    /// manager state
+    /// Manager state.
     state: State,
 }
 
 impl Manager {
-    /// Create new GUI manager
+    /// Create new GUI manager.
     ///
     /// # Errors
-    /// Return error if config is not valid
-    pub fn new(
-        builder: &Builder,
-        res: &mut dyn Manger,
-        cfg: config::Map<String, config::Value>,
-    ) -> Result<Self, Error> {
+    /// Return error if config is not valid.
+    pub fn new(builder: &Builder, res: &mut dyn Manger, cfg: Config) -> Result<Self, Error> {
         let root = Self::make_gui_tree(builder, cfg, res)?;
         Ok(Self {
             hovered: root.clone(),
@@ -60,50 +57,41 @@ impl Manager {
         })
     }
 
-    /// Recursive make gui tree with given config
+    /// Recursive make gui tree with given config.
     fn make_gui_tree(
         builder: &Builder,
-        mut cfg: config::Map<String, config::Value>,
+        mut cfg: Config,
         res_mngr: &mut dyn Manger,
     ) -> Result<WRef, Error> {
-        if let Some(res_cfg) = cfg.remove("recourses") {
-            let res_arr = res_cfg
-                .into_array()
-                .change_context(Error::msg("\"recourses\" field is not array"))?;
-            for res in res_arr {
-                let mut table = res
-                    .into_table()
-                    .change_context(Error::msg("\"recourses\" array item is not a table"))?;
-
-                let mut gets = |str| {
-                    table
-                        .remove(str)
-                        .ok_or_else(|| {
-                            Error::msg(format!("Some resource has not field \"{str}\""))
-                        })?
-                        .into_string()
-                        .change_context(Error::msg(format!(
-                            "Some resource has invalid field \"{str}\""
-                        )))
-                };
-                let name = gets("name")?;
-                let kind = gets("type")?;
-                let path = gets("path")?;
+        if let Some(res_arr) = cfg
+            .take_opt::<Vec<Config>>("recourses")
+            .change_context(Error::msg("Failed to init recourses"))?
+        {
+            for mut res in res_arr {
+                let name = res
+                    .take::<String>("name")
+                    .change_context(Error::msg("Failed to init resource"))?;
+                let kind = res
+                    .take::<String>("type")
+                    .change_context(Error::msg("Failed to init resource"))?;
+                let path = res
+                    .take::<String>("path")
+                    .change_context(Error::msg("Failed to init resource"))?;
                 res_mngr.load(&kind, &name, &path).change_context(Error::msg(format!(
                     "Failed to load resource: name: \"{name}\", type: \"{kind}\", path: \"{path}\""
                 )))?;
             }
         }
 
-        let childs_cfg = cfg.remove("childs");
+        let childs_cfg = cfg
+            .take_opt::<Vec<Config>>("childs")
+            .change_context(Error::msg("Failed to get childs config"))?;
         let widget =
             builder.build(cfg, res_mngr).change_context(Error::msg("Failed to build widget"))?;
 
         if let Some(childs_cfg) = childs_cfg {
-            let childs_cfg = childs_cfg.into_array().unwrap();
             for child_cfg in childs_cfg {
-                let child =
-                    Self::make_gui_tree(builder, child_cfg.into_table().unwrap(), res_mngr)?;
+                let child = Self::make_gui_tree(builder, child_cfg, res_mngr)?;
                 widget.borrow_mut().add_widget(
                     widget.clone(),
                     &mut *child.borrow_mut(),
@@ -115,10 +103,10 @@ impl Manager {
         Ok(widget)
     }
 
-    /// Handle event
+    /// Handle event.
     ///
     /// # Errors
-    /// Return error if widget failed to handle event
+    /// Return error if widget failed to handle event.
     pub fn handle_event(&mut self, event: SceneEvent) -> Result<(), Error> {
         if let SceneEvent::MouseMove(x, y) = event {
             self.state.mouse = (x, y).into();
@@ -141,7 +129,7 @@ impl Manager {
         Ok(())
     }
 
-    /// Update hovered widget
+    /// Update hovered widget.
     fn update_hovered(&mut self, pos: Vec2f) -> Result<(), Error> {
         let hovered = self.root.borrow().get_hovered(pos).unwrap_or_else(|| self.root.clone());
         if self.hovered != hovered {
@@ -158,32 +146,33 @@ impl Manager {
         Ok(())
     }
 
-    /// Find widget by specified identification
+    /// Find widget by specified identification.
     #[must_use]
     pub fn get_by_id(&self, id: &str) -> Option<WRef> {
         self.root.borrow().find(id)
     }
 
-    /// Find widget by specified identification and downcast it
+    /// Find widget by specified identification and downcast it.
     ///
     /// # Errors
     /// Return error if widget not found or can not be casted to specified type.
-    #[must_use]
     pub fn get_by_id_cast<T: 'static>(&self, id: &str) -> Result<Rc<RefCell<T>>, Error> {
         Ok(self
             .get_by_id(id)
-            .ok_or(Error::msg(format!("Failed to find requested widget: id: \"{id}\"")))?
+            .ok_or_else(|| Error::msg(format!("Failed to find requested widget: id: \"{id}\"")))?
             .try_cast::<T>()
-            .ok_or(Error::msg(format!(
-                "Widget \"{}\" has unexpected type. Expected: {}",
-                id,
-                std::any::type_name::<T>()
-            )))?)
+            .ok_or_else(|| {
+                Error::msg(format!(
+                    "Widget \"{}\" has unexpected type. Expected: {}",
+                    id,
+                    std::any::type_name::<T>()
+                ))
+            })?)
     }
 }
 
 impl Drawable for Manager {
-    /// Draw all visible widgets
+    /// Draw all visible widgets.
     fn draw(&self, renderer: &mut dyn Renderer) {
         self.root.borrow().draw(renderer);
         if let Some(ref c) = self.state.caught {

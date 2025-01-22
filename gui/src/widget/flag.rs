@@ -2,9 +2,6 @@
 //!
 //! Flag widget, that change state by click
 
-use error_stack::{Result, ResultExt};
-use std::{cell::RefCell, rc::Weak};
-use builder::{self, BuildFromCfg};
 use crate::manager::{
     widget::{
         event::{Event, MouseButton},
@@ -12,8 +9,11 @@ use crate::manager::{
     },
     State,
 };
+use builder::{self, BuildFromCfg, Config};
+use error_stack::{Result, ResultExt};
 use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
 use resources::TextureId;
+use std::{cell::RefCell, rc::Weak};
 
 use super::Base;
 
@@ -164,30 +164,18 @@ impl Drawable for Flag {
 }
 
 impl BuildFromCfg<WRef> for Flag {
-    fn build(
-        mut cfg: config::Map<String, config::Value>,
-        res: &mut dyn resources::Manger,
-    ) -> Result<WRef, builder::Error> {
-        let bg_texture = cfg
-            .remove("background")
-            .ok_or_else(|| builder::Error::msg("Failed to init flag, no filed \"background\""))?;
-        let bg_name = bg_texture.into_string().change_context(builder::Error::msg(
-            "Failed to init flag, filed \"background\" is not a string",
-        ))?;
+    fn build(mut cfg: Config, res: &mut dyn resources::Manger) -> Result<WRef, builder::Error> {
+        let bg_name = cfg
+            .take::<String>("background")
+            .change_context(builder::Error::msg("Failed to init flag background texture"))?;
         let texture = res.get_texture(&bg_name).change_context(builder::Error::msg(format!(
             "Failed to init flag, texture: \"{bg_name}\" not found"
         )))?;
 
         let mut get_rect = |name| -> Result<Rect<f64>, builder::Error> {
             Ok(cfg
-                .remove(name)
-                .ok_or_else(|| {
-                    builder::Error::msg(format!("Failed to init flag, no filed \"{name}\""))
-                })?
-                .try_deserialize::<[f64; 4]>()
-                .change_context(builder::Error::msg(format!(
-                    "Failed deserialize filed \"{name}\" as rectangle"
-                )))?
+                .take::<[f64; 4]>(name)
+                .change_context(builder::Error::msg("Failed to init flag"))?
                 .into())
         };
 

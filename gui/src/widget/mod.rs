@@ -1,21 +1,21 @@
 //! Implementations of widget
 
+mod base;
 mod button;
 mod flag;
 mod label;
 mod panel;
-mod base;
 
 use std::ops::{Deref, DerefMut};
 
+pub use base::Base;
 pub use button::Button;
 pub use flag::Flag;
 pub use label::Label;
 pub use panel::Panel;
-pub use base::Base;
 
-use builder::{BuildFromCfg, Builder as BaseBuilder};
 use crate::manager::widget::WRef;
+use builder::{BuildFromCfg, Builder as BaseBuilder};
 
 /// Widget builder.
 pub struct Builder(BaseBuilder<WRef>);

@@ -1,0 +1,7 @@
+{
+    "str": "Hello",
+    "cfg": {
+        "str": "World",
+        "include": "file!:../tests/include.yml"
+    }
+}

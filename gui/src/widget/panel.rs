@@ -5,7 +5,7 @@
 use error_stack::{Result, ResultExt};
 use std::{cell::RefCell, rc::Weak};
 
-use builder::{self, BuildFromCfg};
+use super::Base;
 use crate::manager::{
     widget::{
         event::{Event, MouseButton},
@@ -13,9 +13,9 @@ use crate::manager::{
     },
     State,
 };
+use builder::{self, BuildFromCfg, Config};
 use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
 use resources::TextureId;
-use super::Base;
 
 /// Panel widget
 pub struct Panel {
@@ -134,29 +134,19 @@ impl Drawable for Panel {
 }
 
 impl BuildFromCfg<WRef> for Panel {
-    fn build(
-        mut cfg: config::Map<String, config::Value>,
-        res: &mut dyn resources::Manger,
-    ) -> Result<WRef, builder::Error> {
-        let bg_texture = cfg
-            .remove("background")
-            .ok_or_else(|| builder::Error::msg("Failed to init panel, no filed \"background\""))?;
-        let bg_name = bg_texture.into_string().change_context(builder::Error::msg(
-            "Failed to init panel, filed \"background\" is not a string",
-        ))?;
+    fn build(mut cfg: Config, res: &mut dyn resources::Manger) -> Result<WRef, builder::Error> {
+        let bg_name = cfg
+            .take::<String>("background")
+            .change_context(builder::Error::msg("Failed to init button background texture"))?;
         let texture = res.get_texture(&bg_name).change_context(builder::Error::msg(format!(
-            "Failed to init panel, texture: \"{bg_name}\" not found"
+            "Failed to init button, texture: \"{bg_name}\" not found"
         )))?;
+
         let texture_rect = cfg
-            .remove("background_rect")
-            .ok_or_else(|| {
-                builder::Error::msg("Failed to init panel, no filed \"background_rect\"")
-            })?
-            .try_deserialize::<[f64; 4]>()
-            .change_context(builder::Error::msg(
-                "Failed deserialize filed \"background_rect\" as rectangle",
-            ))?
+            .take::<[f64; 4]>("background_rect")
+            .change_context(builder::Error::msg("Failed to init button"))?
             .into();
+
         Ok(WRef::new(Self {
             base: Base::new(cfg)?,
             texture,

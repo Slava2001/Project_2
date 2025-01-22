@@ -9,13 +9,11 @@ use std::{
 use renderer::{color, rect::Rect, vec2::Vec2f, Drawable, Renderer};
 use resources::Manger;
 
-use builder::{self, BuildFromCfg};
 use crate::manager::{
-    widget::{
-        Error, event::Event, WRef, Widget,
-    },
+    widget::{event::Event, Error, WRef, Widget},
     State,
 };
+use builder::{self, BuildFromCfg, Config};
 
 /// Base implementation of widget
 pub struct Base {
@@ -36,28 +34,20 @@ impl Base {
     ///
     /// # Errors
     /// Return error if config is not valid
-    pub fn new(mut cfg: config::Map<String, config::Value>) -> Result<Self, builder::Error> {
-        let rect = if let Some(rect) = cfg.remove("rect") {
-            rect.try_deserialize::<[f64; 4]>()
-                .change_context(builder::Error::msg("Failed to parse \"rect\" field as bounds"))?
-        } else {
-            [0.0; 4]
-        }
-        .into();
-        let debug = if let Some(debug) = cfg.remove("debug") {
-            debug.into_bool().change_context(builder::Error::msg(
-                "Failed to parse \"debug\" field as debug flag",
-            ))?
-        } else {
-            false
-        };
-        let id = if let Some(debug) = cfg.remove("id") {
-            debug.into_string().change_context(builder::Error::msg(
-                "Failed to parse \"id\" field widget identifier",
-            ))?
-        } else {
-            String::new()
-        };
+    pub fn new(mut cfg: Config) -> Result<Self, builder::Error> {
+        let rect = cfg
+            .take_opt::<[f64; 4]>("rect")
+            .change_context(builder::Error::msg("Failed to init base widget bounds"))?
+            .unwrap_or([0.0; 4])
+            .into();
+        let debug = cfg
+            .take_opt::<bool>("debug")
+            .change_context(builder::Error::msg("Failed to init debug flag"))?
+            .unwrap_or(false);
+        let id = cfg
+            .take_opt::<String>("id")
+            .change_context(builder::Error::msg("Failed to widget id"))?
+            .unwrap_or_default();
         Ok(Self { rect, childs: Vec::new(), parent: None, debug, id })
     }
 }
@@ -179,10 +169,7 @@ impl Drawable for Base {
 }
 
 impl BuildFromCfg<WRef> for Base {
-    fn build(
-        cfg: config::Map<String, config::Value>,
-        _r: &mut dyn Manger,
-    ) -> Result<WRef, builder::Error> {
+    fn build(cfg: Config, _r: &mut dyn Manger) -> Result<WRef, builder::Error> {
         Ok(WRef::new(Self::new(cfg)?))
     }
 }

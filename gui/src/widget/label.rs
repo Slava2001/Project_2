@@ -2,17 +2,15 @@
 //!
 //! Label widget, that used for display text
 
-use error_stack::{Result, ResultExt};
-use std::{cell::RefCell, rc::Weak};
-use builder::{self, BuildFromCfg};
 use crate::manager::{
-    widget::{
-         Error, event::Event, WRef, Widget,
-    },
+    widget::{event::Event, Error, WRef, Widget},
     State,
 };
+use builder::{self, BuildFromCfg, Config};
+use error_stack::{Result, ResultExt};
 use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
 use resources::FontId;
+use std::{cell::RefCell, rc::Weak};
 
 use super::Base;
 
@@ -110,35 +108,18 @@ impl Drawable for Label {
 }
 
 impl BuildFromCfg<WRef> for Label {
-    fn build(
-        mut cfg: config::Map<String, config::Value>,
-        res: &mut dyn resources::Manger,
-    ) -> Result<WRef, builder::Error> {
+    fn build(mut cfg: Config, res: &mut dyn resources::Manger) -> Result<WRef, builder::Error> {
         Ok(WRef::new(Self {
             text: cfg
-                .remove("text")
-                .ok_or_else(|| builder::Error::msg("Failed to init label, no filed \"text\""))?
-                .into_string()
-                .change_context(builder::Error::msg(
-                    "Failed to init label, filed \"text\" is not a string",
-                ))?,
+                .take::<String>("text")
+                .change_context(builder::Error::msg("Failed to init label text"))?,
             size: cfg
-                .remove("font_size")
-                .ok_or_else(|| builder::Error::msg("Failed to init label, no filed \"font_size\""))?
-                .into_float()
-                .change_context(builder::Error::msg(
-                    "Failed to init label, filed \"font_size\" is not a float number",
-                ))?,
+                .take::<f64>("font_size")
+                .change_context(builder::Error::msg("Failed to init label font size"))?,
             font: res
                 .get_font(
-                    &cfg.remove("font")
-                        .ok_or_else(|| {
-                            builder::Error::msg("Failed to init label, no filed \"font\"")
-                        })?
-                        .into_string()
-                        .change_context(builder::Error::msg(
-                            "Failed to init label, filed \"font\" is not a string",
-                        ))?,
+                    &cfg.take::<String>("font")
+                        .change_context(builder::Error::msg("Failed to init label font"))?,
                 )
                 .change_context(builder::Error::msg("Failed to find required font"))?,
             base: Base::new(cfg)?,

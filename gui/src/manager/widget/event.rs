@@ -1,27 +1,28 @@
-//! Widget events
+//! Widget events.
 
+/// Mouse buttons.
 #[derive(Clone, Copy)]
 pub enum MouseButton {
-    /// Mouse left button
+    /// Mouse left button.
     Left,
-    /// Mouse right button
+    /// Mouse right button.
     Right,
-    /// Mouse middle button
+    /// Mouse middle button.
     Middle,
 }
 
-/// Widget events
+/// Widget events.
 #[derive(Clone, Copy)]
 pub enum Event {
-    /// Mouse press button event
+    /// Mouse press button event.
     MousePress(MouseButton),
-    /// Mouse release button event
+    /// Mouse release button event.
     MouseRelease(MouseButton),
-    /// Cursor moving event
+    /// Cursor moving event.
     MouseMove,
-    /// Cursor enter in widget bounds
+    /// Cursor enter in widget bounds.
     MouseEnter,
-    /// Cursor leave from widget bounds
+    /// Cursor leave from widget bounds.
     MouseLeave,
 }
 
@@ -30,7 +31,7 @@ pub enum Event {
 #[error("{0}")]
 pub struct Error(String);
 impl Error {
-    /// Make error from message
+    /// Make error from message.
     pub fn msg<T: Into<String>>(msg: T) -> Self {
         Self(msg.into())
     }
@@ -42,9 +43,9 @@ impl TryFrom<scene::event::Event> for Event {
     fn try_from(value: scene::event::Event) -> Result<Self, Self::Error> {
         use scene::event;
         Ok(match value {
-            event::Event::MousePress(b) => Event::MousePress(b.try_into()?),
-            event::Event::MouseRelease(b) => Event::MouseRelease(b.try_into()?),
-            event::Event::MouseMove(..) => Event::MouseMove,
+            event::Event::MousePress(b) => Self::MousePress(b.try_into()?),
+            event::Event::MouseRelease(b) => Self::MouseRelease(b.try_into()?),
+            event::Event::MouseMove(..) => Self::MouseMove,
         })
     }
 }
@@ -55,9 +56,9 @@ impl TryFrom<scene::event::MouseButton> for MouseButton {
     fn try_from(value: scene::event::MouseButton) -> Result<Self, Self::Error> {
         use scene::event;
         Ok(match value {
-            event::MouseButton::Left => MouseButton::Left,
-            event::MouseButton::Right => MouseButton::Right,
-            event::MouseButton::Middle => MouseButton::Middle,
+            event::MouseButton::Left => Self::Left,
+            event::MouseButton::Right => Self::Right,
+            event::MouseButton::Middle => Self::Middle,
         })
     }
 }

@@ -163,6 +163,7 @@ dependencies = [
  "config",
  "error-stack",
  "resources",
+ "serde",
  "thiserror 2.0.11",
 ]
 
@@ -652,7 +653,6 @@ name = "gui"
 version = "0.1.0"
 dependencies = [
  "builder",
- "config",
  "error-stack",
  "renderer",
  "resources",
@@ -1306,7 +1306,6 @@ dependencies = [
 name = "project_2"
 version = "0.1.0"
 dependencies = [
- "config",
  "error-stack",
  "gui",
  "renderer",
@@ -1416,7 +1415,7 @@ dependencies = [
 name = "runtime"
 version = "0.1.0"
 dependencies = [
- "config",
+ "builder",
  "error-stack",
  "piston",
  "piston2d-graphics",

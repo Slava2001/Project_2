@@ -10,4 +10,3 @@ scene = { workspace = true }
 gui = { workspace = true }
 error-stack = { workspace = true }
 thiserror = { workspace = true }
-config = { workspace = true }

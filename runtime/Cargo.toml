@@ -7,9 +7,9 @@ edition = "2021"
 resources = { workspace = true }
 renderer = { workspace = true }
 scene = { workspace = true }
+builder = { workspace = true }
 error-stack = { workspace = true }
 thiserror = { workspace = true }
-config = { workspace = true }
 
 piston = "1.0.0"
 piston2d-graphics = "0.44.0"

@@ -1,9 +1,11 @@
+//! Simple renderer implementation.
+
+use super::resmgr::ResMngr;
 use graphics::rectangle::Border;
 use graphics::{line, text, Context, DrawState, Image, Rectangle, Transformed};
 use opengl_graphics::GlGraphics;
 use renderer::vec2::Vec2f;
 use renderer::{color::Color, rect::Rect};
-use super::resmgr::ResMngr;
 
 /// Simple implementation of renderer
 pub struct Renderer<'a> {
@@ -72,13 +74,15 @@ impl renderer::Renderer for Renderer<'_> {
 
     fn draw_text(&mut self, txt: &str, size: f64, pos: Vec2f, font: resources::FontId) {
         let font = self.res.fonts.get_mut(font.0).unwrap();
-        let scale = font.font.scale_for_pixel_height(size as f32) as f64;
-        let transform = self
-            .ctx
-            .last()
-            .unwrap()
-            .transform
-            .trans(pos.x, pos.y + font.font.v_metrics_unscaled().ascent as f64 * scale);
+        #[allow(clippy::cast_possible_truncation)]
+        let scale = f64::from(font.font.scale_for_pixel_height(size as f32));
+        let transform =
+            self.ctx.last().unwrap().transform.trans(
+                pos.x,
+                f64::from(font.font.v_metrics_unscaled().ascent).mul_add(scale, pos.y),
+            );
+        #[allow(clippy::cast_sign_loss)]
+        #[allow(clippy::cast_possible_truncation)]
         text([0.0, 0.0, 0.0, 1.0], size as u32, txt, font, transform, self.g).unwrap();
     }
 }
