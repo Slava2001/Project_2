@@ -1,6 +1,6 @@
-//! Flag
+//! Flag.
 //!
-//! Flag widget, that change state by click
+//! Flag widget, that change state by click.
 
 use crate::manager::{
     widget::{
@@ -17,28 +17,28 @@ use std::{cell::RefCell, rc::Weak};
 
 use super::Base;
 
-/// Change state callback. Args: flag and it is state
+/// Change state callback. Args: flag and it is state.
 type FlagCb = dyn FnMut(&mut Flag, bool);
 
-/// Flag widget
+/// Flag widget.
 pub struct Flag {
-    /// Base widget
+    /// Base widget.
     base: Base,
-    /// Background texture
+    /// Background texture.
     texture: TextureId,
-    /// Background texture rectangle on on state
+    /// Background texture rectangle on on state.
     texture_rect_on: Rect<f64>,
-    /// Background texture rectangle on off state
+    /// Background texture rectangle on off state.
     texture_rect_off: Rect<f64>,
-    /// Background texture rectangle on hovered and on state
+    /// Background texture rectangle on hovered and on state.
     texture_rect_hovered_on: Rect<f64>,
-    /// Background texture rectangle on hovered and off state
+    /// Background texture rectangle on hovered and off state.
     texture_rect_hovered_off: Rect<f64>,
-    /// Is widget hovered
+    /// Is widget hovered.
     hovered: bool,
-    /// Flag state
+    /// Flag state.
     state: bool,
-    /// Change state cb
+    /// Change state cb.
     cb: Option<Box<FlagCb>>,
 }
 

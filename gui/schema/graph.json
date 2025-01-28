@@ -1,0 +1,27 @@
+{
+    "properties": {
+        "type": {
+            "type": "string",
+            "enum": [
+                "graph"
+            ]
+        },
+        "value_max_count": {
+            "type": "integer",
+            "minimum": 1,
+            "description":"Queue length"
+        },
+        "value_max": {
+            "type": "number",
+            "description":"Maximum value"
+        },
+        "value_min": {
+            "type": "number",
+            "description":"Minimum value"
+        },
+        "color": {
+            "$ref": "./defines/color.json",
+            "description":"Graph color"
+        }
+    }
+}

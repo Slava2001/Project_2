@@ -1,4 +1,4 @@
-//! Base implementation of widget. It used as root of GUI tree and for implementing other widget
+//! Base implementation of widget. It used as root of GUI tree and for implementing other widget.
 
 use error_stack::{Result, ResultExt};
 use std::{
@@ -15,25 +15,25 @@ use crate::manager::{
 };
 use builder::{self, BuildFromCfg, Config};
 
-/// Base implementation of widget
+/// Base implementation of widget.
 pub struct Base {
-    /// Widget bounds
+    /// Widget bounds.
     rect: Rect<f64>,
-    /// Widget childs
+    /// Widget childs.
     childs: Vec<WRef>,
-    /// Reference on parent widget
+    /// Reference on parent widget.
     parent: Option<Weak<RefCell<dyn Widget>>>,
-    /// Enable debug mode
+    /// Enable debug mode.
     debug: bool,
-    /// Widget identifier
+    /// Widget identifier.
     id: String,
 }
 
 impl Base {
-    /// Create new Base widget from config
+    /// Create new Base widget from config.
     ///
     /// # Errors
-    /// Return error if config is not valid
+    /// Return error if config is not valid.
     pub fn new(mut cfg: Config) -> Result<Self, builder::Error> {
         let rect = cfg
             .take_opt::<[f64; 4]>("rect")
@@ -161,7 +161,8 @@ impl Drawable for Base {
         for c in &self.childs {
             c.borrow().draw(renderer);
             if self.debug {
-                renderer.draw_line((0.0, 0.0).into(), c.borrow_mut().get_position(), &color::RED);
+                renderer
+                    .draw_line(&[(0.0, 0.0).into(), c.borrow_mut().get_position()], &color::RED);
             }
         }
         renderer.pop_state();

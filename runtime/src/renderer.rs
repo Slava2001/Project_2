@@ -40,15 +40,17 @@ impl renderer::Renderer for Renderer<'_> {
         self.ctx.push(state);
     }
 
-    fn draw_line(&mut self, from: Vec2f, to: Vec2f, color: &Color) {
-        line(
-            color.into(),
-            1.0,
-            [from.x, from.y, to.x, to.y],
-            self.ctx.last().unwrap().transform,
-            self.g,
-        );
-    }
+   fn draw_line(&mut self, points: &[Vec2f], color: &Color) {
+        for (from, to) in points.iter().zip(points.iter().skip(1)) {
+            line(
+                color.into(),
+                1.0,
+                [from.x, from.y, to.x, to.y],
+                self.ctx.last().unwrap().transform,
+                self.g,
+            );
+        }
+   }
 
     fn draw_img(
         &mut self,

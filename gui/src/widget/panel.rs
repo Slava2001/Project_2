@@ -1,6 +1,6 @@
-//! Panel
+//! Panel.
 //!
-//! Simple widget. It used for groups other widgets
+//! Simple widget. It used for groups other widgets.
 
 use error_stack::{Result, ResultExt};
 use std::{cell::RefCell, rc::Weak};
@@ -17,15 +17,15 @@ use builder::{self, BuildFromCfg, Config};
 use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
 use resources::TextureId;
 
-/// Panel widget
+/// Panel widget.
 pub struct Panel {
-    /// Base widget
+    /// Base widget.
     base: Base,
-    /// Background texture
+    /// Background texture.
     texture: TextureId,
-    /// Background texture rectangle
+    /// Background texture rectangle.
     texture_rect: Rect<f64>,
-    /// Offset, used when widget cached
+    /// Offset, used when widget cached.
     offset: Vec2f,
 }
 

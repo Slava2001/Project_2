@@ -38,6 +38,24 @@
                     }
                 ]
             }, {
+                "debug": false,
+                "type": "graph",
+                "rect": [ 500, 100, 200, 200 ],
+                "id": "cursor_x",
+                "value_max_count": 100,
+                "value_max": 800,
+                "value_min": 0,
+                "color": "#FF0000"
+            }, {
+                "debug": false,
+                "type": "graph",
+                "rect": [ 500, 100, 200, 200 ],
+                "id": "cursor_y",
+                "value_max_count": 100,
+                "value_max": 450,
+                "value_min": 0,
+                "color": "#00FF00"
+            }, {
                 "recourses": [
                     {
                         "name": "default",

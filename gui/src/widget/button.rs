@@ -1,6 +1,6 @@
-//! Button
+//! Button.
 //!
-//! Button widget
+//! Button widget.
 
 use error_stack::{Result, ResultExt};
 use std::{cell::RefCell, rc::Weak};
@@ -17,26 +17,26 @@ use builder::{self, BuildFromCfg, Config};
 use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
 use resources::TextureId;
 
-/// Button click callback. Called then user click on button
+/// Button click callback. Called then user click on button.
 type ButtonCb = dyn FnMut(&mut Button);
 
-/// Button widget
+/// Button widget.
 pub struct Button {
-    /// Base widget
+    /// Base widget.
     base: Base,
-    /// Background texture
+    /// Background texture.
     texture: TextureId,
-    /// Background texture rectangle when button is preset
+    /// Background texture rectangle when button is preset.
     texture_rect_pressed: Rect<f64>,
-    /// Background texture rectangle when button is released
+    /// Background texture rectangle when button is released.
     texture_rect: Rect<f64>,
-    /// Background texture rectangle when button is hovered and released
+    /// Background texture rectangle when button is hovered and released.
     texture_rect_hovered: Rect<f64>,
-    /// Is widget hovered
+    /// Is widget hovered.
     hovered: bool,
-    /// Button is pressed
+    /// Button is pressed.
     state: bool,
-    /// Pressed cb
+    /// Pressed cb.
     cb: Option<Box<ButtonCb>>,
 }
 

@@ -1,8 +1,9 @@
-//! Implementations of widget
+//! Implementations of widget.
 
 mod base;
 mod button;
 mod flag;
+mod graph;
 mod label;
 mod panel;
 
@@ -11,6 +12,7 @@ use std::ops::{Deref, DerefMut};
 pub use base::Base;
 pub use button::Button;
 pub use flag::Flag;
+pub use graph::Graph;
 pub use label::Label;
 pub use panel::Panel;
 
@@ -21,7 +23,7 @@ use builder::{BuildFromCfg, Builder as BaseBuilder};
 pub struct Builder(BaseBuilder<WRef>);
 
 impl Default for Builder {
-    /// Default builder, that can build all default widgets
+    /// Default builder, that can build all default widgets.
     fn default() -> Self {
         let mut builder = BaseBuilder::<WRef>::new();
         builder.reg_builder("base", Base::build);
@@ -29,6 +31,7 @@ impl Default for Builder {
         builder.reg_builder("flag", Flag::build);
         builder.reg_builder("label", Label::build);
         builder.reg_builder("panel", Panel::build);
+        builder.reg_builder("graph", Graph::build);
         Self(builder)
     }
 }

@@ -1,6 +1,6 @@
-//! Label
+//! Label.
 //!
-//! Label widget, that used for display text
+//! Label widget, that used for display text.
 
 use crate::manager::{
     widget::{event::Event, Error, WRef, Widget},
@@ -14,20 +14,20 @@ use std::{cell::RefCell, rc::Weak};
 
 use super::Base;
 
-/// Label widget
+/// Label widget.
 pub struct Label {
-    /// Base widget
+    /// Base widget.
     base: Base,
-    /// Label text
+    /// Label text.
     text: String,
-    /// Font size
+    /// Font size.
     size: f64,
-    /// Font identification
+    /// Font identification.
     font: FontId,
 }
 
 impl Label {
-    /// Set label text
+    /// Set label text.
     pub fn set_text<T: Into<String>>(&mut self, text: T) {
         self.text = text.into();
     }

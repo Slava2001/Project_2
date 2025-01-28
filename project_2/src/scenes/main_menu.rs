@@ -6,21 +6,23 @@ use builder::{BuildFromCfg, Config};
 use error_stack::ResultExt;
 use gui::{
     manager::Manager as GuiManager,
-    widget::{Builder as GuiBuilder, Button},
+    widget::{Builder as GuiBuilder, Button, Graph},
 };
 use renderer::Drawable;
-use scene::Scene;
+use scene::{event::Event, Scene};
 
 /// Main menu scene.
 pub struct MainMenu {
     /// Main menu GUI.
     gui: GuiManager,
-
     /// Is need to load next scene.
     next_scene: Rc<RefCell<bool>>,
-
     /// Next scene config.
     cfg: Config,
+    /// Graph for cursor x.
+    cursor_x: Rc<RefCell<Graph>>,
+    /// Graph for cursor y.
+    cursor_y: Rc<RefCell<Graph>>
 }
 
 impl Scene for MainMenu {
@@ -30,6 +32,10 @@ impl Scene for MainMenu {
         state: &mut dyn scene::State,
     ) -> error_stack::Result<(), scene::Error> {
         self.gui.handle_event(e).change_context(scene::Error::msg("Gui failed"))?;
+        if let Event::MouseMove(x, y) = e {
+            self.cursor_x.borrow_mut().push(x);
+            self.cursor_y.borrow_mut().push(y);
+        }
         if *self.next_scene.borrow() {
             state
                 .load_next_scene(
@@ -65,6 +71,12 @@ impl BuildFromCfg<Box<dyn Scene>> for MainMenu {
             .change_context(builder::Error::msg("Failed to find change scene button"))?
             .borrow_mut()
             .click_cb(move |_| *next_scene_clone.borrow_mut() = true);
-        Ok(Box::new(Self { gui, next_scene, cfg }))
+        let cursor_x = gui
+            .get_by_id_cast::<Graph>("cursor_x")
+            .change_context(builder::Error::msg("Failed to find graph for cursor x"))?;
+        let cursor_y = gui
+            .get_by_id_cast::<Graph>("cursor_y")
+            .change_context(builder::Error::msg("Failed to find graph for cursor y"))?;
+        Ok(Box::new(Self { gui, next_scene, cfg, cursor_x, cursor_y }))
     }
 }
