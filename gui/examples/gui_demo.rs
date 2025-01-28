@@ -10,7 +10,7 @@ use gui::{
 };
 use renderer::Drawable;
 use runtime::Runtime;
-use scene::{event::Event, Scene};
+use scene::{event::Event, Scene, State};
 
 /// Window scale
 const WINDOW_SCALE: u32 = 50;
@@ -37,8 +37,8 @@ fn main() {
 }
 
 fn run() -> Result<(), Error> {
-    let runtime =
-        Runtime::new((WINDOW_H, WINDOW_W)).change_context(Error::msg("Failed to init runtime"))?;
+    let runtime = Runtime::new("GUI Demo", (WINDOW_H, WINDOW_W))
+        .change_context(Error::msg("Failed to init runtime"))?;
     let mut builder = scene::Builder::new();
     builder.reg_builder("main", MainScene::build);
 
@@ -54,7 +54,11 @@ struct MainScene {
 }
 
 impl Scene for MainScene {
-    fn handle_event(&mut self, e: scene::event::Event) -> Result<(), scene::Error> {
+    fn handle_event(
+        &mut self,
+        e: scene::event::Event,
+        _state: &mut dyn State,
+    ) -> Result<(), scene::Error> {
         if let Event::MouseMove(x, y) = e {
             self.cursor_pos_label.borrow_mut().set_text(format!("Cursor pos: ({x}, {y})"));
         }

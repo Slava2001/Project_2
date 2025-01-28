@@ -3,8 +3,10 @@ mod builder;
 pub mod event;
 pub use builder::Builder;
 
+use ::builder::Config;
 use error_stack::Result;
 use renderer::Drawable;
+use resources::Manger as ResManger;
 
 /// Scene error.
 #[derive(Debug, thiserror::Error)]
@@ -17,11 +19,24 @@ impl Error {
     }
 }
 
+/// Scene state.
+pub trait State {
+    /// Request load next scene by config.
+    /// Scene will be load on next frame.
+    ///
+    /// # Errors
+    /// Return errors if loading scene already requested (two request on one frame).
+    fn load_next_scene(&mut self, cfg: Config) -> Result<(), Error>;
+
+    /// Get resource manager.
+    fn get_resources_manager(&mut self) -> &dyn ResManger;
+}
+
 /// Scene interface.
 pub trait Scene: Drawable {
     /// Handles the event.
     ///
     /// # Errors
     /// Return error if the event could not be handled.
-    fn handle_event(&mut self, e: event::Event) -> Result<(), Error>;
+    fn handle_event(&mut self, e: event::Event, state: &mut dyn State) -> Result<(), Error>;
 }

@@ -8,5 +8,7 @@ renderer = { workspace = true }
 resources = { workspace = true }
 scene = { workspace = true }
 gui = { workspace = true }
+runtime = { workspace = true }
+builder = { workspace = true }
 error-stack = { workspace = true }
 thiserror = { workspace = true }

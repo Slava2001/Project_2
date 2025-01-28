@@ -4,7 +4,7 @@ mod renderer;
 mod resmgr;
 
 use builder::Config;
-use error_stack::{Result, ResultExt};
+use error_stack::{ensure, Result, ResultExt};
 use glutin_window::GlutinWindow as Window;
 use graphics::clear;
 use opengl_graphics::{GlGraphics, OpenGL};
@@ -40,8 +40,8 @@ impl Runtime {
     ///
     /// # Errors
     /// Return error if failed to init window.
-    pub fn new(window_size: (u32, u32)) -> Result<Self, Error> {
-        let window: Window = WindowSettings::new("GUI Demo", window_size)
+    pub fn new(window_name: &str, window_size: (u32, u32)) -> Result<Self, Error> {
+        let window: Window = WindowSettings::new(window_name, window_size)
             .graphics_api(OpenGL::V3_2)
             .build()
             .map_err(|_| Error::msg("Failed to init window"))?;
@@ -55,16 +55,16 @@ impl Runtime {
     /// Return error if some scene failed.
     pub fn run(mut self, scene_builder: &scene::Builder, scene_cfg: Config) -> Result<(), Error> {
         let mut events = Events::new(EventSettings::new());
-        let mut resources = ResMngr::new();
+        let mut state = State { next_scene: None, res: ResMngr::new() };
         let mut scene = scene_builder
-            .build(scene_cfg, &mut resources)
+            .build(scene_cfg, &mut state.res)
             .change_context(Error::msg("Failed to create first scene"))?;
 
         while let Some(e) = events.next(&mut self.window) {
             if let Some(args) = e.render_args() {
                 self.gl.draw(args.viewport(), |c, g| {
                     clear([1.0; 4], g);
-                    let mut renderer = Renderer { ctx: vec![c], g, res: &mut resources };
+                    let mut renderer = Renderer { ctx: vec![c], g, res: &mut state.res };
                     scene.draw(&mut renderer);
                 });
             }
@@ -94,9 +94,37 @@ impl Runtime {
                 |args| Some(Event::MouseMove(args[0], args[1])),
             );
             if let Some(e) = event {
-                scene.handle_event(e).change_context(Error::msg("Scene failed to handle event"))?;
+                scene
+                    .handle_event(e, &mut state)
+                    .change_context(Error::msg("Scene failed to handle event"))?;
+            }
+            if let Some(cfg) = state.next_scene.take() {
+                scene = scene_builder
+                    .build(cfg, &mut state.res)
+                    .change_context(Error::msg("Failed to load next scene"))?;
             }
         }
         Ok(())
+    }
+}
+
+/// Scene state.
+struct State {
+    /// Next scene config.
+    next_scene: Option<Config>,
+
+    /// Resource manager.
+    res: ResMngr,
+}
+
+impl scene::State for State {
+    fn load_next_scene(&mut self, cfg: Config) -> Result<(), scene::Error> {
+        ensure!(self.next_scene.is_none(), scene::Error::msg("Next scene already specified"));
+        self.next_scene = Some(cfg);
+        Ok(())
+    }
+
+    fn get_resources_manager(&mut self) -> &dyn resources::Manger {
+        &mut self.res
     }
 }

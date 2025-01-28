@@ -20,7 +20,7 @@ pub struct Renderer<'a> {
 impl renderer::Renderer for Renderer<'_> {
     fn draw_rect(&mut self, rect: &Rect<f64>, color: &Color) {
         Rectangle::new([0.0; 4]).border(Border { color: color.into(), radius: 1.0 }).draw(
-            [rect.x, rect.y, rect.h, rect.w],
+            [rect.x, rect.y, rect.w, rect.h],
             &DrawState::default(),
             self.ctx.last().unwrap().transform,
             self.g,
@@ -57,12 +57,12 @@ impl renderer::Renderer for Renderer<'_> {
         texture_rect: &Rect<f64>,
     ) {
         Image::new()
-            .rect([rect.x, rect.y, rect.h, rect.w])
+            .rect([rect.x, rect.y, rect.w, rect.h])
             .src_rect(Into::<[f64; 4]>::into([
                 texture_rect.x,
                 texture_rect.y,
-                texture_rect.h,
                 texture_rect.w,
+                texture_rect.h,
             ]))
             .draw(
                 &self.res.textures[texture.0],
