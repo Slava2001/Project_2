@@ -1,0 +1,11 @@
+[package]
+name = "builder"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+error-stack = { workspace = true }
+thiserror = { workspace = true }
+resources = { workspace = true }
+config = "0.15.4"
+serde = "1.0.217"

@@ -62,6 +62,9 @@
                 },
                 {
                     "$ref": "./label.json"
+                },
+                {
+                    "$ref": "./graph.json"
                 }
             ]
         }

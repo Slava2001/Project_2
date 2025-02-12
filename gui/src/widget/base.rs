@@ -1,4 +1,4 @@
-//! Base implementation of widget. It used as root of GUI tree and for implementing other widget
+//! Base implementation of widget. It used as root of GUI tree and for implementing other widget.
 
 use error_stack::{Result, ResultExt};
 use std::{
@@ -6,60 +6,48 @@ use std::{
     rc::{Rc, Weak},
 };
 
-use crate::resources::Manger;
+use renderer::{color, rect::Rect, vec2::Vec2f, Drawable, Renderer};
+use resources::Manger;
 
-use super::{
-    super::{
-        super::renderer::{color, rect::Rect, vec2::Vec2f, Drawable, Renderer},
-        State,
-    },
-    builder::{self, BuildFromCfg},
-    event::Event,
-    wref::WRef,
-    Error, Widget,
+use crate::manager::{
+    widget::{event::Event, Error, WRef, Widget},
+    State,
 };
+use builder::{self, BuildFromCfg, Config};
 
-/// Base implementation of widget
+/// Base implementation of widget.
 pub struct Base {
-    /// Widget bounds
+    /// Widget bounds.
     rect: Rect<f64>,
-    /// Widget childs
+    /// Widget childs.
     childs: Vec<WRef>,
-    /// Reference on parent widget
+    /// Reference on parent widget.
     parent: Option<Weak<RefCell<dyn Widget>>>,
-    /// Enable debug mode
+    /// Enable debug mode.
     debug: bool,
-    /// Widget identifier
+    /// Widget identifier.
     id: String,
 }
 
 impl Base {
-    /// Create new Base widget from config
+    /// Create new Base widget from config.
     ///
     /// # Errors
-    /// Return error if config is not valid
-    pub fn new(mut cfg: config::Map<String, config::Value>) -> Result<Self, builder::Error> {
-        let rect = if let Some(rect) = cfg.remove("rect") {
-            rect.try_deserialize::<[f64; 4]>()
-                .change_context(builder::Error::msg("Failed to parse \"rect\" field as bounds"))?
-        } else {
-            [0.0; 4]
-        }
-        .into();
-        let debug = if let Some(debug) = cfg.remove("debug") {
-            debug.into_bool().change_context(builder::Error::msg(
-                "Failed to parse \"debug\" field as debug flag",
-            ))?
-        } else {
-            false
-        };
-        let id = if let Some(debug) = cfg.remove("id") {
-            debug.into_string().change_context(builder::Error::msg(
-                "Failed to parse \"id\" field widget identifier",
-            ))?
-        } else {
-            String::new()
-        };
+    /// Return error if config is not valid.
+    pub fn new(mut cfg: Config) -> Result<Self, builder::Error> {
+        let rect = cfg
+            .take_opt::<[f64; 4]>("rect")
+            .change_context(builder::Error::msg("Failed to init base widget bounds"))?
+            .unwrap_or([0.0; 4])
+            .into();
+        let debug = cfg
+            .take_opt::<bool>("debug")
+            .change_context(builder::Error::msg("Failed to init debug flag"))?
+            .unwrap_or(false);
+        let id = cfg
+            .take_opt::<String>("id")
+            .change_context(builder::Error::msg("Failed to widget id"))?
+            .unwrap_or_default();
         Ok(Self { rect, childs: Vec::new(), parent: None, debug, id })
     }
 }
@@ -173,18 +161,16 @@ impl Drawable for Base {
         for c in &self.childs {
             c.borrow().draw(renderer);
             if self.debug {
-                renderer.draw_line((0.0, 0.0).into(), c.borrow_mut().get_position(), &color::RED);
+                renderer
+                    .draw_line(&[(0.0, 0.0).into(), c.borrow_mut().get_position()], &color::RED);
             }
         }
         renderer.pop_state();
     }
 }
 
-impl BuildFromCfg for Base {
-    fn build(
-        cfg: config::Map<String, config::Value>,
-        _r: &mut dyn Manger,
-    ) -> Result<WRef, builder::Error> {
+impl BuildFromCfg<WRef> for Base {
+    fn build(cfg: Config, _r: &mut dyn Manger) -> Result<WRef, builder::Error> {
         Ok(WRef::new(Self::new(cfg)?))
     }
 }

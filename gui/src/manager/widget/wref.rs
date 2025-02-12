@@ -10,17 +10,17 @@ use std::{
 
 use super::Widget;
 
-/// Widget reference
+/// Widget reference.
 #[derive(Clone)]
 pub struct WRef(Rc<RefCell<dyn Widget>>);
 impl WRef {
-    /// Create new widget reference
+    /// Create new widget reference.
     #[must_use]
     pub fn new<T: 'static + Widget>(widget: T) -> Self {
         Self(Rc::new(RefCell::new(widget)))
     }
 
-    /// Try cast widget reference to concrete widget
+    /// Try cast widget reference to concrete widget.
     #[must_use]
     pub fn try_cast<T: Any>(self) -> Option<Rc<RefCell<T>>> {
         if TypeId::of::<T>() == (*self.0.borrow()).type_id() {

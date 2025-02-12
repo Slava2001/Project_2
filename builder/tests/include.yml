@@ -1,0 +1,6 @@
+---
+str: "Included config"
+cfg_arr:
+  - include: "file!:config.json"
+  - str: one
+  - str: two

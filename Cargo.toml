@@ -1,3 +1,21 @@
 [workspace]
 resolver = "2"
-members = ["gui"]
+members = [
+    "builder",
+    "gui",
+    "project_2",
+    "renderer",
+    "resources",
+    "runtime",
+    "scene",
+]
+
+[workspace.dependencies]
+builder = { path = "./builder" }
+gui = { path = "./gui" }
+runtime = { path = "./runtime" }
+renderer = { path = "./renderer" }
+resources = { path = "./resources" }
+scene = { path = "./scene" }
+error-stack = "0.5.0"
+thiserror = "2.0.4"
