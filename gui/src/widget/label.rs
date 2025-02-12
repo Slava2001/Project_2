@@ -102,7 +102,7 @@ impl Widget for Label {
 
 impl Drawable for Label {
     fn draw(&self, renderer: &mut dyn Renderer) {
-        renderer.draw_text(&self.text, self.size, self.base.get_position(), self.font);
+        renderer.draw_text(&self.text, self.size, self.base.get_rect(), self.font);
         self.base.draw(renderer);
     }
 }

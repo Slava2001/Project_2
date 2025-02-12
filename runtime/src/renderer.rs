@@ -2,7 +2,7 @@
 
 use super::resmgr::ResMngr;
 use graphics::rectangle::Border;
-use graphics::{line, text, Context, DrawState, Image, Rectangle, Transformed};
+use graphics::{line, text, CharacterCache, Context, DrawState, Image, Rectangle, Transformed};
 use opengl_graphics::GlGraphics;
 use renderer::vec2::Vec2f;
 use renderer::{color::Color, rect::Rect};
@@ -40,7 +40,7 @@ impl renderer::Renderer for Renderer<'_> {
         self.ctx.push(state);
     }
 
-   fn draw_line(&mut self, points: &[Vec2f], color: &Color) {
+    fn draw_line(&mut self, points: &[Vec2f], color: &Color) {
         for (from, to) in points.iter().zip(points.iter().skip(1)) {
             line(
                 color.into(),
@@ -50,7 +50,7 @@ impl renderer::Renderer for Renderer<'_> {
                 self.g,
             );
         }
-   }
+    }
 
     fn draw_img(
         &mut self,
@@ -74,17 +74,38 @@ impl renderer::Renderer for Renderer<'_> {
             );
     }
 
-    fn draw_text(&mut self, txt: &str, size: f64, pos: Vec2f, font: resources::FontId) {
+    fn draw_text(&mut self, txt: &str, size: f64, rect: &Rect<f64>, font: resources::FontId) {
         let font = self.res.fonts.get_mut(font.0).unwrap();
         #[allow(clippy::cast_possible_truncation)]
         let scale = f64::from(font.font.scale_for_pixel_height(size as f32));
         let transform =
             self.ctx.last().unwrap().transform.trans(
-                pos.x,
-                f64::from(font.font.v_metrics_unscaled().ascent).mul_add(scale, pos.y),
+                rect.x,
+                f64::from(font.font.v_metrics_unscaled().ascent).mul_add(scale, rect.y),
             );
-        #[allow(clippy::cast_sign_loss)]
-        #[allow(clippy::cast_possible_truncation)]
-        text([0.0, 0.0, 0.0, 1.0], size as u32, txt, font, transform, self.g).unwrap();
+
+        let mut image = Image::new_color([0.0, 0.0, 0.0, 1.0]);
+
+        let mut x = 0.0;
+        let mut y = 0.0;
+        for ch in txt.chars() {
+            let character = font.character(size as u32, ch).unwrap();
+            let ch_x = x + character.left();
+            let ch_y = y - character.top();
+            image = image.src_rect([
+                character.atlas_offset[0],
+                character.atlas_offset[1],
+                character.atlas_size[0],
+                character.atlas_size[1],
+            ]);
+            image.draw(
+                character.texture,
+                &DrawState::default(),
+                transform.trans(ch_x, ch_y),
+                self.g,
+            );
+            x += character.advance_width();
+            y += character.advance_height();
+        }
     }
 }
