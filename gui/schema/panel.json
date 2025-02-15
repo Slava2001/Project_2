@@ -1,18 +1,21 @@
 {
-    "properties": {
-        "type": {
-            "type": "string",
-            "enum": [
-                "panel"
-            ]
-        },
-        "background": {
-            "type": "string",
-            "description": "Panel background texture name"
-        },
-        "background_rect": {
-            "$ref": "./defines/rect.json",
-            "description": "Panel background texture rectangle"
+    "allOf": [
+        {
+            "$ref": "./base.json"
+        }, {
+            "properties": {
+                "type": {
+                    "const": "panel"
+                },
+                "background": {
+                    "type": "string",
+                    "description": "Panel background texture name"
+                },
+                "background_rect": {
+                    "$ref": "./defines/rect.json",
+                    "description": "Panel background texture rectangle"
+                }
+            }
         }
-    }
+    ]
 }

@@ -1,0 +1,8 @@
+{
+    "$ref": "./label.json",
+    "properties": {
+        "type": {
+            "const": "textbox"
+        }
+    }
+}

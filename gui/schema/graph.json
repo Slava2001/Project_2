@@ -1,27 +1,25 @@
 {
+    "$ref": "./base.json",
     "properties": {
         "type": {
-            "type": "string",
-            "enum": [
-                "graph"
-            ]
+            "const": "graph"
         },
         "value_max_count": {
             "type": "integer",
             "minimum": 1,
-            "description":"Queue length"
+            "description": "Queue length"
         },
         "value_max": {
             "type": "number",
-            "description":"Maximum value"
+            "description": "Maximum value"
         },
         "value_min": {
             "type": "number",
-            "description":"Minimum value"
+            "description": "Minimum value"
         },
         "color": {
             "$ref": "./defines/color.json",
-            "description":"Graph color"
+            "description": "Graph color"
         }
     }
 }

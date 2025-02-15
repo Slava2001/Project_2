@@ -1,0 +1,164 @@
+{
+    "debug": false,
+    "type": "base",
+    "rect": [ 0, 0, 0, 0 ],
+    "recourses": [
+        {
+            "name": "button_tiles",
+            "type": "texture",
+            "path": "assets/button.png"
+        }, {
+            "name": "default",
+            "type": "font",
+            "path": "assets/unifont.otf"
+        }
+    ],
+    "childs": [
+        {
+            "type": "",
+
+
+
+        },
+        {
+            "debug": false,
+            "type": "button",
+            "rect": [ 30, 50, 300, 30 ],
+            "id": "change_scene",
+            "background": "button_tiles",
+            "texture_rect": [ 0, 0, 160, 16 ],
+            "texture_rect_hovered": [ 0, 16, 160, 16 ],
+            "texture_rect_pressed": [ 0, 32, 160, 16 ],
+            "childs": [
+                {
+                    "type": "label",
+                    "rect_color": "#00000000",
+                    "text": "Reload this scene",
+                    "font_size": 20,
+                    "font": "default",
+                    "rect": [ 30, 4, 240, 0 ],
+                    "id": "cursor_pos",
+                    "color": "#FFFFFF",
+                    "debug": false
+                }
+            ]
+        }, {
+            "debug": false,
+            "type": "graph",
+            "rect": [ 500, 100, 200, 200 ],
+            "id": "cursor_x",
+            "value_max_count": 100,
+            "value_max": 800,
+            "value_min": 0,
+            "color": "#FF0000"
+        }, {
+            "debug": false,
+            "type": "graph",
+            "rect": [ 500, 100, 200, 200 ],
+            "id": "cursor_y",
+            "value_max_count": 100,
+            "value_max": 450,
+            "value_min": 0,
+            "color": "#00FF00"
+        }, {
+            "recourses": [
+                {
+                    "name": "default",
+                    "type": "texture",
+                    "path": "assets/frame.png"
+                }, {
+                    "name": "flag_tiles",
+                    "type": "texture",
+                    "path": "assets/flag.png"
+                }, {
+                    "name": "small_button_tiles",
+                    "type": "texture",
+                    "path": "assets/small_button.png"
+                }
+            ],
+            "debug": false,
+            "type": "panel",
+            "background": "default",
+            "background_rect": [ 0, 0, 25, 25 ],
+            "rect": [ 100, 100, 190, 60 ],
+            "childs": [
+                {
+                    "debug": false,
+                    "type": "panel",
+                    "background": "default",
+                    "background_rect": [ 0, 0, 25, 25 ],
+                    "rect": [ 10, 5, 50, 50 ],
+                    "childs": [
+                        {
+                            "debug": false,
+                            "type": "flag",
+                            "id": "hello_flag",
+                            "background": "flag_tiles",
+                            "texture_rect_off": [ 0, 0, 32, 32 ],
+                            "texture_rect_on": [ 0, 32, 32, 32 ],
+                            "texture_rect_hovered_off": [ 0, 64, 32, 32 ],
+                            "texture_rect_hovered_on": [ 0, 96, 32, 32 ],
+                            "rect": [ 10, 10, 30, 30 ]
+                        }
+                    ]
+                }, {
+                    "debug": false,
+                    "type": "panel",
+                    "background": "default",
+                    "background_rect": [ 0, 0, 25, 25 ],
+                    "rect": [ 70, 5, 50, 50 ],
+                    "childs": [
+                        {
+                            "debug": false,
+                            "type": "label",
+                            "rect_color": "#00000000",
+                            "text": "A",
+                            "color": "#000000",
+                            "font_size": 45,
+                            "font": "default",
+                            "rect": [ 8, 0, 0, 0 ]
+                        }
+                    ]
+                }, {
+                    "debug": false,
+                    "type": "panel",
+                    "background": "default",
+                    "background_rect": [ 0, 0, 25, 25 ],
+                    "rect": [ 130, 5, 50, 50 ],
+                    "childs": [
+                        {
+                            "debug": false,
+                            "type": "button",
+                            "background": "small_button_tiles",
+                            "rect": [ 10, 10, 30, 30 ],
+                            "id": "hello_button",
+                            "texture_rect": [ 0, 0, 32, 32 ],
+                            "texture_rect_hovered": [ 0, 32, 32, 32 ],
+                            "texture_rect_pressed": [ 0, 64, 32, 32 ]
+                        }
+                    ]
+                }
+            ]
+        }, {
+            "type": "textbox",
+            "text": "",
+            "font_size": 20,
+            "font": "default",
+            "rect": [ 30, 200, 300, 25 ],
+            "id": "input_txt_1",
+            "color": "#000000",
+            "rect_color": "#000000",
+            "debug": false
+        }, {
+            "type": "textbox",
+            "text": "",
+            "font_size": 20,
+            "font": "default",
+            "rect": [ 30, 230, 300, 25 ],
+            "id": "input_txt_2",
+            "color": "#000000",
+            "rect_color": "#000000",
+            "debug": false
+        }
+    ]
+}

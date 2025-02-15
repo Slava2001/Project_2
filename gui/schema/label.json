@@ -1,10 +1,8 @@
 {
+    "$ref": "./base.json",
     "properties": {
         "type": {
-            "type": "string",
-            "enum": [
-                "label"
-            ]
+            "const": "label"
         },
         "text": {
             "type": "string",

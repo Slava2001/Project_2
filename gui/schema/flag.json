@@ -1,10 +1,8 @@
 {
+    "$ref": "./base.json",
     "properties": {
         "type": {
-            "type": "string",
-            "enum": [
-                "flag"
-            ]
+            "const": "flag"
         },
         "background": {
             "type": "string",

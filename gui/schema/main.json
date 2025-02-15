@@ -32,5 +32,22 @@
                 "description": "Widget resources"
             }
         }
-    }
+    },
+    "oneOf": [
+        {
+            "$ref": "./base.json"
+        }, {
+            "$ref": "./button.json"
+        }, {
+            "$ref": "./flag.json"
+        }, {
+            "$ref": "./graph.json"
+        }, {
+            "$ref": "./label.json"
+        }, {
+            "$ref": "./panel.json"
+        }, {
+            "$ref": "./textbox.json"
+        }
+    ]
 }
