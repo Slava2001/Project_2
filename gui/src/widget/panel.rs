@@ -38,29 +38,29 @@ impl Widget for Panel {
     ) -> Result<(), Error> {
         match event {
             Event::MousePress(MouseButton::Left) => {
-                if state.caught.is_none() {
+                if state.get_caught().is_none() {
                     self.get_parent()
                         .map(|p| p.upgrade().map(|p| p.borrow_mut().erase_widget(&self_rc)));
                     self.offset = self.get_global_position() - state.mouse;
                     self.set_position(state.mouse + self.offset);
-                    state.caught = Some(self_rc);
+                    state.catch_self(self, self_rc)?;
                 }
             }
             Event::MouseRelease(MouseButton::Left) => {
-                if let Some(caught) = state.caught.clone() {
+                if let Some(caught) = state.get_caught().clone() {
                     if caught == self_rc {
                         self.get_parent().map(|p| {
                             p.upgrade().map(|p| {
-                                p.clone().borrow_mut().add_widget(p.into(), self, self_rc);
+                                p.clone().borrow_mut().add_widget(p.into(), self, self_rc.clone());
                             })
                         });
-                        state.caught = None;
+                        state.uncatch(self, self_rc)?;
                         self.set_global_position(self.get_position());
                     }
                 }
             }
             Event::MouseMove => {
-                if state.caught == Some(self_rc) {
+                if state.is_caught(self_rc) {
                     self.set_position(state.mouse + self.offset);
                 }
             }

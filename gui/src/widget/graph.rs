@@ -1,10 +1,7 @@
 //! Simple graph.
 
 use error_stack::{Result, ResultExt};
-use std::{
-    cell::RefCell,
-    rc::Weak,
-};
+use std::{cell::RefCell, rc::Weak};
 
 use renderer::{
     color::{self, Color},
@@ -46,8 +43,10 @@ impl Graph {
             - bounds.h * (value.clamp(self.value_min, self.value_max) - self.value_min)
                 / (self.value_max - self.value_min);
         self.points.push((bounds.w, v).into());
+        #[allow(clippy::cast_precision_loss)]
         let x_step = bounds.w / (self.value_max_count - 1) as f64;
         for (v, i) in points.into_iter().zip(1..self.value_max_count) {
+            #[allow(clippy::cast_precision_loss)]
             let x = x_step * (self.value_max_count - 1 - i) as f64;
             self.points.push(Vec2f::new(x, v.y));
         }

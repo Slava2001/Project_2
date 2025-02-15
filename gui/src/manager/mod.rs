@@ -12,7 +12,10 @@ use resources::Manger;
 use scene::event::Event as SceneEvent;
 use widget::{event::Event, WRef};
 
+mod state;
 pub mod widget;
+
+pub use state::State;
 
 /// Manager error.
 #[derive(Debug, thiserror::Error)]
@@ -25,18 +28,8 @@ impl Error {
     }
 }
 
-/// Manager state
-pub struct State {
-    /// Coughed widget
-    pub caught: Option<WRef>,
-    /// Cursor position
-    pub mouse: Vec2f,
-}
-
 /// GUI manager
 pub struct Manager {
-    /// Reference on widget under cursor.
-    hovered: WRef,
     /// Reference on root widget.
     root: WRef,
     /// Manager state.
@@ -50,11 +43,7 @@ impl Manager {
     /// Return error if config is not valid.
     pub fn new(builder: &Builder, res: &mut dyn Manger, cfg: Config) -> Result<Self, Error> {
         let root = Self::make_gui_tree(builder, cfg, res)?;
-        Ok(Self {
-            hovered: root.clone(),
-            root,
-            state: State { mouse: Vec2f::new(0.0, 0.0), caught: None },
-        })
+        Ok(Self { state: State::new(root.clone()), root })
     }
 
     /// Recursive make gui tree with given config.
@@ -116,15 +105,30 @@ impl Manager {
             return Ok(());
         };
 
-        if let Some(c) = self.state.caught.clone() {
-            c.borrow_mut()
-                .handle_event(c.clone(), event, &mut self.state)
-                .change_context(Error::msg("Couched widget failed when handle event"))?;
+        if let Some(w) = self.state.get_caught() {
+            w.borrow_mut()
+                .handle_event(w.clone(), event.clone(), &mut self.state)
+                .change_context(Error::msg("Caught widget failed when handle event"))?;
         }
-        self.hovered
-            .borrow_mut()
-            .handle_event(self.hovered.clone(), event, &mut self.state)
-            .change_context(Error::msg("Hovered widget failed when handle event"))?;
+
+        if let Some(w) = self.state.get_focused() {
+            if !self.state.is_caught(w.clone()) {
+                w.borrow_mut()
+                    .handle_event(w.clone(), event.clone(), &mut self.state)
+                    .change_context(Error::msg("Focused widget failed when handle event"))?;
+            }
+        }
+
+        if !self.state.is_caught(self.state.hovered.clone())
+            && !self.state.is_focused(self.state.hovered.clone())
+        {
+            self.state
+                .hovered
+                .clone()
+                .borrow_mut()
+                .handle_event(self.state.hovered.clone(), event, &mut self.state)
+                .change_context(Error::msg("Hovered widget failed when handle event"))?;
+        }
         self.update_hovered(self.state.mouse)?;
         Ok(())
     }
@@ -132,16 +136,18 @@ impl Manager {
     /// Update hovered widget.
     fn update_hovered(&mut self, pos: Vec2f) -> Result<(), Error> {
         let hovered = self.root.borrow().get_hovered(pos).unwrap_or_else(|| self.root.clone());
-        if self.hovered != hovered {
+        if self.state.hovered != hovered {
             hovered
                 .borrow_mut()
                 .handle_event(hovered.clone(), Event::MouseEnter, &mut self.state)
                 .change_context(Error::msg("Widget failed to handle mouse enter event"))?;
-            self.hovered
+            self.state
+                .hovered
+                .clone()
                 .borrow_mut()
-                .handle_event(self.hovered.clone(), Event::MouseLeave, &mut self.state)
+                .handle_event(self.state.hovered.clone(), Event::MouseLeave, &mut self.state)
                 .change_context(Error::msg("Widget failed to handle mouse leave event"))?;
-            self.hovered = hovered;
+            self.state.hovered = hovered;
         }
         Ok(())
     }
@@ -175,7 +181,7 @@ impl Drawable for Manager {
     /// Draw all visible widgets.
     fn draw(&self, renderer: &mut dyn Renderer) {
         self.root.borrow().draw(renderer);
-        if let Some(ref c) = self.state.caught {
+        if let Some(ref c) = self.state.get_caught() {
             c.borrow().draw(renderer);
         }
     }

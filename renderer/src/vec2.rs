@@ -1,12 +1,13 @@
 //! 2D vector.
 
-use std::ops::{Add, Sub};
+use std::
+    ops::{Add, Sub};
 
 /// f64 vec2.
 pub type Vec2f = Vec2<f64>;
 
 /// 2D vector.
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct Vec2<T> {
     /// X component.
     pub x: T,

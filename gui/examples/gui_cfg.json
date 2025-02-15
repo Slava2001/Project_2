@@ -11,28 +11,34 @@
     ],
     "childs": [
         {
-            "debug": false,
+            "debug": true,
             "type": "label",
+            "color": "#000000",
+            "rect_color": "#00000000",
             "text": "Debug text:",
             "font_size": 20,
             "font": "default",
-            "rect": [ 0, 0, 0, 0 ],
+            "rect": [ 0, 0, 300, 25 ],
             "id": "cursor_pos"
         }, {
-            "debug": false,
+            "debug": true,
             "type": "label",
+            "color": "#000000",
+            "rect_color": "#00000000",
             "text": "Cursor pos: (0, 0)",
             "font_size": 20,
             "font": "default",
-            "rect": [ 0, 20, 0, 0 ],
+            "rect": [ 0, 25, 300, 25 ],
             "id": "cursor_pos"
         }, {
-            "debug": false,
+            "debug": true,
             "type": "label",
+            "color": "#000000",
+            "rect_color": "#00000000",
             "text": "Flag state: false",
             "font_size": 20,
             "font": "default",
-            "rect": [ 0, 40, 0, 0 ],
+            "rect": [ 0, 50, 300, 25 ],
             "id": "flag_state"
         }, {
             "recourses": [
@@ -92,10 +98,12 @@
                         {
                             "debug": false,
                             "type": "label",
+                            "color": "#000000",
+                            "rect_color": "#00000000",
                             "text": "A",
-                            "font_size": 50,
+                            "font_size": 45,
                             "font": "default",
-                            "rect": [ 7, 5, 0, 0 ]
+                            "rect": [ 8, 0, 0, 0 ]
                         }
                     ]
                 }, {

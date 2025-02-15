@@ -11,7 +11,7 @@ use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::RenderEvent;
 use piston::window::WindowSettings;
-use piston::{MouseCursorEvent, PressEvent, ReleaseEvent};
+use piston::Motion;
 use renderer::Renderer;
 use resmgr::ResMngr;
 use scene::event::{Event, MouseButton};
@@ -69,35 +69,56 @@ impl Runtime {
                 });
             }
 
-            let event = e.mouse_cursor_args().map_or_else(
-                || {
-                    if let Some(piston::Button::Mouse(args)) = e.press_args() {
-                        match args {
-                            piston::MouseButton::Left => Some(MouseButton::Left),
-                            piston::MouseButton::Right => Some(MouseButton::Right),
-                            piston::MouseButton::Middle => Some(MouseButton::Middle),
-                            _ => None,
+            let event = match e {
+                piston::Event::Input(input, _) => match input {
+                    piston::Input::Button(arg) => match arg.button {
+                        piston::Button::Keyboard(_) => {
+                            if let Some(k) = arg.scancode {
+                                match arg.state {
+                                    piston::ButtonState::Press => Some(Event::KeyPress(k)),
+                                    piston::ButtonState::Release => Some(Event::KeyRelease(k)),
+                                }
+                            } else {
+                                None
+                            }
                         }
-                        .map(Event::MousePress)
-                    } else if let Some(piston::Button::Mouse(args)) = e.release_args() {
-                        match args {
-                            piston::MouseButton::Left => Some(MouseButton::Left),
-                            piston::MouseButton::Right => Some(MouseButton::Right),
-                            piston::MouseButton::Middle => Some(MouseButton::Middle),
+                        piston::Button::Mouse(mouse_button) => match (mouse_button, arg.state) {
+                            (piston::MouseButton::Left, piston::ButtonState::Press) => {
+                                Some(Event::MousePress(MouseButton::Left))
+                            }
+                            (piston::MouseButton::Right, piston::ButtonState::Press) => {
+                                Some(Event::MousePress(MouseButton::Right))
+                            }
+                            (piston::MouseButton::Middle, piston::ButtonState::Press) => {
+                                Some(Event::MousePress(MouseButton::Middle))
+                            }
+                            (piston::MouseButton::Left, piston::ButtonState::Release) => {
+                                Some(Event::MouseRelease(MouseButton::Left))
+                            }
+                            (piston::MouseButton::Right, piston::ButtonState::Release) => {
+                                Some(Event::MouseRelease(MouseButton::Right))
+                            }
+                            (piston::MouseButton::Middle, piston::ButtonState::Release) => {
+                                Some(Event::MouseRelease(MouseButton::Middle))
+                            }
                             _ => None,
-                        }
-                        .map(Event::MouseRelease)
-                    } else {
-                        None
+                        },
+                        _ => None,
+                    },
+                    piston::Input::Move(Motion::MouseCursor([x, y])) => {
+                        Some(Event::MouseMove(x, y))
                     }
+                    piston::Input::Text(txt) => Some(Event::TextInput(txt)),
+                    _ => None,
                 },
-                |args| Some(Event::MouseMove(args[0], args[1])),
-            );
+                _ => None,
+            };
             if let Some(e) = event {
                 scene
                     .handle_event(e, &mut state)
                     .change_context(Error::msg("Scene failed to handle event"))?;
             }
+
             if let Some(cfg) = state.next_scene.take() {
                 scene = scene_builder
                     .build(cfg, &mut state.res)

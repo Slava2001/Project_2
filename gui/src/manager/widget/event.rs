@@ -12,7 +12,7 @@ pub enum MouseButton {
 }
 
 /// Widget events.
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub enum Event {
     /// Mouse press button event.
     MousePress(MouseButton),
@@ -24,6 +24,24 @@ pub enum Event {
     MouseEnter,
     /// Cursor leave from widget bounds.
     MouseLeave,
+    /// Input text.
+    TextInput(String),
+    /// The cursor has captured the widget.
+    Caught,
+    /// Cursor released widget.
+    Released,
+    /// Widget got into focus.
+    Focused,
+    /// Widget went out of focus.
+    Unfocused,
+    /// Keyboard key press event, arg: [`Scancode`].
+    ///
+    /// [`Scancode`]: scene::event::Scancode
+    KeyPress(i32),
+    /// Keyboard key release event, arg: [`Scancode`].
+    ///
+    /// [`Scancode`]: scene::event::Scancode
+    KeyRelease(i32)
 }
 
 /// Event conversion error.
@@ -46,6 +64,10 @@ impl TryFrom<scene::event::Event> for Event {
             event::Event::MousePress(b) => Self::MousePress(b.try_into()?),
             event::Event::MouseRelease(b) => Self::MouseRelease(b.try_into()?),
             event::Event::MouseMove(..) => Self::MouseMove,
+            event::Event::TextInput(text) => Self::TextInput(text),
+            event::Event::KeyPress(k) => Self::KeyPress(k),
+            event::Event::KeyRelease(k) => Self::KeyRelease(k),
+
         })
     }
 }

@@ -58,17 +58,15 @@ impl Widget for Flag {
     ) -> Result<(), Error> {
         match event {
             Event::MousePress(mouse_button) => {
-                if matches!(mouse_button, MouseButton::Left) && state.caught.is_none() {
+                if matches!(mouse_button, MouseButton::Left) && state.get_caught().is_none() {
                     self.set_position(self.get_global_position());
                     self.get_parent()
                         .map(|p| p.upgrade().map(|p| p.borrow_mut().erase_widget(&self_rc)));
-                    state.caught = Some(self_rc);
+                    state.catch_self(self, self_rc)?;
                 }
             }
             Event::MouseRelease(mouse_button) => {
-                if matches!(mouse_button, MouseButton::Left)
-                    && state.caught == Some(self_rc.clone())
-                {
+                if matches!(mouse_button, MouseButton::Left) && state.is_caught(self_rc.clone()) {
                     if self.check_bounds(state.mouse) {
                         self.state = !self.state;
                         if let Some(mut cb) = self.cb.take() {
@@ -76,7 +74,7 @@ impl Widget for Flag {
                             self.cb = Some(cb);
                         }
                     }
-                    state.caught = None;
+                    state.uncatch(self, self_rc.clone())?;
                     self.get_parent().map(|p| {
                         p.upgrade().map(|p| {
                             p.clone().borrow_mut().add_widget(p.into(), self, self_rc);
@@ -87,8 +85,15 @@ impl Widget for Flag {
                 }
             }
             Event::MouseEnter => self.hovered = true,
-            Event::MouseLeave => self.hovered = state.caught == Some(self_rc),
-            Event::MouseMove => {}
+            Event::MouseLeave => self.hovered = state.get_caught() == Some(self_rc),
+            Event::MouseMove
+            | Event::TextInput(_)
+            | Event::Caught
+            | Event::Released
+            | Event::Focused
+            | Event::Unfocused
+            | Event::KeyPress(_)
+            | Event::KeyRelease(_) => {}
         }
         Ok(())
     }

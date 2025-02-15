@@ -22,7 +22,7 @@ pub struct MainMenu {
     /// Graph for cursor x.
     cursor_x: Rc<RefCell<Graph>>,
     /// Graph for cursor y.
-    cursor_y: Rc<RefCell<Graph>>
+    cursor_y: Rc<RefCell<Graph>>,
 }
 
 impl Scene for MainMenu {
@@ -31,7 +31,7 @@ impl Scene for MainMenu {
         e: scene::event::Event,
         state: &mut dyn scene::State,
     ) -> error_stack::Result<(), scene::Error> {
-        self.gui.handle_event(e).change_context(scene::Error::msg("Gui failed"))?;
+        self.gui.handle_event(e.clone()).change_context(scene::Error::msg("Gui failed"))?;
         if let Event::MouseMove(x, y) = e {
             self.cursor_x.borrow_mut().push(x);
             self.cursor_y.borrow_mut().push(y);

@@ -1,72 +1,36 @@
 {
     "type": "object",
-    "allOf": [
-        {
-            "$ref": "./base.json"
+    "properties": {
+        "childs": {
+            "type": "array",
+            "items": {
+                "$ref": "#"
+            },
+            "description": "Widget children"
         },
-        {
-            "properties": {
-                "childs": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#"
+        "recourses": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "Resource name"
                     },
-                    "description": "Widget children"
-                },
-                "recourses": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "type": "string",
-                                "description": "Resource name"
-                            },
-                            "type": {
-                                "type": "string",
-                                "enum": [
-                                    "texture",
-                                    "font"
-                                ]
-                            },
-                            "path": {
-                                "type": "string",
-                                "description": "Path to resource"
-                            }
-                        },
-                        "description": "Widget resources"
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "texture",
+                            "font"
+                        ]
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "Path to resource"
                     }
-                }
+                },
+                "description": "Widget resources"
             }
-        },
-        {
-            "oneOf": [
-                {
-                    "properties": {
-                        "type": {
-                            "type": "string",
-                            "enum": [
-                                "base"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "$ref": "./panel.json"
-                },
-                {
-                    "$ref": "./flag.json"
-                },
-                {
-                    "$ref": "./button.json"
-                },
-                {
-                    "$ref": "./label.json"
-                },
-                {
-                    "$ref": "./graph.json"
-                }
-            ]
         }
-    ]
+    }
 }

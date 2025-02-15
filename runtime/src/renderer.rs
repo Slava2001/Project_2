@@ -2,10 +2,14 @@
 
 use super::resmgr::ResMngr;
 use graphics::rectangle::Border;
-use graphics::{line, text, CharacterCache, Context, DrawState, Image, Rectangle, Transformed};
-use opengl_graphics::GlGraphics;
+use graphics::{
+    line, Character, CharacterCache, Context, DrawState, Image, Rectangle, Transformed,
+};
+use opengl_graphics::{GlGraphics, Texture};
 use renderer::vec2::Vec2f;
+use renderer::TextTruncateMode;
 use renderer::{color::Color, rect::Rect};
+use resources::FontId;
 
 /// Simple implementation of renderer
 pub struct Renderer<'a> {
@@ -74,38 +78,70 @@ impl renderer::Renderer for Renderer<'_> {
             );
     }
 
-    fn draw_text(&mut self, txt: &str, size: f64, rect: &Rect<f64>, font: resources::FontId) {
+    fn draw_text(
+        &mut self,
+        txt: &str,
+        size: f64,
+        rect: &Rect<f64>,
+        font: FontId,
+        color: &Color,
+        mode: TextTruncateMode,
+    ) -> usize {
         let font = self.res.fonts.get_mut(font.0).unwrap();
         #[allow(clippy::cast_possible_truncation)]
-        let scale = f64::from(font.font.scale_for_pixel_height(size as f32));
-        let transform =
-            self.ctx.last().unwrap().transform.trans(
-                rect.x,
-                f64::from(font.font.v_metrics_unscaled().ascent).mul_add(scale, rect.y),
-            );
+        let scale = font.font.scale_for_pixel_height(size as f32) as f64;
+        let vmetric = font.font.v_metrics_unscaled();
+        let ascent = vmetric.ascent as f64 * scale * 1.2;
+        let descent = (vmetric.line_gap - vmetric.descent) as f64 * scale;
+        let line_step = ascent + descent;
+        let y_lim = rect.h - line_step;
+        let transform = self.ctx.last().unwrap().transform.trans(rect.x, rect.y + ascent);
 
-        let mut image = Image::new_color([0.0, 0.0, 0.0, 1.0]);
+        let mut iter_over_char =
+            |iter: &mut dyn Iterator<Item = char>,
+             f: &mut dyn FnMut(char, &Character<'_, Texture>, f64, f64)| {
+                let mut x = 0.0;
+                let mut y = 0.0;
+                for ch in iter {
+                    #[allow(clippy::cast_possible_truncation)]
+                    let character = font.character(size as u32, ch).unwrap();
+                    let mut ch_x = x + character.left();
+                    let mut ch_y = y - character.top();
+                    if rect.w > 0.0 && (ch_x + character.advance_width() > rect.w || ch == '\n') {
+                        x = 0.0;
+                        y += line_step;
+                        ch_x = x + character.left();
+                        ch_y = y - character.top();
+                        if rect.h > 0.0 && y > y_lim {
+                            break;
+                        }
+                    }
+                    f(ch, &character, ch_x, ch_y);
 
-        let mut x = 0.0;
-        let mut y = 0.0;
-        for ch in txt.chars() {
-            let character = font.character(size as u32, ch).unwrap();
-            let ch_x = x + character.left();
-            let ch_y = y - character.top();
-            image = image.src_rect([
-                character.atlas_offset[0],
-                character.atlas_offset[1],
-                character.atlas_size[0],
-                character.atlas_size[1],
-            ]);
-            image.draw(
-                character.texture,
-                &DrawState::default(),
-                transform.trans(ch_x, ch_y),
-                self.g,
-            );
-            x += character.advance_width();
-            y += character.advance_height();
+                    if ch != '\n' {
+                        x += character.advance_width();
+                    }
+                    y += character.advance_height();
+                }
+            };
+
+        let mut start_index = 0;
+        if matches!(mode, TextTruncateMode::Front) {
+            iter_over_char(&mut txt.chars().rev(), &mut |ch, _, _, _| start_index += ch.len_utf8());
+            start_index = txt.len() - start_index;
         }
+
+        let mut image = Image::new_color(Into::<[f32; 4]>::into(color));
+        let mut displayed_bytes = 0;
+        iter_over_char(&mut txt[start_index..].chars(), &mut |c, ch, x, y| {
+            displayed_bytes += c.len_utf8();
+            if c != '\n' {
+                let rect =
+                    [ch.atlas_offset[0], ch.atlas_offset[1], ch.atlas_size[0], ch.atlas_size[1]];
+                image = image.src_rect(rect);
+                image.draw(ch.texture, &DrawState::default(), transform.trans(x, y), self.g);
+            }
+        });
+        txt.len() - displayed_bytes
     }
 }

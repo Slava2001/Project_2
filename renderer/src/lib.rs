@@ -15,6 +15,12 @@ use rect::Rect;
 use resources::{FontId, TextureId};
 use vec2::Vec2f;
 
+#[derive(Clone, Copy)]
+pub enum TextTruncateMode {
+    Front,
+    Back,
+}
+
 /// GUI rendered interface.
 pub trait Renderer {
     /// Save current renderer state (offset, rotation and scale).
@@ -31,5 +37,14 @@ pub trait Renderer {
     /// Draw specified part of texture in some area.
     fn draw_img(&mut self, rect: &Rect<f64>, texture: TextureId, texture_rect: &Rect<f64>);
     /// Draw specified text.
-    fn draw_text(&mut self, text: &str, size: f64, rect: &Rect<f64>, font: FontId);
+    /// Returns number of truncated bytes.
+    fn draw_text(
+        &mut self,
+        text: &str,
+        size: f64,
+        rect: &Rect<f64>,
+        font: FontId,
+        color: &Color,
+        mode: TextTruncateMode,
+    ) -> usize;
 }

@@ -1,5 +1,11 @@
 {
     "properties": {
+        "type": {
+            "type": "string",
+            "enum": [
+                "label"
+            ]
+        },
         "rect": {
             "$ref": "./defines/rect.json",
             "description": "Widget bounders"

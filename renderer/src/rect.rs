@@ -1,8 +1,8 @@
 //! Rectangle with position.
-use std::ops::Add;
+use std::{fmt::{Debug, Display}, ops::Add};
 
 /// Rectangle
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Rect<T> {
     /// X coordinate.
     pub x: T,
@@ -14,7 +14,7 @@ pub struct Rect<T> {
     pub h: T,
 }
 
-impl<T: Copy + Add<Output = T> + PartialOrd<T>> Rect<T> {
+impl<T: Display + Debug + Copy + Add<Output = T> + PartialOrd<T>> Rect<T> {
     /// Check what (`x`, `y`) point inside rectangle bounds.
     pub fn check_bounds(&self, x: T, y: T) -> bool {
         self.x < x && self.y < y && (self.x + self.w) > x && (self.y + self.h) > y
