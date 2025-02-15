@@ -26,6 +26,8 @@ pub struct Textbox {
     base: Label,
     /// Last pressed key.
     last_key: Option<i32>,
+    /// Is textbox focused.
+    is_focused: bool,
 }
 
 impl Textbox {
@@ -36,7 +38,7 @@ impl Textbox {
     pub fn new(cfg: Config, res: &mut dyn resources::Manger) -> Result<Self, builder::Error> {
         let mut base = Label::new(cfg, res)?;
         base.set_text_truncating(false);
-        Ok(Self { base, last_key: None })
+        Ok(Self { base, last_key: None, is_focused: false })
     }
 }
 
@@ -58,32 +60,41 @@ impl Widget for Textbox {
                 }
             }
             Event::TextInput(txt) if !txt.is_empty() => {
-                if state.get_focused() == Some(self_rc) {
+                if self.is_focused && state.get_focused() == Some(self_rc) {
                     self.base.text_mut().pop();
                     *self.base.text_mut() += &txt;
                     self.base.text_mut().push(CURSOR_CHAR);
                 }
             }
             Event::TextInput(_) => {
-                if Some(Scancode::BACKSPACE) == self.last_key {
+                if self.is_focused && Some(Scancode::BACKSPACE) == self.last_key {
                     self.base.text_mut().pop();
                     self.base.text_mut().pop();
                     self.base.text_mut().push(CURSOR_CHAR);
                 }
             }
             Event::Focused => {
+                self.is_focused = true;
                 self.base.text_mut().push(CURSOR_CHAR);
                 self.base.set_draw_truncate_mode(TextTruncateMode::Front);
             }
             Event::Unfocused => {
+                self.is_focused = false;
+                self.last_key = None;
                 self.base.text_mut().pop();
                 self.base.set_draw_truncate_mode(TextTruncateMode::Back);
             }
-            Event::KeyPress(k) if self.last_key.is_none() => self.last_key = Some(k),
-            Event::KeyRelease(k) if self.last_key == Some(k) => self.last_key = None,
+            Event::KeyPress(k) => {
+                if self.is_focused && self.last_key.is_none() {
+                    self.last_key = Some(k);
+                }
+            }
+            Event::KeyRelease(k) => {
+                if self.is_focused && self.last_key == Some(k) {
+                    self.last_key = None;
+                }
+            }
             Event::MouseRelease(_)
-            | Event::KeyPress(_)
-            | Event::KeyRelease(_)
             | Event::MouseMove
             | Event::MouseEnter
             | Event::MouseLeave
