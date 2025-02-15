@@ -34,7 +34,7 @@ pub struct Label {
     /// Text truncate mode.
     need_to_truncate_text: bool,
     /// Label border color.
-    rect_color: Color
+    rect_color: Color,
 }
 
 impl Label {

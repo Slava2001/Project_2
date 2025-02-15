@@ -41,7 +41,7 @@ pub enum Event {
     /// Keyboard key release event, arg: [`Scancode`].
     ///
     /// [`Scancode`]: scene::event::Scancode
-    KeyRelease(i32)
+    KeyRelease(i32),
 }
 
 /// Event conversion error.
@@ -67,7 +67,6 @@ impl TryFrom<scene::event::Event> for Event {
             event::Event::TextInput(text) => Self::TextInput(text),
             event::Event::KeyPress(k) => Self::KeyPress(k),
             event::Event::KeyRelease(k) => Self::KeyRelease(k),
-
         })
     }
 }

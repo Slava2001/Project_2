@@ -25,7 +25,7 @@ pub enum Event {
     /// Keyboard key press event, arg: [`Scancode`].
     KeyPress(i32),
     /// Keyboard key release event, arg: [`Scancode`].
-    KeyRelease(i32)
+    KeyRelease(i32),
 }
 
 pub struct Scancode;

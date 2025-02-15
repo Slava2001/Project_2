@@ -1,5 +1,8 @@
 //! Rectangle with position.
-use std::{fmt::{Debug, Display}, ops::Add};
+use std::{
+    fmt::{Debug, Display},
+    ops::Add,
+};
 
 /// Rectangle
 #[derive(Clone, Copy, Debug)]
