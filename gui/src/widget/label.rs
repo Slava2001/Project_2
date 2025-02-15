@@ -38,6 +38,10 @@ pub struct Label {
 }
 
 impl Label {
+    /// Create new label.
+    ///
+    /// # Errors
+    /// Return error if the config is incorrect or the required resource is not found.
     pub fn new(mut cfg: Config, res: &mut dyn resources::Manger) -> Result<Self, builder::Error> {
         Ok(Self {
             text: RefCell::new(

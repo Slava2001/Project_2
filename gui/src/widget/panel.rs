@@ -47,7 +47,7 @@ impl Widget for Panel {
                 }
             }
             Event::MouseRelease(MouseButton::Left) => {
-                if let Some(caught) = state.get_caught().clone() {
+                if let Some(caught) = state.get_caught() {
                     if caught == self_rc {
                         self.get_parent().map(|p| {
                             p.upgrade().map(|p| {

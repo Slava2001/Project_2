@@ -72,16 +72,10 @@ impl Runtime {
             let event = match e {
                 piston::Event::Input(input, _) => match input {
                     piston::Input::Button(arg) => match arg.button {
-                        piston::Button::Keyboard(_) => {
-                            if let Some(k) = arg.scancode {
-                                match arg.state {
-                                    piston::ButtonState::Press => Some(Event::KeyPress(k)),
-                                    piston::ButtonState::Release => Some(Event::KeyRelease(k)),
-                                }
-                            } else {
-                                None
-                            }
-                        }
+                        piston::Button::Keyboard(_) => arg.scancode.map(|k| match arg.state {
+                            piston::ButtonState::Press => Event::KeyPress(k),
+                            piston::ButtonState::Release => Event::KeyRelease(k),
+                        }),
                         piston::Button::Mouse(mouse_button) => match (mouse_button, arg.state) {
                             (piston::MouseButton::Left, piston::ButtonState::Press) => {
                                 Some(Event::MousePress(MouseButton::Left))

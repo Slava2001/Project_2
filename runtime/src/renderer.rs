@@ -89,21 +89,22 @@ impl renderer::Renderer for Renderer<'_> {
     ) -> usize {
         let font = self.res.fonts.get_mut(font.0).unwrap();
         #[allow(clippy::cast_possible_truncation)]
-        let scale = font.font.scale_for_pixel_height(size as f32) as f64;
+        let scale = f64::from(font.font.scale_for_pixel_height(size as f32));
         let vmetric = font.font.v_metrics_unscaled();
-        let ascent = vmetric.ascent as f64 * scale * 1.2;
-        let descent = (vmetric.line_gap - vmetric.descent) as f64 * scale;
+        let ascent = f64::from(vmetric.ascent) * scale * 1.2;
+        let descent = f64::from(vmetric.line_gap - vmetric.descent) * scale;
         let line_step = ascent + descent;
         let y_lim = rect.h - line_step;
         let transform = self.ctx.last().unwrap().transform.trans(rect.x, rect.y + ascent);
 
+        #[allow(clippy::type_complexity)]
         let mut iter_over_char =
             |iter: &mut dyn Iterator<Item = char>,
              f: &mut dyn FnMut(char, &Character<'_, Texture>, f64, f64)| {
                 let mut x = 0.0;
                 let mut y = 0.0;
                 for ch in iter {
-                    #[allow(clippy::cast_possible_truncation)]
+                    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
                     let character = font.character(size as u32, ch).unwrap();
                     let mut ch_x = x + character.left();
                     let mut ch_y = y - character.top();

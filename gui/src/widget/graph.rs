@@ -35,6 +35,7 @@ pub struct Graph {
 }
 
 impl Graph {
+    /// Push value.
     pub fn push(&mut self, value: f64) {
         let mut points = Vec::with_capacity(self.value_max_count);
         std::mem::swap(&mut self.points, &mut points);

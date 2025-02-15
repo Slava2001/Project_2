@@ -17,6 +17,7 @@ use std::{cell::RefCell, rc::Weak};
 
 use super::Label;
 
+/// Cursor char.
 const CURSOR_CHAR: char = '▎';
 
 /// Textbox widget.
@@ -28,6 +29,10 @@ pub struct Textbox {
 }
 
 impl Textbox {
+    /// Create new textbox.
+    ///
+    /// # Errors
+    /// Return error if the config is incorrect or the required resource is not found.
     pub fn new(cfg: Config, res: &mut dyn resources::Manger) -> Result<Self, builder::Error> {
         let mut base = Label::new(cfg, res)?;
         base.set_text_truncating(false);
@@ -45,12 +50,10 @@ impl Widget for Textbox {
         match event {
             Event::MousePress(mouse_button) => {
                 if matches!(mouse_button, MouseButton::Left) {
-                    if state.is_hovered(self_rc.clone()) {
+                    if state.is_hovered(&self_rc) {
                         state.focus_self(self, self_rc)?;
-                    } else {
-                        if state.is_focused(self_rc.clone()) {
-                            state.unfocus(self, self_rc)?;
-                        }
+                    } else if state.is_focused(self_rc.clone()) {
+                        state.unfocus(self, self_rc)?;
                     }
                 }
             }
@@ -62,14 +65,11 @@ impl Widget for Textbox {
                 }
             }
             Event::TextInput(_) => {
-                match self.last_key {
-                    Some(Scancode::BACKSPACE) => {
-                        self.base.text_mut().pop();
-                        self.base.text_mut().pop();
-                        self.base.text_mut().push(CURSOR_CHAR);
-                    }
-                    _ => {}
-                };
+                if Some(Scancode::BACKSPACE) == self.last_key {
+                    self.base.text_mut().pop();
+                    self.base.text_mut().pop();
+                    self.base.text_mut().push(CURSOR_CHAR);
+                }
             }
             Event::Focused => {
                 self.base.text_mut().push(CURSOR_CHAR);

@@ -28,8 +28,9 @@ pub enum Event {
     KeyRelease(i32),
 }
 
+/// Module that contains constants for keyboard button codes
 pub struct Scancode;
-#[allow(dead_code)]
+#[allow(dead_code, missing_docs)]
 impl Scancode {
     pub const ESCAPE: i32 = 1;
     pub const BACKSPACE: i32 = 14;

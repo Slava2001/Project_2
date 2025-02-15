@@ -15,9 +15,12 @@ use rect::Rect;
 use resources::{FontId, TextureId};
 use vec2::Vec2f;
 
+/// Text truncation mode.
 #[derive(Clone, Copy)]
 pub enum TextTruncateMode {
+    /// Truncate string front.
     Front,
+    /// Truncate string back.
     Back,
 }
 
