@@ -8,7 +8,7 @@
 //! }
 //! ```
 
-use config::{Config as Cfg, File, Value, ValueKind};
+use config::{Config as Cfg, File, FileFormat, Value, ValueKind};
 use error_stack::{bail, ensure, Result, ResultExt};
 use serde::Deserialize;
 use std::{any::Any, collections::HashMap, path::Path};
@@ -36,8 +36,8 @@ impl Config {
     /// Creates new config from file.
     ///
     /// # Errors
-    /// Return error if failed to load file.
-    pub fn new(path: &str) -> Result<Self, Error> {
+    /// Return error if failed to load or parse file.
+    pub fn from_file(path: &str) -> Result<Self, Error> {
         let mut cfg = Cfg::builder()
             .add_source(File::with_name(path))
             .build()
@@ -48,8 +48,26 @@ impl Config {
         Ok(cfg)
     }
 
+    /// Creates new config from json5 str.
+    ///
+    /// # Errors
+    /// Return error if failed to parse provided config.
+    pub fn from_json(json: &str) -> Result<Self, Error> {
+        let mut cfg = Cfg::builder()
+            .add_source(File::from_str(json, FileFormat::Json5))
+            .build()
+            .change_context(Error::msg(format!("Failed to load config from json str: {json:?}")))?
+            .try_deserialize::<Self>()
+            .change_context(Error::msg(format!(
+                "Failed to parse config from json str as table: {json:?}"
+            )))?;
+        cfg.file = "./CONFIG_CREATED_FROM_STR.json".into();
+        Ok(cfg)
+    }
+
     /// Take option value.
-    /// if the required field is in the config, it is retrieved and returned as `Some(T)`, otherwise `None`.
+    /// if the required field is in the config, it is retrieved and returned as `Some(T)`,
+    /// otherwise `None`.
     ///
     /// # Errors
     /// Return error if required field exist, but has unexpected type.

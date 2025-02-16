@@ -4,7 +4,7 @@
             "$ref": "./base.json"
         }, {
             "properties": {
-                "value_max_count": {
+                "value_count": {
                     "type": "integer",
                     "minimum": 1,
                     "description": "Queue length"

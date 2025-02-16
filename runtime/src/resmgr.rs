@@ -11,11 +11,11 @@ pub struct ResMngr {
     /// All loaded textures.
     pub textures: Vec<Texture>,
     /// Map to associate texture string name with index in textures vector.
-    textures_map: HashMap<String, TextureId>,
+    pub textures_map: HashMap<String, TextureId>,
     /// All loaded fonts.
     pub fonts: Vec<GlyphCache<'static>>,
     /// Map to associate font string name with index in fonts vector.
-    fonts_map: HashMap<String, FontId>,
+    pub fonts_map: HashMap<String, FontId>,
 }
 impl ResMngr {
     /// Creates new resource manager.

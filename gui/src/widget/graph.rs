@@ -23,7 +23,7 @@ pub struct Graph {
     /// Base widget.
     base: Base,
     /// Queue length.
-    value_max_count: usize,
+    value_count: usize,
     /// Points.
     points: Vec<Vec2f>,
     /// Maximum value.
@@ -37,7 +37,7 @@ pub struct Graph {
 impl Graph {
     /// Push value.
     pub fn push(&mut self, value: f64) {
-        let mut points = Vec::with_capacity(self.value_max_count);
+        let mut points = Vec::with_capacity(self.value_count);
         std::mem::swap(&mut self.points, &mut points);
         let bounds = self.base.get_rect();
         let v = bounds.h
@@ -45,10 +45,10 @@ impl Graph {
                 / (self.value_max - self.value_min);
         self.points.push((bounds.w, v).into());
         #[allow(clippy::cast_precision_loss)]
-        let x_step = bounds.w / (self.value_max_count - 1) as f64;
-        for (v, i) in points.into_iter().zip(1..self.value_max_count) {
+        let x_step = bounds.w / (self.value_count - 1) as f64;
+        for (v, i) in points.into_iter().zip(1..self.value_count) {
             #[allow(clippy::cast_precision_loss)]
-            let x = x_step * (self.value_max_count - 1 - i) as f64;
+            let x = x_step * (self.value_count - 1 - i) as f64;
             self.points.push(Vec2f::new(x, v.y));
         }
     }
@@ -144,8 +144,8 @@ impl Drawable for Graph {
 impl BuildFromCfg<WRef> for Graph {
     fn build(mut cfg: Config, _res: &mut dyn resources::Manger) -> Result<WRef, builder::Error> {
         Ok(WRef::new(Self {
-            value_max_count: cfg
-                .take("value_max_count")
+            value_count: cfg
+                .take("value_count")
                 .change_context(builder::Error::msg("Failed to init max values count"))?,
             value_min: cfg
                 .take("value_min")
