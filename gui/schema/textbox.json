@@ -1,8 +1,10 @@
 {
-    "$ref": "./label.json",
-    "properties": {
-        "type": {
-            "const": "textbox"
+    "allOf": [
+        {
+            "$ref": "./label.json"
+        }, {
+            "properties": {
+            }
         }
-    }
+    ]
 }

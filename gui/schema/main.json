@@ -1,53 +1,130 @@
 {
     "type": "object",
-    "properties": {
-        "childs": {
-            "type": "array",
-            "items": {
-                "$ref": "#"
-            },
-            "description": "Widget children"
-        },
-        "recourses": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "description": "Resource name"
-                    },
-                    "type": {
-                        "type": "string",
-                        "enum": [
-                            "texture",
-                            "font"
-                        ]
-                    },
-                    "path": {
-                        "type": "string",
-                        "description": "Path to resource"
-                    }
-                },
-                "description": "Widget resources"
-            }
-        }
-    },
-    "oneOf": [
+
+    "allOf": [
         {
-            "$ref": "./base.json"
+            "properties": {
+                "childs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#"
+                    },
+                    "description": "Widget children"
+                },
+                "recourses": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "description": "Resource name"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "texture",
+                                    "font"
+                                ]
+                            },
+                            "path": {
+                                "type": "string",
+                                "description": "Path to resource"
+                            }
+                        },
+                        "description": "Widget resources"
+                    }
+                }
+            }
         }, {
-            "$ref": "./button.json"
-        }, {
-            "$ref": "./flag.json"
-        }, {
-            "$ref": "./graph.json"
-        }, {
-            "$ref": "./label.json"
-        }, {
-            "$ref": "./panel.json"
-        }, {
-            "$ref": "./textbox.json"
+
+            "anyOf": [
+                {
+                    "allOf": [
+                        {
+                            "properties": {
+                                "type": {
+                                    "const": "base"
+                                }
+                            }
+                        }, {
+                            "$ref": "./base.json"
+                        }
+                    ]
+                }, {
+                    "allOf": [
+                        {
+                            "properties": {
+                                "type": {
+                                    "const": "button"
+                                }
+                            }
+                        }, {
+                            "$ref": "./button.json"
+                        }
+                    ]
+                }, {
+                    "allOf": [
+                        {
+                            "properties": {
+                                "type": {
+                                    "const": "flag"
+                                }
+                            }
+                        }, {
+                            "$ref": "./flag.json"
+                        }
+                    ]
+                }, {
+                    "allOf": [
+                        {
+                            "properties": {
+                                "type": {
+                                    "const": "graph"
+                                }
+                            }
+                        }, {
+                            "$ref": "./graph.json"
+                        }
+                    ]
+                }, {
+                    "allOf": [
+                        {
+                            "properties": {
+                                "type": {
+                                    "const": "label"
+                                }
+                            }
+                        }, {
+                            "$ref": "./label.json"
+                        }
+                    ]
+                }, {
+                    "allOf": [
+                        {
+                            "properties": {
+                                "type": {
+                                    "const": "panel"
+                                }
+                            }
+                        }, {
+                            "$ref": "./panel.json"
+                        }
+                    ]
+                }, {
+                    "allOf": [
+                        {
+                            "properties": {
+                                "type": {
+                                    "const": "textbox"
+                                }
+                            }
+                        }, {
+                            "$ref": "./textbox.json"
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }

@@ -15,12 +15,6 @@
     ],
     "childs": [
         {
-            "type": "",
-
-
-
-        },
-        {
             "debug": false,
             "type": "button",
             "rect": [ 30, 50, 300, 30 ],

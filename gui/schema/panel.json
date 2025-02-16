@@ -4,9 +4,6 @@
             "$ref": "./base.json"
         }, {
             "properties": {
-                "type": {
-                    "const": "panel"
-                },
                 "background": {
                     "type": "string",
                     "description": "Panel background texture name"

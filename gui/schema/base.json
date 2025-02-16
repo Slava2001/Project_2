@@ -1,8 +1,5 @@
 {
     "properties": {
-        "type": {
-            "const": "base"
-        },
         "rect": {
             "$ref": "./defines/rect.json",
             "description": "Widget bounders"
