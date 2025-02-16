@@ -1,5 +1,5 @@
 {
     "type": "main_menu",
-    "next_scene_cfg": "file!:./main_menu.json",
+    "next_scene_cfg": "file!:./level.json",
     "gui": "file!:./main_menu_gui.json"
 }

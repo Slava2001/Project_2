@@ -27,6 +27,8 @@ pub struct Base {
     debug: bool,
     /// Widget identifier.
     id: String,
+    /// Is visibility flag.
+    is_visible: bool,
 }
 
 impl Base {
@@ -48,7 +50,11 @@ impl Base {
             .take_opt::<String>("id")
             .change_context(builder::Error::msg("Failed to widget id"))?
             .unwrap_or_default();
-        Ok(Self { rect, childs: Vec::new(), parent: None, debug, id })
+        let is_visible = cfg
+            .take_opt::<bool>("is_visible")
+            .change_context(builder::Error::msg("Failed to widget is visible flag"))?
+            .unwrap_or(true);
+        Ok(Self { rect, childs: Vec::new(), parent: None, debug, id, is_visible })
     }
 }
 
@@ -63,6 +69,9 @@ impl Widget for Base {
     }
 
     fn get_hovered(&self, mut pos: Vec2f) -> Option<WRef> {
+        if !self.is_visible {
+            return None;
+        }
         pos = pos - (self.rect.x, self.rect.y).into();
         for c in self.childs.iter().rev() {
             if let Some(c) = c.borrow().get_hovered(pos) {
@@ -76,6 +85,9 @@ impl Widget for Base {
     }
 
     fn check_bounds(&self, pos: Vec2f) -> bool {
+        if !self.is_visible {
+            return false;
+        }
         self.rect.check_bounds(pos.x, pos.y)
     }
 
@@ -149,6 +161,14 @@ impl Widget for Base {
         }
         None
     }
+
+    fn set_visible_flag(&mut self, is_visible: bool) {
+        self.is_visible = is_visible;
+    }
+
+    fn is_visible(&self) -> bool {
+        self.is_visible
+    }
 }
 
 impl Drawable for Base {
@@ -159,6 +179,9 @@ impl Drawable for Base {
         }
         renderer.translate(self.rect.x, self.rect.y);
         for c in &self.childs {
+            if !c.borrow().is_visible() {
+                continue;
+            }
             c.borrow().draw(renderer);
             if self.debug {
                 renderer

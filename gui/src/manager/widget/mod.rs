@@ -90,4 +90,10 @@ pub trait Widget: Drawable + Any {
     /// Returns the first widget witt specified id.
     /// - `id`: widget id.
     fn find(&self, id: &str) -> Option<WRef>;
+
+    /// Set widget is visible flag.
+    fn set_visible_flag(&mut self, is_visible: bool);
+
+    /// Check if widget is visible.
+    fn is_visible(&self) -> bool;
 }

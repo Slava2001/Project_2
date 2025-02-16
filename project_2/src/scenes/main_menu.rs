@@ -5,8 +5,8 @@ use std::{cell::RefCell, rc::Rc};
 use builder::{BuildFromCfg, Config};
 use error_stack::ResultExt;
 use gui::{
-    manager::Manager as GuiManager,
-    widget::{Builder as GuiBuilder, Button, Graph},
+    manager::{widget::Widget, Manager as GuiManager},
+    widget::{Builder as GuiBuilder, Button, Flag, Graph, Textbox},
 };
 use renderer::Drawable;
 use scene::{event::Event, Scene};
@@ -77,6 +77,25 @@ impl BuildFromCfg<Box<dyn Scene>> for MainMenu {
         let cursor_y = gui
             .get_by_id_cast::<Graph>("cursor_y")
             .change_context(builder::Error::msg("Failed to find graph for cursor y"))?;
+        {
+            let cursor_x = cursor_x.clone();
+            let cursor_y = cursor_y.clone();
+            let text_1 = gui
+                .get_by_id_cast::<Textbox>("input_txt_1")
+                .change_context(builder::Error::msg("Failed to find textbox 1"))?;
+            let text_2 = gui
+                .get_by_id_cast::<Textbox>("input_txt_2")
+                .change_context(builder::Error::msg("Failed to find textbox 2"))?;
+            gui.get_by_id_cast::<Flag>("hello_flag")
+                .change_context(builder::Error::msg("Failed to find change scene button"))?
+                .borrow_mut()
+                .change_state_cb(move |_, state| {
+                    cursor_x.borrow_mut().set_visible_flag(state);
+                    cursor_y.borrow_mut().set_visible_flag(state);
+                    text_1.borrow_mut().set_visible_flag(state);
+                    text_2.borrow_mut().set_visible_flag(state);
+                });
+        }
         Ok(Box::new(Self { gui, next_scene, cfg, cursor_x, cursor_y }))
     }
 }

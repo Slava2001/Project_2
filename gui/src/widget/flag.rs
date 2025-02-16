@@ -153,6 +153,14 @@ impl Widget for Flag {
     fn get_id(&self) -> String {
         self.base.get_id()
     }
+
+    fn set_visible_flag(&mut self, is_visible: bool) {
+        self.base.set_visible_flag(is_visible);
+    }
+
+    fn is_visible(&self) -> bool {
+        self.base.is_visible()
+    }
 }
 
 impl Drawable for Flag {
@@ -173,6 +181,10 @@ impl BuildFromCfg<WRef> for Flag {
         let bg_name = cfg
             .take::<String>("background")
             .change_context(builder::Error::msg("Failed to init flag background texture"))?;
+        let state = cfg
+            .take_opt::<bool>("state")
+            .change_context(builder::Error::msg("Failed to init flag state"))?
+            .unwrap_or(false);
         let texture = res.get_texture(&bg_name).change_context(builder::Error::msg(format!(
             "Failed to init flag, texture: \"{bg_name}\" not found"
         )))?;
@@ -186,7 +198,7 @@ impl BuildFromCfg<WRef> for Flag {
 
         Ok(WRef::new(Self {
             hovered: false,
-            state: false,
+            state,
             texture,
             texture_rect_on: get_rect("texture_rect_on")?,
             texture_rect_hovered_off: get_rect("texture_rect_hovered_off")?,

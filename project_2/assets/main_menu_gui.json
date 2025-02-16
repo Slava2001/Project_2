@@ -27,7 +27,7 @@
                 {
                     "type": "label",
                     "rect_color": "#00000000",
-                    "text": "Reload this scene",
+                    "text": "Load level",
                     "font_size": 20,
                     "font": "default",
                     "rect": [ 30, 4, 240, 0 ],
@@ -92,7 +92,8 @@
                             "texture_rect_on": [ 0, 32, 32, 32 ],
                             "texture_rect_hovered_off": [ 0, 64, 32, 32 ],
                             "texture_rect_hovered_on": [ 0, 96, 32, 32 ],
-                            "rect": [ 10, 10, 30, 30 ]
+                            "rect": [ 10, 10, 30, 30 ],
+                            "state": true
                         }
                     ]
                 }, {

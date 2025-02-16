@@ -1,0 +1,38 @@
+{
+    "type": "level",
+    "next_scene_cfg": "file!:./main_menu.json",
+    "gui": {
+        "recourses": [
+            {
+                "name": "button_tiles",
+                "type": "texture",
+                "path": "assets/button.png"
+            }, {
+                "name": "default",
+                "type": "font",
+                "path": "assets/unifont.otf"
+            }
+        ],
+        "debug": false,
+        "type": "button",
+        "rect": [ 30, 50, 300, 30 ],
+        "id": "change_scene",
+        "background": "button_tiles",
+        "texture_rect": [ 0, 0, 160, 16 ],
+        "texture_rect_hovered": [ 0, 16, 160, 16 ],
+        "texture_rect_pressed": [ 0, 32, 160, 16 ],
+        "childs": [
+            {
+                "type": "label",
+                "rect_color": "#00000000",
+                "text": "Return to menu",
+                "font_size": 20,
+                "font": "default",
+                "rect": [ 30, 4, 240, 0 ],
+                "id": "cursor_pos",
+                "color": "#FFFFFF",
+                "debug": false
+            }
+        ]
+    }
+}
