@@ -1,6 +1,7 @@
 //! Scene manager.
 mod builder;
 pub mod event;
+
 pub use builder::Builder;
 
 use ::builder::Config;

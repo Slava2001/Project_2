@@ -1472,6 +1472,7 @@ version = "0.1.0"
 dependencies = [
  "builder",
  "error-stack",
+ "gui",
  "piston",
  "piston2d-graphics",
  "piston2d-opengl_graphics",

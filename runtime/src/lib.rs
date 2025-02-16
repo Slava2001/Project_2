@@ -3,18 +3,24 @@
 mod renderer;
 mod resmgr;
 
+use std::time::{Duration, Instant};
+
+use ::renderer::Drawable;
 use builder::Config;
 use error_stack::{ensure, Result, ResultExt};
 use glutin_window::GlutinWindow as Window;
 use graphics::clear;
-use opengl_graphics::{GlGraphics, OpenGL};
+use gui::widget::{Graph, Label};
+use gui::{manager::Manager as GuiMngr, widget::Builder as GuiBuilder};
+use opengl_graphics::{GlGraphics, GlyphCache, OpenGL, TextureSettings};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::RenderEvent;
 use piston::window::WindowSettings;
-use piston::Motion;
+use piston::{EventLoop, Motion};
 use renderer::Renderer;
 use resmgr::ResMngr;
-use scene::event::{Event, MouseButton};
+use resources::FontId;
+use scene::event::{Event, MouseButton, Scancode};
 
 /// Runtime error.
 #[derive(Debug, thiserror::Error)]
@@ -33,6 +39,10 @@ pub struct Runtime {
     window: Window,
     /// OpenGL data.
     gl: GlGraphics,
+    /// Runtime gui.
+    gui: GuiMngr,
+    /// Runtime gui recourses.
+    gui_res: ResMngr,
 }
 
 impl Runtime {
@@ -46,7 +56,26 @@ impl Runtime {
             .build()
             .map_err(|_| Error::msg("Failed to init window"))?;
         let gl = GlGraphics::new(OpenGL::V3_2);
-        Ok(Self { window, gl })
+        let mut gui_res = ResMngr::new();
+        let id = FontId(gui_res.fonts.len());
+        {
+            // load default font
+            let mut settings = TextureSettings::new();
+            settings.set_filter(opengl_graphics::Filter::Nearest);
+            let cache = GlyphCache::from_bytes(
+                include_bytes!("./ubuntu.mono.ttf"),
+                (),
+                TextureSettings::new(),
+            )
+            .map_err(|e| Error::msg(format!("Failed to load font: {e:?}")))?;
+            gui_res.fonts.push(cache);
+            gui_res.fonts_map.insert("default".into(), id);
+        }
+        let cfg = Config::from_json(include_str!("./gui_cfg.json"))
+            .change_context(Error::msg("Failed to create runtime gui config"))?;
+        let gui = GuiMngr::new(&GuiBuilder::default(), &mut gui_res, cfg)
+            .change_context(Error::msg("Failed to load runtime gui"))?;
+        Ok(Self { window, gl, gui, gui_res })
     }
 
     /// Run runtime cycle.
@@ -54,11 +83,29 @@ impl Runtime {
     /// # Errors
     /// Return error if some scene failed.
     pub fn run(mut self, scene_builder: &scene::Builder, scene_cfg: Config) -> Result<(), Error> {
+        let root = self
+            .gui
+            .get_by_id("root")
+            .ok_or_else(|| Error::msg("Failed to get runtime gui root"))?;
+        let fps_graph = self
+            .gui
+            .get_by_id_cast::<Graph>("fps_graph")
+            .change_context(Error::msg("Failed to get runtime fps graph"))?;
+        let fps_label = self
+            .gui
+            .get_by_id_cast::<Label>("fps_label")
+            .change_context(Error::msg("Failed to get runtime fps label"))?;
+
         let mut events = Events::new(EventSettings::new());
+        events.bench_mode(true);
+        events.max_fps(100);
         let mut state = State { next_scene: None, res: ResMngr::new() };
         let mut scene = scene_builder
             .build(scene_cfg, &mut state.res)
             .change_context(Error::msg("Failed to create first scene"))?;
+
+        let mut fps_counter = 0;
+        let mut fps_timer = Instant::now();
 
         while let Some(e) = events.next(&mut self.window) {
             if let Some(args) = e.render_args() {
@@ -66,7 +113,18 @@ impl Runtime {
                     clear([1.0; 4], g);
                     let mut renderer = Renderer { ctx: vec![c], g, res: &mut state.res };
                     scene.draw(&mut renderer);
+                    let mut renderer = Renderer { ctx: vec![c], g, res: &mut self.gui_res };
+                    self.gui.draw(&mut renderer);
                 });
+
+                fps_counter += 1;
+                if fps_timer.elapsed() >= Duration::from_secs_f32(0.1) {
+                    let fps = f64::from(fps_counter) / fps_timer.elapsed().as_secs_f64();
+                    fps_graph.borrow_mut().push(fps);
+                    *fps_label.borrow_mut().text_mut() = format!("fps: {}", fps.round());
+                    fps_counter = 0;
+                    fps_timer = Instant::now();
+                }
             }
 
             let event = match e {
@@ -108,9 +166,16 @@ impl Runtime {
                 _ => None,
             };
             if let Some(e) = event {
+                if matches!(e, Event::KeyPress(Scancode::F1)) {
+                    let is_visible = root.borrow().is_visible();
+                    root.borrow_mut().set_visible_flag(!is_visible);
+                }
                 scene
-                    .handle_event(e, &mut state)
+                    .handle_event(e.clone(), &mut state)
                     .change_context(Error::msg("Scene failed to handle event"))?;
+                self.gui
+                    .handle_event(e)
+                    .change_context(Error::msg("Failed to update runtime gui"))?;
             }
 
             if let Some(cfg) = state.next_scene.take() {

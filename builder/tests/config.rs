@@ -2,7 +2,7 @@ use builder::Config;
 
 #[test]
 fn single_value() {
-    let mut cfg = Config::new("./tests/config.json").unwrap();
+    let mut cfg = Config::from_file("./tests/config.json").unwrap();
     assert_eq!(cfg.take::<String>("str").unwrap().as_str(), "Hello");
 
     let mut cfg = cfg.take::<Config>("cfg").unwrap();

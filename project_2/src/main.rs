@@ -40,7 +40,7 @@ fn run() -> Result<(), Error> {
     builder.reg_builder("main_menu", MainMenu::build);
     builder.reg_builder("level", Level::build);
 
-    let scene_cfg = Config::new("assets/main_menu.json")
+    let scene_cfg = Config::from_file("assets/main_menu.json")
         .change_context(Error::msg("Failed to load scene config"))?;
     runtime.run(&builder, scene_cfg).change_context(Error::msg("Runtime error"))?;
     Ok(())

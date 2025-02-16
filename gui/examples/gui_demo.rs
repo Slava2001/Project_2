@@ -42,8 +42,8 @@ fn run() -> Result<(), Error> {
     let mut builder = scene::Builder::new();
     builder.reg_builder("main", MainScene::build);
 
-    let scene_cfg =
-        Config::new("./gui_demo.json").change_context(Error::msg("Failed to load scene config"))?;
+    let scene_cfg = Config::from_file("./gui_demo.json")
+        .change_context(Error::msg("Failed to load scene config"))?;
     runtime.run(&builder, scene_cfg).change_context(Error::msg("Runtime error"))?;
     Ok(())
 }
