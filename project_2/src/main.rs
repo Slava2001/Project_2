@@ -5,7 +5,7 @@ mod scenes;
 use builder::{BuildFromCfg, Config};
 use error_stack::{Result, ResultExt};
 use runtime::Runtime;
-use scenes::MainMenu;
+use scenes::{Level, MainMenu};
 
 /// Window scale.
 const WINDOW_SCALE: u32 = 50;
@@ -38,6 +38,7 @@ fn run() -> Result<(), Error> {
         .change_context(Error::msg("Failed to init runtime"))?;
     let mut builder = scene::Builder::new();
     builder.reg_builder("main_menu", MainMenu::build);
+    builder.reg_builder("level", Level::build);
 
     let scene_cfg = Config::new("assets/main_menu.json")
         .change_context(Error::msg("Failed to load scene config"))?;

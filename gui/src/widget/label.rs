@@ -159,6 +159,14 @@ impl Widget for Label {
     fn get_id(&self) -> String {
         self.base.get_id()
     }
+
+    fn set_visible_flag(&mut self, is_visible: bool) {
+        self.base.set_visible_flag(is_visible);
+    }
+
+    fn is_visible(&self) -> bool {
+        self.base.is_visible()
+    }
 }
 
 impl Drawable for Label {

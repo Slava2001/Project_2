@@ -23,6 +23,10 @@
                 "texture_rect_hovered_off": {
                     "$ref": "./defines/rect.json",
                     "description": "Background texture rectangle on hovered and off state"
+                },
+                "state": {
+                    "type": "boolean",
+                    "description": "Flag init state"
                 }
             }
         }

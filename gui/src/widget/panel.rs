@@ -121,8 +121,16 @@ impl Widget for Panel {
         self.base.find(id)
     }
 
+    fn set_visible_flag(&mut self, is_visible: bool) {
+        self.base.set_visible_flag(is_visible);
+    }
+
     fn get_id(&self) -> String {
         self.base.get_id()
+    }
+
+    fn is_visible(&self) -> bool {
+        self.base.is_visible()
     }
 }
 
