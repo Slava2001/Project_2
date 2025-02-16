@@ -1,32 +1,31 @@
-//! Panel
+//! Panel.
 //!
-//! Simple widget. It used for groups other widgets
+//! Simple widget. It used for groups other widgets.
 
 use error_stack::{Result, ResultExt};
 use std::{cell::RefCell, rc::Weak};
 
-use crate::{
-    manager::{
-        input_event::{InputEvent, MouseButton},
-        widget::{
-            builder::{self, BuildFromCfg},
-            Base, Error, Event, WRef, Widget,
-        },
-        State,
+use super::Base;
+use crate::manager::{
+    widget::{
+        event::{Event, MouseButton},
+        Error, WRef, Widget,
     },
-    renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer},
-    resources::TextureId,
+    State,
 };
+use builder::{self, BuildFromCfg, Config};
+use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
+use resources::TextureId;
 
-/// Panel widget
+/// Panel widget.
 pub struct Panel {
-    /// Base widget
+    /// Base widget.
     base: Base,
-    /// Background texture
+    /// Background texture.
     texture: TextureId,
-    /// Background texture rectangle
+    /// Background texture rectangle.
     texture_rect: Rect<f64>,
-    /// Offset, used when widget cached
+    /// Offset, used when widget cached.
     offset: Vec2f,
 }
 
@@ -37,37 +36,35 @@ impl Widget for Panel {
         event: Event,
         state: &mut State,
     ) -> Result<(), Error> {
-        if let Event::InputEvent(i) = event {
-            match i {
-                InputEvent::MousePress(MouseButton::Left) => {
-                    if state.caught.is_none() {
-                        self.get_parent()
-                            .map(|p| p.upgrade().map(|p| p.borrow_mut().erase_widget(&self_rc)));
-                        self.offset = self.get_global_position() - state.mouse;
-                        self.set_position(state.mouse + self.offset);
-                        state.caught = Some(self_rc);
-                    }
+        match event {
+            Event::MousePress(MouseButton::Left) => {
+                if state.get_caught().is_none() {
+                    self.get_parent()
+                        .map(|p| p.upgrade().map(|p| p.borrow_mut().erase_widget(&self_rc)));
+                    self.offset = self.get_global_position() - state.mouse;
+                    self.set_position(state.mouse + self.offset);
+                    state.catch_self(self, self_rc)?;
                 }
-                InputEvent::MouseRelease(MouseButton::Left) => {
-                    if let Some(caught) = state.caught.clone() {
-                        if caught == self_rc {
-                            self.get_parent().map(|p| {
-                                p.upgrade().map(|p| {
-                                    p.clone().borrow_mut().add_widget(p.into(), self, self_rc);
-                                })
-                            });
-                            state.caught = None;
-                            self.set_global_position(self.get_position());
-                        }
-                    }
-                }
-                InputEvent::MouseMove(..) => {
-                    if state.caught == Some(self_rc) {
-                        self.set_position(state.mouse + self.offset);
-                    }
-                }
-                _ => {}
             }
+            Event::MouseRelease(MouseButton::Left) => {
+                if let Some(caught) = state.get_caught() {
+                    if caught == self_rc {
+                        self.get_parent().map(|p| {
+                            p.upgrade().map(|p| {
+                                p.clone().borrow_mut().add_widget(p.into(), self, self_rc.clone());
+                            })
+                        });
+                        state.uncatch(self, self_rc)?;
+                        self.set_global_position(self.get_position());
+                    }
+                }
+            }
+            Event::MouseMove => {
+                if state.is_caught(self_rc) {
+                    self.set_position(state.mouse + self.offset);
+                }
+            }
+            _ => {}
         }
         Ok(())
     }
@@ -136,30 +133,20 @@ impl Drawable for Panel {
     }
 }
 
-impl BuildFromCfg for Panel {
-    fn build(
-        mut cfg: config::Map<String, config::Value>,
-        res: &mut dyn crate::resources::Manger,
-    ) -> Result<WRef, builder::Error> {
-        let bg_texture = cfg
-            .remove("background")
-            .ok_or_else(|| builder::Error::msg("Failed to init panel, no filed \"background\""))?;
-        let bg_name = bg_texture.into_string().change_context(builder::Error::msg(
-            "Failed to init panel, filed \"background\" is not a string",
-        ))?;
+impl BuildFromCfg<WRef> for Panel {
+    fn build(mut cfg: Config, res: &mut dyn resources::Manger) -> Result<WRef, builder::Error> {
+        let bg_name = cfg
+            .take::<String>("background")
+            .change_context(builder::Error::msg("Failed to init button background texture"))?;
         let texture = res.get_texture(&bg_name).change_context(builder::Error::msg(format!(
-            "Failed to init panel, texture: \"{bg_name}\" not found"
+            "Failed to init button, texture: \"{bg_name}\" not found"
         )))?;
+
         let texture_rect = cfg
-            .remove("background_rect")
-            .ok_or_else(|| {
-                builder::Error::msg("Failed to init panel, no filed \"background_rect\"")
-            })?
-            .try_deserialize::<[f64; 4]>()
-            .change_context(builder::Error::msg(
-                "Failed deserialize filed \"background_rect\" as rectangle",
-            ))?
+            .take::<[f64; 4]>("background_rect")
+            .change_context(builder::Error::msg("Failed to init button"))?
             .into();
+
         Ok(WRef::new(Self {
             base: Base::new(cfg)?,
             texture,

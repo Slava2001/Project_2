@@ -1,0 +1,10 @@
+{
+    "allOf": [
+        {
+            "$ref": "./label.json"
+        }, {
+            "properties": {
+            }
+        }
+    ]
+}

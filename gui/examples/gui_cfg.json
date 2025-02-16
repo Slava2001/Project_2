@@ -1,0 +1,168 @@
+{
+    "debug": false,
+    "type": "base",
+    "rect": [ 0, 0, 0, 0 ],
+    "recourses": [
+        {
+            "name": "default",
+            "type": "font",
+            "path": "./ubuntu.mono.ttf"
+        }
+    ],
+    "childs": [
+        {
+            "debug": true,
+            "type": "label",
+            "color": "#000000",
+            "rect_color": "#00000000",
+            "text": "Debug text:",
+            "font_size": 20,
+            "font": "default",
+            "rect": [ 0, 0, 300, 25 ],
+            "id": "cursor_pos"
+        }, {
+            "debug": true,
+            "type": "label",
+            "color": "#000000",
+            "rect_color": "#00000000",
+            "text": "Cursor pos: (0, 0)",
+            "font_size": 20,
+            "font": "default",
+            "rect": [ 0, 25, 300, 25 ],
+            "id": "cursor_pos"
+        }, {
+            "debug": true,
+            "type": "label",
+            "color": "#000000",
+            "rect_color": "#00000000",
+            "text": "Flag state: false",
+            "font_size": 20,
+            "font": "default",
+            "rect": [ 0, 50, 300, 25 ],
+            "id": "flag_state"
+        }, {
+            "recourses": [
+                {
+                    "name": "default",
+                    "type": "texture",
+                    "path": "./frame.png"
+                }, {
+                    "name": "flag_tiles",
+                    "type": "texture",
+                    "path": "./flag.png"
+                }, {
+                    "name": "button_tiles",
+                    "type": "texture",
+                    "path": "./button.png"
+                }
+            ],
+            "debug": true,
+            "type": "panel",
+            "background": "default",
+            "background_rect": [ 0, 0, 25, 25 ],
+            "rect": [ 100, 100, 190, 190 ],
+            "childs": [
+                {
+                    "debug": false,
+                    "type": "panel",
+                    "background": "default",
+                    "background_rect": [ 0, 0, 25, 25 ],
+                    "rect": [ 10, 10, 50, 50 ],
+                    "childs": [
+                        {
+                            "debug": false,
+                            "type": "flag",
+                            "id": "hello_flag",
+                            "recourses": [
+                                {
+                                    "name": "flag_tiles",
+                                    "type": "texture",
+                                    "path": "./flag.png"
+                                }
+                            ],
+                            "background": "flag_tiles",
+                            "texture_rect_off": [ 0, 0, 32, 32 ],
+                            "texture_rect_on": [ 0, 32, 32, 32 ],
+                            "texture_rect_hovered_off": [ 0, 64, 32, 32 ],
+                            "texture_rect_hovered_on": [ 0, 96, 32, 32 ],
+                            "rect": [ 10, 10, 30, 30 ]
+                        }
+                    ]
+                }, {
+                    "debug": false,
+                    "type": "panel",
+                    "background": "default",
+                    "background_rect": [ 0, 0, 25, 25 ],
+                    "rect": [ 70, 10, 50, 50 ],
+                    "childs": [
+                        {
+                            "debug": false,
+                            "type": "label",
+                            "color": "#000000",
+                            "rect_color": "#00000000",
+                            "text": "A",
+                            "font_size": 45,
+                            "font": "default",
+                            "rect": [ 8, 0, 0, 0 ]
+                        }
+                    ]
+                }, {
+                    "debug": false,
+                    "type": "panel",
+                    "background": "default",
+                    "background_rect": [ 0, 0, 25, 25 ],
+                    "rect": [ 130, 10, 50, 50 ],
+                    "childs": [
+                        {
+                            "debug": false,
+                            "type": "button",
+                            "background": "button_tiles",
+                            "rect": [ 10, 10, 30, 30 ],
+                            "id": "hello_button",
+                            "texture_rect": [ 0, 0, 32, 32 ],
+                            "texture_rect_hovered": [ 0, 32, 32, 32 ],
+                            "texture_rect_pressed": [ 0, 64, 32, 32 ]
+                        }
+                    ]
+                }, {
+                    "debug": true,
+                    "type": "panel",
+                    "background": "default",
+                    "background_rect": [ 0, 0, 25, 25 ],
+                    "rect": [ 10, 70, 50, 50 ]
+                }, {
+                    "debug": false,
+                    "type": "panel",
+                    "id": "middle_panel",
+                    "background": "default",
+                    "background_rect": [ 0, 0, 25, 25 ],
+                    "rect": [ 70, 70, 50, 50 ]
+                }, {
+                    "debug": false,
+                    "type": "panel",
+                    "background": "default",
+                    "background_rect": [ 0, 0, 25, 25 ],
+                    "rect": [ 130, 70, 50, 50 ]
+                }, {
+                    "debug": false,
+                    "type": "panel",
+                    "background": "default",
+                    "background_rect": [ 0, 0, 25, 25 ],
+                    "rect": [ 10, 130, 50, 50 ]
+                }, {
+                    "debug": false,
+                    "type": "panel",
+                    "background": "default",
+                    "background_rect": [ 0, 0, 25, 25 ],
+                    "rect": [ 70, 130, 50, 50 ]
+                }, {
+                    "debug": false,
+                    "type": "panel",
+                    "background": "default",
+                    "background_rect": [ 0, 0, 25, 25 ],
+                    "rect": [ 130, 130, 50, 50 ]
+                }
+            ]
+        }
+    ]
+}

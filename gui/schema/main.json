@@ -1,9 +1,7 @@
 {
     "type": "object",
+
     "allOf": [
-        {
-            "$ref": "./base.json"
-        },
         {
             "properties": {
                 "childs": {
@@ -38,30 +36,93 @@
                     }
                 }
             }
-        },
-        {
-            "oneOf": [
+        }, {
+
+            "anyOf": [
                 {
-                    "properties": {
-                        "type": {
-                            "type": "string",
-                            "enum": [
-                                "base"
-                            ]
+                    "allOf": [
+                        {
+                            "properties": {
+                                "type": {
+                                    "const": "base"
+                                }
+                            }
+                        }, {
+                            "$ref": "./base.json"
                         }
-                    }
-                },
-                {
-                    "$ref": "./panel.json"
-                },
-                {
-                    "$ref": "./flag.json"
-                },
-                {
-                    "$ref": "./button.json"
-                },
-                {
-                    "$ref": "./label.json"
+                    ]
+                }, {
+                    "allOf": [
+                        {
+                            "properties": {
+                                "type": {
+                                    "const": "button"
+                                }
+                            }
+                        }, {
+                            "$ref": "./button.json"
+                        }
+                    ]
+                }, {
+                    "allOf": [
+                        {
+                            "properties": {
+                                "type": {
+                                    "const": "flag"
+                                }
+                            }
+                        }, {
+                            "$ref": "./flag.json"
+                        }
+                    ]
+                }, {
+                    "allOf": [
+                        {
+                            "properties": {
+                                "type": {
+                                    "const": "graph"
+                                }
+                            }
+                        }, {
+                            "$ref": "./graph.json"
+                        }
+                    ]
+                }, {
+                    "allOf": [
+                        {
+                            "properties": {
+                                "type": {
+                                    "const": "label"
+                                }
+                            }
+                        }, {
+                            "$ref": "./label.json"
+                        }
+                    ]
+                }, {
+                    "allOf": [
+                        {
+                            "properties": {
+                                "type": {
+                                    "const": "panel"
+                                }
+                            }
+                        }, {
+                            "$ref": "./panel.json"
+                        }
+                    ]
+                }, {
+                    "allOf": [
+                        {
+                            "properties": {
+                                "type": {
+                                    "const": "textbox"
+                                }
+                            }
+                        }, {
+                            "$ref": "./textbox.json"
+                        }
+                    ]
                 }
             ]
         }

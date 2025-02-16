@@ -1,38 +1,96 @@
-//! Label
+//! Label.
 //!
-//! Label widget, that used for display text
+//! Label widget, that used for display text.
 
+use crate::manager::{
+    widget::{event::Event, Error, WRef, Widget},
+    State,
+};
+use builder::{self, BuildFromCfg, Config};
 use error_stack::{Result, ResultExt};
-use std::{cell::RefCell, rc::Weak};
-
-use crate::{
-    manager::{
-        widget::{
-            builder::{self, BuildFromCfg},
-            Base, Error, Event, WRef, Widget,
-        },
-        State,
-    },
-    renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer},
-    resources::FontId,
+use renderer::{color::Color, rect::Rect, vec2::Vec2f, Drawable, Renderer, TextTruncateMode};
+use resources::FontId;
+use std::{
+    cell::{Ref, RefCell, RefMut},
+    rc::Weak,
 };
 
-/// Label widget
+use super::Base;
+
+/// Label widget.
 pub struct Label {
-    /// Base widget
+    /// Base widget.
     base: Base,
-    /// Label text
-    text: String,
-    /// Font size
+    /// Label text.
+    text: RefCell<String>,
+    /// Font size.
     size: f64,
-    /// Font identification
+    /// Font identification.
     font: FontId,
+    /// Text color.
+    color: Color,
+    /// Text draw truncate mode.
+    draw_truncate: TextTruncateMode,
+    /// Text truncate mode.
+    need_to_truncate_text: bool,
+    /// Label border color.
+    rect_color: Color,
 }
 
 impl Label {
-    /// Set label text
-    pub fn set_text<T: Into<String>>(&mut self, text: T) {
-        self.text = text.into();
+    /// Create new label.
+    ///
+    /// # Errors
+    /// Return error if the config is incorrect or the required resource is not found.
+    pub fn new(mut cfg: Config, res: &mut dyn resources::Manger) -> Result<Self, builder::Error> {
+        Ok(Self {
+            text: RefCell::new(
+                cfg.take::<String>("text")
+                    .change_context(builder::Error::msg("Failed to init label text"))?,
+            ),
+            size: cfg
+                .take::<f64>("font_size")
+                .change_context(builder::Error::msg("Failed to init label font size"))?,
+            font: res
+                .get_font(
+                    &cfg.take::<String>("font")
+                        .change_context(builder::Error::msg("Failed to init label font"))?,
+                )
+                .change_context(builder::Error::msg("Failed to find required font"))?,
+            color: cfg
+                .take::<String>("color")
+                .change_context(builder::Error::msg("Failed to init color"))?
+                .parse::<Color>()
+                .change_context(builder::Error::msg("Failed to parse color"))?,
+            rect_color: cfg
+                .take::<String>("rect_color")
+                .change_context(builder::Error::msg("Failed to init Textbox border color"))?
+                .parse::<Color>()
+                .change_context(builder::Error::msg("Failed to parse border color"))?,
+            base: Base::new(cfg)?,
+            draw_truncate: TextTruncateMode::Back,
+            need_to_truncate_text: false,
+        })
+    }
+
+    /// Get access to read label text.
+    pub fn text(&self) -> Ref<'_, String> {
+        self.text.borrow()
+    }
+
+    /// Get access to change label text.
+    pub fn text_mut(&self) -> RefMut<'_, String> {
+        self.text.borrow_mut()
+    }
+
+    /// Set text truncate mode.
+    pub fn set_draw_truncate_mode(&mut self, mode: TextTruncateMode) {
+        self.draw_truncate = mode;
+    }
+
+    /// Set to true to clip the text to fit it into the rectangle.
+    pub fn set_text_truncating(&mut self, mode: bool) {
+        self.need_to_truncate_text = mode;
     }
 }
 
@@ -105,44 +163,31 @@ impl Widget for Label {
 
 impl Drawable for Label {
     fn draw(&self, renderer: &mut dyn Renderer) {
-        renderer.draw_text(&self.text, self.size, self.base.get_position(), self.font);
+        let rc = renderer.draw_text(
+            &self.text.borrow(),
+            self.size,
+            self.base.get_rect(),
+            self.font,
+            &self.color,
+            self.draw_truncate,
+        );
+        if self.need_to_truncate_text && rc != 0 {
+            match self.draw_truncate {
+                TextTruncateMode::Front => {
+                    self.text.borrow_mut().drain(..rc);
+                }
+                TextTruncateMode::Back => {
+                    self.text.borrow_mut().drain(rc..);
+                }
+            }
+        }
+        renderer.draw_rect(self.base.get_rect(), &self.rect_color);
         self.base.draw(renderer);
     }
 }
 
-impl BuildFromCfg for Label {
-    fn build(
-        mut cfg: config::Map<String, config::Value>,
-        res: &mut dyn crate::resources::Manger,
-    ) -> Result<WRef, builder::Error> {
-        Ok(WRef::new(Self {
-            text: cfg
-                .remove("text")
-                .ok_or_else(|| builder::Error::msg("Failed to init label, no filed \"text\""))?
-                .into_string()
-                .change_context(builder::Error::msg(
-                    "Failed to init label, filed \"text\" is not a string",
-                ))?,
-            size: cfg
-                .remove("font_size")
-                .ok_or_else(|| builder::Error::msg("Failed to init label, no filed \"font_size\""))?
-                .into_float()
-                .change_context(builder::Error::msg(
-                    "Failed to init label, filed \"font_size\" is not a float number",
-                ))?,
-            font: res
-                .get_font(
-                    &cfg.remove("font")
-                        .ok_or_else(|| {
-                            builder::Error::msg("Failed to init label, no filed \"font\"")
-                        })?
-                        .into_string()
-                        .change_context(builder::Error::msg(
-                            "Failed to init label, filed \"font\" is not a string",
-                        ))?,
-                )
-                .change_context(builder::Error::msg("Failed to find required font"))?,
-            base: Base::new(cfg)?,
-        }))
+impl BuildFromCfg<WRef> for Label {
+    fn build(cfg: Config, res: &mut dyn resources::Manger) -> Result<WRef, builder::Error> {
+        Ok(WRef::new(Self::new(cfg, res)?))
     }
 }

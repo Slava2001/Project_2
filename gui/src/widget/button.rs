@@ -1,43 +1,42 @@
-//! Button
+//! Button.
 //!
-//! Button widget
+//! Button widget.
 
 use error_stack::{Result, ResultExt};
 use std::{cell::RefCell, rc::Weak};
 
-use crate::{
-    manager::{
-        input_event::{InputEvent, MouseButton},
-        widget::{
-            builder::{self, BuildFromCfg},
-            Base, Error, Event, WRef, Widget,
-        },
-        State,
+use super::Base;
+use crate::manager::{
+    widget::{
+        event::{Event, MouseButton},
+        Error, WRef, Widget,
     },
-    renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer},
-    resources::TextureId,
+    State,
 };
+use builder::{self, BuildFromCfg, Config};
+use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
+use resources::TextureId;
 
-/// Button click callback. Called then user click on button
+/// Button click callback. Called then user click on button.
 type ButtonCb = dyn FnMut(&mut Button);
 
-/// Button widget
+/// Button widget.
 pub struct Button {
-    /// Base widget
+    /// Base widget.
     base: Base,
-    /// Background texture
+    /// Background texture.
     texture: TextureId,
-    /// Background texture rectangle when button is preset
+    /// Background texture rectangle when button is preset.
     texture_rect_pressed: Rect<f64>,
-    /// Background texture rectangle when button is released
+    /// Background texture rectangle when button is released.
     texture_rect: Rect<f64>,
-    /// Background texture rectangle when button is hovered and released
+    /// Background texture rectangle when button is hovered and released.
     texture_rect_hovered: Rect<f64>,
-    /// Is widget hovered
+    /// Is widget hovered.
     hovered: bool,
-    /// Button is pressed
+    /// Button is pressed.
     state: bool,
-    /// Pressed cb
+    /// Pressed cb.
     cb: Option<Box<ButtonCb>>,
 }
 
@@ -56,41 +55,44 @@ impl Widget for Button {
         state: &mut State,
     ) -> Result<(), Error> {
         match event {
-            Event::InputEvent(input_event) => match input_event {
-                InputEvent::MousePress(mouse_button) => {
-                    if matches!(mouse_button, MouseButton::Left) && state.caught.is_none() {
-                        self.set_position(self.get_global_position());
-                        self.get_parent()
-                            .map(|p| p.upgrade().map(|p| p.borrow_mut().erase_widget(&self_rc)));
-                        state.caught = Some(self_rc);
-                        self.state = true;
-                    }
+            Event::MousePress(mouse_button) => {
+                if matches!(mouse_button, MouseButton::Left) && state.get_caught().is_none() {
+                    self.set_position(self.get_global_position());
+                    self.get_parent()
+                        .map(|p| p.upgrade().map(|p| p.borrow_mut().erase_widget(&self_rc)));
+                    state.catch_self(self, self_rc)?;
+                    self.state = true;
                 }
-                InputEvent::MouseRelease(mouse_button) => {
-                    if matches!(mouse_button, MouseButton::Left)
-                        && state.caught == Some(self_rc.clone())
-                    {
-                        self.state = false;
-                        if self.check_bounds(state.mouse) {
-                            if let Some(mut cb) = self.cb.take() {
-                                cb(self);
-                                self.cb = Some(cb);
-                            }
+            }
+            Event::MouseRelease(mouse_button) => {
+                if matches!(mouse_button, MouseButton::Left) && state.is_caught(self_rc.clone()) {
+                    self.state = false;
+                    if self.check_bounds(state.mouse) {
+                        if let Some(mut cb) = self.cb.take() {
+                            cb(self);
+                            self.cb = Some(cb);
                         }
-                        state.caught = None;
-                        self.get_parent().map(|p| {
-                            p.upgrade().map(|p| {
-                                p.clone().borrow_mut().add_widget(p.into(), self, self_rc);
-                            })
-                        });
-                        self.hovered = self.check_bounds(state.mouse);
-                        self.set_global_position(self.get_position());
                     }
+                    state.uncatch(self, self_rc.clone())?;
+                    self.get_parent().map(|p| {
+                        p.upgrade().map(|p| {
+                            p.clone().borrow_mut().add_widget(p.into(), self, self_rc);
+                        })
+                    });
+                    self.hovered = self.check_bounds(state.mouse);
+                    self.set_global_position(self.get_position());
                 }
-                InputEvent::MouseMove(..) => {}
-            },
+            }
             Event::MouseEnter => self.hovered = true,
-            Event::MouseLeave => self.hovered = state.caught == Some(self_rc),
+            Event::MouseLeave => self.hovered = state.is_caught(self_rc),
+            Event::MouseMove
+            | Event::TextInput(_)
+            | Event::Caught
+            | Event::Released
+            | Event::Focused
+            | Event::Unfocused
+            | Event::KeyPress(_)
+            | Event::KeyRelease(_) => {}
         }
         Ok(())
     }
@@ -166,31 +168,19 @@ impl Drawable for Button {
     }
 }
 
-impl BuildFromCfg for Button {
-    fn build(
-        mut cfg: config::Map<String, config::Value>,
-        res: &mut dyn crate::resources::Manger,
-    ) -> Result<WRef, builder::Error> {
-        let bg_texture = cfg
-            .remove("background")
-            .ok_or_else(|| builder::Error::msg("Failed to init button, no filed \"background\""))?;
-        let bg_name = bg_texture.into_string().change_context(builder::Error::msg(
-            "Failed to init button, filed \"background\" is not a string",
-        ))?;
+impl BuildFromCfg<WRef> for Button {
+    fn build(mut cfg: Config, res: &mut dyn resources::Manger) -> Result<WRef, builder::Error> {
+        let bg_name = cfg
+            .take::<String>("background")
+            .change_context(builder::Error::msg("Failed to init button background texture"))?;
         let texture = res.get_texture(&bg_name).change_context(builder::Error::msg(format!(
             "Failed to init button, texture: \"{bg_name}\" not found"
         )))?;
 
         let mut get_rect = |name| -> Result<Rect<f64>, builder::Error> {
             Ok(cfg
-                .remove(name)
-                .ok_or_else(|| {
-                    builder::Error::msg(format!("Failed to init button, no filed \"{name}\""))
-                })?
-                .try_deserialize::<[f64; 4]>()
-                .change_context(builder::Error::msg(format!(
-                    "Failed deserialize filed \"{name}\" as rectangle"
-                )))?
+                .take::<[f64; 4]>(name)
+                .change_context(builder::Error::msg("Failed to init button"))?
                 .into())
         };
 

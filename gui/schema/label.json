@@ -1,23 +1,28 @@
 {
-    "properties": {
-        "type": {
-            "type": "string",
-            "enum": [
-                "label"
-            ]
-        },
-        "text": {
-            "type": "string",
-            "description": "Label text"
-        },
-        "font_size": {
-            "type": "number",
-            "minimum": 1,
-            "description": "Font size"
-        },
-        "font": {
-            "type": "string",
-            "description": "Label font name"
+    "allOf": [
+        {
+            "$ref": "./base.json"
+        }, {
+            "properties": {
+                "text": {
+                    "type": "string",
+                    "description": "Label text"
+                },
+                "font_size": {
+                    "type": "number",
+                    "minimum": 1,
+                    "default": 10,
+                    "description": "Font size"
+                },
+                "font": {
+                    "type": "string",
+                    "description": "Label font name"
+                },
+                "color": {
+                    "$ref": "./defines/color.json",
+                    "description": "Text color"
+                }
+            }
         }
-    }
+    ]
 }

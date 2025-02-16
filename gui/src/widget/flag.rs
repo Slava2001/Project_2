@@ -1,45 +1,44 @@
-//! Flag
+//! Flag.
 //!
-//! Flag widget, that change state by click
+//! Flag widget, that change state by click.
 
+use crate::manager::{
+    widget::{
+        event::{Event, MouseButton},
+        Error, WRef, Widget,
+    },
+    State,
+};
+use builder::{self, BuildFromCfg, Config};
 use error_stack::{Result, ResultExt};
+use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
+use resources::TextureId;
 use std::{cell::RefCell, rc::Weak};
 
-use crate::{
-    manager::{
-        input_event::{InputEvent, MouseButton},
-        widget::{
-            builder::{self, BuildFromCfg},
-            Base, Error, Event, WRef, Widget,
-        },
-        State,
-    },
-    renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer},
-    resources::TextureId,
-};
+use super::Base;
 
-/// Change state callback. Args: flag and it is state
+/// Change state callback. Args: flag and it is state.
 type FlagCb = dyn FnMut(&mut Flag, bool);
 
-/// Flag widget
+/// Flag widget.
 pub struct Flag {
-    /// Base widget
+    /// Base widget.
     base: Base,
-    /// Background texture
+    /// Background texture.
     texture: TextureId,
-    /// Background texture rectangle on on state
+    /// Background texture rectangle on on state.
     texture_rect_on: Rect<f64>,
-    /// Background texture rectangle on off state
+    /// Background texture rectangle on off state.
     texture_rect_off: Rect<f64>,
-    /// Background texture rectangle on hovered and on state
+    /// Background texture rectangle on hovered and on state.
     texture_rect_hovered_on: Rect<f64>,
-    /// Background texture rectangle on hovered and off state
+    /// Background texture rectangle on hovered and off state.
     texture_rect_hovered_off: Rect<f64>,
-    /// Is widget hovered
+    /// Is widget hovered.
     hovered: bool,
-    /// Flag state
+    /// Flag state.
     state: bool,
-    /// Change state cb
+    /// Change state cb.
     cb: Option<Box<FlagCb>>,
 }
 
@@ -58,40 +57,43 @@ impl Widget for Flag {
         state: &mut State,
     ) -> Result<(), Error> {
         match event {
-            Event::InputEvent(input_event) => match input_event {
-                InputEvent::MousePress(mouse_button) => {
-                    if matches!(mouse_button, MouseButton::Left) && state.caught.is_none() {
-                        self.set_position(self.get_global_position());
-                        self.get_parent()
-                            .map(|p| p.upgrade().map(|p| p.borrow_mut().erase_widget(&self_rc)));
-                        state.caught = Some(self_rc);
-                    }
+            Event::MousePress(mouse_button) => {
+                if matches!(mouse_button, MouseButton::Left) && state.get_caught().is_none() {
+                    self.set_position(self.get_global_position());
+                    self.get_parent()
+                        .map(|p| p.upgrade().map(|p| p.borrow_mut().erase_widget(&self_rc)));
+                    state.catch_self(self, self_rc)?;
                 }
-                InputEvent::MouseRelease(mouse_button) => {
-                    if matches!(mouse_button, MouseButton::Left)
-                        && state.caught == Some(self_rc.clone())
-                    {
-                        if self.check_bounds(state.mouse) {
-                            self.state = !self.state;
-                            if let Some(mut cb) = self.cb.take() {
-                                cb(self, self.state);
-                                self.cb = Some(cb);
-                            }
+            }
+            Event::MouseRelease(mouse_button) => {
+                if matches!(mouse_button, MouseButton::Left) && state.is_caught(self_rc.clone()) {
+                    if self.check_bounds(state.mouse) {
+                        self.state = !self.state;
+                        if let Some(mut cb) = self.cb.take() {
+                            cb(self, self.state);
+                            self.cb = Some(cb);
                         }
-                        state.caught = None;
-                        self.get_parent().map(|p| {
-                            p.upgrade().map(|p| {
-                                p.clone().borrow_mut().add_widget(p.into(), self, self_rc);
-                            })
-                        });
-                        self.hovered = self.check_bounds(state.mouse);
-                        self.set_global_position(self.get_position());
                     }
+                    state.uncatch(self, self_rc.clone())?;
+                    self.get_parent().map(|p| {
+                        p.upgrade().map(|p| {
+                            p.clone().borrow_mut().add_widget(p.into(), self, self_rc);
+                        })
+                    });
+                    self.hovered = self.check_bounds(state.mouse);
+                    self.set_global_position(self.get_position());
                 }
-                InputEvent::MouseMove(..) => {}
-            },
+            }
             Event::MouseEnter => self.hovered = true,
-            Event::MouseLeave => self.hovered = state.caught == Some(self_rc),
+            Event::MouseLeave => self.hovered = state.get_caught() == Some(self_rc),
+            Event::MouseMove
+            | Event::TextInput(_)
+            | Event::Caught
+            | Event::Released
+            | Event::Focused
+            | Event::Unfocused
+            | Event::KeyPress(_)
+            | Event::KeyRelease(_) => {}
         }
         Ok(())
     }
@@ -166,31 +168,19 @@ impl Drawable for Flag {
     }
 }
 
-impl BuildFromCfg for Flag {
-    fn build(
-        mut cfg: config::Map<String, config::Value>,
-        res: &mut dyn crate::resources::Manger,
-    ) -> Result<WRef, builder::Error> {
-        let bg_texture = cfg
-            .remove("background")
-            .ok_or_else(|| builder::Error::msg("Failed to init flag, no filed \"background\""))?;
-        let bg_name = bg_texture.into_string().change_context(builder::Error::msg(
-            "Failed to init flag, filed \"background\" is not a string",
-        ))?;
+impl BuildFromCfg<WRef> for Flag {
+    fn build(mut cfg: Config, res: &mut dyn resources::Manger) -> Result<WRef, builder::Error> {
+        let bg_name = cfg
+            .take::<String>("background")
+            .change_context(builder::Error::msg("Failed to init flag background texture"))?;
         let texture = res.get_texture(&bg_name).change_context(builder::Error::msg(format!(
             "Failed to init flag, texture: \"{bg_name}\" not found"
         )))?;
 
         let mut get_rect = |name| -> Result<Rect<f64>, builder::Error> {
             Ok(cfg
-                .remove(name)
-                .ok_or_else(|| {
-                    builder::Error::msg(format!("Failed to init flag, no filed \"{name}\""))
-                })?
-                .try_deserialize::<[f64; 4]>()
-                .change_context(builder::Error::msg(format!(
-                    "Failed deserialize filed \"{name}\" as rectangle"
-                )))?
+                .take::<[f64; 4]>(name)
+                .change_context(builder::Error::msg("Failed to init flag"))?
                 .into())
         };
 
