@@ -1,7 +1,7 @@
 //! Scene implementations.
 
-mod main_menu;
 mod level;
+mod main_menu;
 
-pub use main_menu::MainMenu;
 pub use level::Level;
+pub use main_menu::MainMenu;

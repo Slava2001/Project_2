@@ -27,7 +27,7 @@ impl Scene for Level {
         e: scene::event::Event,
         state: &mut dyn scene::State,
     ) -> error_stack::Result<(), scene::Error> {
-        self.gui.handle_event(e.clone()).change_context(scene::Error::msg("Gui failed"))?;
+        self.gui.handle_event(e).change_context(scene::Error::msg("Gui failed"))?;
         if *self.menu_scene.borrow() {
             state
                 .load_next_scene(
