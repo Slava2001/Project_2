@@ -14,5 +14,6 @@
                 }
             }
         }
-    ]
+    ],
+    "required": [ "background", "background_rect" ]
 }

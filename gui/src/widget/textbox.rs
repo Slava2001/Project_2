@@ -10,24 +10,25 @@ use crate::manager::{
     State,
 };
 use builder::{self, BuildFromCfg, Config};
-use error_stack::Result;
+use error_stack::{Result, ResultExt};
 use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer, TextTruncateMode};
-use scene::event::Scancode;
+use scene::event::KeyCode;
 use std::{cell::RefCell, rc::Weak};
 
 use super::Label;
-
-/// Cursor char.
-const CURSOR_CHAR: char = '▎';
 
 /// Textbox widget.
 pub struct Textbox {
     /// Base widget.
     base: Label,
     /// Last pressed key.
-    last_key: Option<i32>,
+    last_key: Option<KeyCode>,
     /// Is textbox focused.
     is_focused: bool,
+    /// Cursor char.
+    cursor: char,
+    /// Cursor offset.
+    cursor_offset: usize,
 }
 
 impl Textbox {
@@ -35,10 +36,14 @@ impl Textbox {
     ///
     /// # Errors
     /// Return error if the config is incorrect or the required resource is not found.
-    pub fn new(cfg: Config, res: &mut dyn resources::Manger) -> Result<Self, builder::Error> {
+    pub fn new(mut cfg: Config, res: &mut dyn resources::Manger) -> Result<Self, builder::Error> {
+        let cursor = cfg
+            .take_opt("cursor")
+            .change_context(builder::Error::msg("Failed to init textbox cursor"))?
+            .unwrap_or('\u{033F}');
         let mut base = Label::new(cfg, res)?;
         base.set_text_truncating(false);
-        Ok(Self { base, last_key: None, is_focused: false })
+        Ok(Self { base, last_key: None, is_focused: false, cursor, cursor_offset: 0 })
     }
 }
 
@@ -61,31 +66,67 @@ impl Widget for Textbox {
             }
             Event::TextInput(txt) if !txt.is_empty() => {
                 if self.is_focused && state.get_focused() == Some(self_rc) {
-                    self.base.text_mut().pop();
-                    *self.base.text_mut() += &txt;
-                    self.base.text_mut().push(CURSOR_CHAR);
+                    for c in txt.chars() {
+                        self.base.chars_mut().insert(self.cursor_offset, c);
+                        self.cursor_offset += 1;
+                    }
                 }
             }
             Event::TextInput(_) => {
-                if self.is_focused && Some(Scancode::BACKSPACE) == self.last_key {
-                    self.base.text_mut().pop();
-                    self.base.text_mut().pop();
-                    self.base.text_mut().push(CURSOR_CHAR);
+                if self.is_focused {
+                    if Some(KeyCode::Backspace) == self.last_key {
+                        if self.cursor_offset > 0 {
+                            self.base.chars_mut().remove(self.cursor_offset - 1);
+                            self.cursor_offset -= 1;
+                        }
+                    } else if Some(KeyCode::Delete) == self.last_key {
+                        if self.cursor_offset < self.base.chars().len() - 1 {
+                            self.base.chars_mut().remove(self.cursor_offset + 1);
+                        }
+                    }
                 }
             }
             Event::Focused => {
                 self.is_focused = true;
-                self.base.text_mut().push(CURSOR_CHAR);
+                self.cursor_offset = self.base.chars().len();
+                self.base.chars_mut().push(self.cursor);
                 self.base.set_draw_truncate_mode(TextTruncateMode::Front);
             }
             Event::Unfocused => {
                 self.is_focused = false;
+                self.base.chars_mut().remove(self.cursor_offset);
                 self.last_key = None;
-                self.base.text_mut().pop();
                 self.base.set_draw_truncate_mode(TextTruncateMode::Back);
             }
             Event::KeyPress(k) => {
                 if self.is_focused && self.last_key.is_none() {
+                    match k {
+                        KeyCode::ArrowLeft => {
+                            if self.cursor_offset > 0 {
+                                self.base
+                                    .chars_mut()
+                                    .swap(self.cursor_offset, self.cursor_offset - 1);
+                                self.cursor_offset -= 1;
+                            }
+                        }
+                        KeyCode::ArrowRight => {
+                            if self.cursor_offset < self.base.chars().len() - 1 {
+                                self.base.chars_mut().swap(self.cursor_offset, self.cursor_offset + 1);
+                                self.cursor_offset += 1;
+                            }
+                        }
+                        KeyCode::Home => {
+                            self.base.chars_mut().remove(self.cursor_offset);
+                            self.cursor_offset = 0;
+                            self.base.chars_mut().insert(0, self.cursor);
+                        }
+                        KeyCode::End => {
+                            self.base.chars_mut().remove(self.cursor_offset);
+                            self.cursor_offset = self.base.chars().len();
+                            self.base.chars_mut().push(self.cursor);
+                        }
+                        _ => {}
+                    }
                     self.last_key = Some(k);
                 }
             }

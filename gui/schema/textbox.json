@@ -4,7 +4,15 @@
             "$ref": "./label.json"
         }, {
             "properties": {
+                "cursor": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1,
+                    "description": "Textbox cursor char",
+                    "default": "|"
+                }
             }
         }
-    ]
+    ],
+    "required": [ ]
 }

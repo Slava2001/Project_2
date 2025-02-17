@@ -22,19 +22,25 @@ pub enum Event {
     MouseMove(f64, f64),
     /// Text input event
     TextInput(String),
-    /// Keyboard key press event, arg: [`Scancode`].
-    KeyPress(i32),
-    /// Keyboard key release event, arg: [`Scancode`].
-    KeyRelease(i32),
+    /// Keyboard key press event, arg: [`KeyCode`].
+    KeyPress(KeyCode),
+    /// Keyboard key release event, arg: [`KeyCode`].
+    KeyRelease(KeyCode),
 }
 
-/// Module that contains constants for keyboard button codes
-pub struct Scancode;
-#[allow(dead_code, missing_docs)]
-impl Scancode {
-    pub const ESCAPE: i32 = 1;
-    pub const BACKSPACE: i32 = 14;
-    pub const TAB: i32 = 15;
-    pub const F1: i32 = 59;
-    pub const ENTER: i32 = 28;
+/// Keyboard button codes.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KeyCode {
+    Escape,
+    Backspace,
+    Tab,
+    F1,
+    Enter,
+    ArrowUp,
+    ArrowDown,
+    ArrowRight,
+    ArrowLeft,
+    Home,
+    End,
+    Delete,
 }

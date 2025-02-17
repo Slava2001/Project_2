@@ -80,7 +80,7 @@ impl renderer::Renderer for Renderer<'_> {
 
     fn draw_text(
         &mut self,
-        txt: &str,
+        txt: &[char],
         size: f64,
         rect: &Rect<f64>,
         font: FontId,
@@ -128,14 +128,14 @@ impl renderer::Renderer for Renderer<'_> {
 
         let mut start_index = 0;
         if matches!(mode, TextTruncateMode::Front) {
-            iter_over_char(&mut txt.chars().rev(), &mut |ch, _, _, _| start_index += ch.len_utf8());
+            iter_over_char(&mut txt.iter().cloned().rev(), &mut |_, _, _, _| start_index += 1);
             start_index = txt.len() - start_index;
         }
 
         let mut image = Image::new_color(Into::<[f32; 4]>::into(color));
-        let mut displayed_bytes = 0;
-        iter_over_char(&mut txt[start_index..].chars(), &mut |c, ch, x, y| {
-            displayed_bytes += c.len_utf8();
+        let mut displayed_chars = 0;
+        iter_over_char(&mut txt[start_index..].iter().cloned(), &mut |c, ch, x, y| {
+            displayed_chars += 1;
             if c != '\n' {
                 let rect =
                     [ch.atlas_offset[0], ch.atlas_offset[1], ch.atlas_size[0], ch.atlas_size[1]];
@@ -143,6 +143,6 @@ impl renderer::Renderer for Renderer<'_> {
                 image.draw(ch.texture, &DrawState::default(), transform.trans(x, y), self.g);
             }
         });
-        txt.len() - displayed_bytes
+        txt.len() - displayed_chars
     }
 }

@@ -16,11 +16,11 @@ use opengl_graphics::{GlGraphics, GlyphCache, OpenGL, TextureSettings};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::RenderEvent;
 use piston::window::WindowSettings;
-use piston::{EventLoop, Motion};
+use piston::{Button, EventLoop, Key, Motion};
 use renderer::Renderer;
 use resmgr::ResMngr;
 use resources::FontId;
-use scene::event::{Event, MouseButton, Scancode};
+use scene::event::{Event, KeyCode, MouseButton};
 
 /// Runtime error.
 #[derive(Debug, thiserror::Error)]
@@ -121,7 +121,7 @@ impl Runtime {
                 if fps_timer.elapsed() >= Duration::from_secs_f32(0.1) {
                     let fps = f64::from(fps_counter) / fps_timer.elapsed().as_secs_f64();
                     fps_graph.borrow_mut().push(fps);
-                    *fps_label.borrow_mut().text_mut() = format!("fps: {}", fps.round());
+                    fps_label.borrow_mut().set_text(&format!("fps: {}", fps.round()));
                     fps_counter = 0;
                     fps_timer = Instant::now();
                 }
@@ -130,7 +130,22 @@ impl Runtime {
             let event = match e {
                 piston::Event::Input(input, _) => match input {
                     piston::Input::Button(arg) => match arg.button {
-                        piston::Button::Keyboard(_) => arg.scancode.map(|k| match arg.state {
+                        piston::Button::Keyboard(_) => match arg.button {
+                            Button::Keyboard(Key::Escape) => Some(KeyCode::Escape),
+                            Button::Keyboard(Key::Backspace) => Some(KeyCode::Backspace),
+                            Button::Keyboard(Key::Tab) => Some(KeyCode::Tab),
+                            Button::Keyboard(Key::F1) => Some(KeyCode::F1),
+                            Button::Keyboard(Key::Return) => Some(KeyCode::Enter),
+                            Button::Keyboard(Key::Up) => Some(KeyCode::ArrowUp),
+                            Button::Keyboard(Key::Down) => Some(KeyCode::ArrowDown),
+                            Button::Keyboard(Key::Right) => Some(KeyCode::ArrowRight),
+                            Button::Keyboard(Key::Left) => Some(KeyCode::ArrowLeft),
+                            Button::Keyboard(Key::Home) => Some(KeyCode::Home),
+                            Button::Keyboard(Key::End) => Some(KeyCode::End),
+                            Button::Keyboard(Key::Delete) => Some(KeyCode::Delete),
+                            _ => None,
+                        }
+                        .map(|k| match arg.state {
                             piston::ButtonState::Press => Event::KeyPress(k),
                             piston::ButtonState::Release => Event::KeyRelease(k),
                         }),
@@ -166,7 +181,7 @@ impl Runtime {
                 _ => None,
             };
             if let Some(e) = event {
-                if matches!(e, Event::KeyPress(Scancode::F1)) {
+                if matches!(e, Event::KeyPress(KeyCode::F1)) {
                     let is_visible = root.borrow().is_visible();
                     root.borrow_mut().set_visible_flag(!is_visible);
                 }
