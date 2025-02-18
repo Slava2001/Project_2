@@ -60,7 +60,7 @@ impl Scene for MainScene {
         _state: &mut dyn State,
     ) -> Result<(), scene::Error> {
         if let Event::MouseMove(x, y) = e {
-            *self.cursor_pos_label.borrow_mut().text_mut() = format!("Cursor pos: ({x}, {y})");
+            self.cursor_pos_label.borrow_mut().set_text(&format!("Cursor pos: ({x}, {y})"));
         }
         self.gui.handle_event(e).change_context(scene::Error::msg("Failed to update gui"))?;
         Ok(())
@@ -96,7 +96,7 @@ impl BuildFromCfg<Box<dyn Scene>> for MainScene {
         let flag_state = gui.get_by_id_cast::<Label>("flag_state").change_context_lazy(err)?;
         let flag = gui.get_by_id_cast::<Flag>("hello_flag").change_context_lazy(err)?;
         flag.borrow_mut().change_state_cb(move |flag, state| {
-            *flag_state.borrow_mut().text_mut() = format!("Flag state: {}", state);
+            flag_state.borrow_mut().set_text(&format!("Flag state: {}", state));
             println!("Flag \"{}\" change state: {}", flag.get_id(), state);
         });
 

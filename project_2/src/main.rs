@@ -10,9 +10,9 @@ use scenes::{Level, MainMenu};
 /// Window scale.
 const WINDOW_SCALE: u32 = 50;
 /// Window hight.
-const WINDOW_H: u32 = 16 * WINDOW_SCALE;
+const WINDOW_H: u32 = 9 * WINDOW_SCALE;
 /// Window width.
-const WINDOW_W: u32 = 9 * WINDOW_SCALE;
+const WINDOW_W: u32 = 16 * WINDOW_SCALE;
 
 /// `Project_2` error.
 #[derive(Debug, thiserror::Error)]
@@ -34,7 +34,7 @@ fn main() {
 
 /// `Project_2` main loop.
 fn run() -> Result<(), Error> {
-    let runtime = Runtime::new("Project 2", (WINDOW_H, WINDOW_W))
+    let runtime = Runtime::new("Project 2", (WINDOW_W, WINDOW_H))
         .change_context(Error::msg("Failed to init runtime"))?;
     let mut builder = scene::Builder::new();
     builder.reg_builder("main_menu", MainMenu::build);

@@ -1,5 +1,7 @@
 //! Widget events.
 
+use scene::event::KeyCode;
+
 /// Mouse buttons.
 #[derive(Clone, Copy)]
 pub enum MouseButton {
@@ -34,14 +36,14 @@ pub enum Event {
     Focused,
     /// Widget went out of focus.
     Unfocused,
-    /// Keyboard key press event, arg: [`Scancode`].
+    /// Keyboard key press event, arg: [`KeyCode`].
     ///
     /// [`Scancode`]: scene::event::Scancode
-    KeyPress(i32),
-    /// Keyboard key release event, arg: [`Scancode`].
+    KeyPress(KeyCode),
+    /// Keyboard key release event, arg: [`KeyCode`].
     ///
     /// [`Scancode`]: scene::event::Scancode
-    KeyRelease(i32),
+    KeyRelease(KeyCode),
 }
 
 /// Event conversion error.

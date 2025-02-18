@@ -22,5 +22,6 @@
                 }
             }
         }
-    ]
+    ],
+    "required": [ "background", "texture_rect_pressed", "texture_rect", "texture_rect_hovered" ]
 }

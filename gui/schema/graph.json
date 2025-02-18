@@ -23,5 +23,6 @@
                 }
             }
         }
-    ]
+    ],
+    "required": [ "value_count", "value_max", "value_min", "color" ]
 }

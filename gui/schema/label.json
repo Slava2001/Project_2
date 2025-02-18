@@ -24,5 +24,6 @@
                 }
             }
         }
-    ]
+    ],
+    "required": [ "text", "font_size", "font", "color" ]
 }

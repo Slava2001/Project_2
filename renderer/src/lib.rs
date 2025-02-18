@@ -40,10 +40,10 @@ pub trait Renderer {
     /// Draw specified part of texture in some area.
     fn draw_img(&mut self, rect: &Rect<f64>, texture: TextureId, texture_rect: &Rect<f64>);
     /// Draw specified text.
-    /// Returns number of truncated bytes.
+    /// Returns number of truncated chars.
     fn draw_text(
         &mut self,
-        text: &str,
+        text: &[char],
         size: f64,
         rect: &Rect<f64>,
         font: FontId,

@@ -37,8 +37,23 @@
                 }
             }
         }, {
-
-            "anyOf": [
+            "properties": {
+                "type": {
+                    "enum": [
+                        "base",
+                        "button",
+                        "flag",
+                        "graph",
+                        "label",
+                        "panel",
+                        "textbox"
+                    ],
+                    "description": "Widget type"
+                }
+            },
+            "required": [ "type" ]
+        }, {
+            "oneOf": [
                 {
                     "allOf": [
                         {
