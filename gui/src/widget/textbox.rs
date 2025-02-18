@@ -58,7 +58,9 @@ impl Widget for Textbox {
             Event::MousePress(mouse_button) => {
                 if matches!(mouse_button, MouseButton::Left) {
                     if state.is_hovered(&self_rc) {
-                        state.focus_self(self, self_rc)?;
+                        if !state.is_focused(self_rc.clone()) {
+                            state.focus_self(self, self_rc)?;
+                        }
                     } else if state.is_focused(self_rc.clone()) {
                         state.unfocus(self, self_rc)?;
                     }
@@ -74,15 +76,13 @@ impl Widget for Textbox {
             }
             Event::TextInput(_) => {
                 if self.is_focused {
-                    if Some(KeyCode::Backspace) == self.last_key {
-                        if self.cursor_offset > 0 {
-                            self.base.chars_mut().remove(self.cursor_offset - 1);
-                            self.cursor_offset -= 1;
-                        }
-                    } else if Some(KeyCode::Delete) == self.last_key {
-                        if self.cursor_offset < self.base.chars().len() - 1 {
-                            self.base.chars_mut().remove(self.cursor_offset + 1);
-                        }
+                    if Some(KeyCode::Backspace) == self.last_key && self.cursor_offset > 0 {
+                        self.base.chars_mut().remove(self.cursor_offset - 1);
+                        self.cursor_offset -= 1;
+                    } else if Some(KeyCode::Delete) == self.last_key
+                        && self.cursor_offset < self.base.chars().len() - 1
+                    {
+                        self.base.chars_mut().remove(self.cursor_offset + 1);
                     }
                 }
             }
@@ -111,7 +111,9 @@ impl Widget for Textbox {
                         }
                         KeyCode::ArrowRight => {
                             if self.cursor_offset < self.base.chars().len() - 1 {
-                                self.base.chars_mut().swap(self.cursor_offset, self.cursor_offset + 1);
+                                self.base
+                                    .chars_mut()
+                                    .swap(self.cursor_offset, self.cursor_offset + 1);
                                 self.cursor_offset += 1;
                             }
                         }

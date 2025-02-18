@@ -156,7 +156,8 @@
             "color": "#000000",
             "rect_color": "#000000",
             "debug": false,
-            "cursor": "\u035f"
+            "cursor": "\u035f",
+            "is_visible": true
         }
     ]
 }

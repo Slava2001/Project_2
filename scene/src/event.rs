@@ -30,6 +30,7 @@ pub enum Event {
 
 /// Keyboard button codes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(missing_docs)]
 pub enum KeyCode {
     Escape,
     Backspace,

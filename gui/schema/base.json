@@ -12,6 +12,11 @@
         "id": {
             "type": "string",
             "description": "Widget identifier"
+        },
+        "is_visible": {
+            "type": "boolean",
+            "default": true,
+            "description": "Is widget visible flag"
         }
     },
     "required": [ "rect" ]

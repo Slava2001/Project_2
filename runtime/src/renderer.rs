@@ -128,13 +128,13 @@ impl renderer::Renderer for Renderer<'_> {
 
         let mut start_index = 0;
         if matches!(mode, TextTruncateMode::Front) {
-            iter_over_char(&mut txt.iter().cloned().rev(), &mut |_, _, _, _| start_index += 1);
+            iter_over_char(&mut txt.iter().copied().rev(), &mut |_, _, _, _| start_index += 1);
             start_index = txt.len() - start_index;
         }
 
         let mut image = Image::new_color(Into::<[f32; 4]>::into(color));
         let mut displayed_chars = 0;
-        iter_over_char(&mut txt[start_index..].iter().cloned(), &mut |c, ch, x, y| {
+        iter_over_char(&mut txt[start_index..].iter().copied(), &mut |c, ch, x, y| {
             displayed_chars += 1;
             if c != '\n' {
                 let rect =
