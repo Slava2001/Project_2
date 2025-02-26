@@ -2,7 +2,7 @@
 
 mod scenes;
 
-use builder::{BuildFromCfg, Config};
+use builder::{config::Config, BuildFromCfg};
 use error_stack::{Result, ResultExt};
 use runtime::Runtime;
 use scenes::{Level, MainMenu};

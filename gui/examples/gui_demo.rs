@@ -2,7 +2,7 @@
 
 use std::{cell::RefCell, rc::Rc};
 
-use builder::{BuildFromCfg, Config};
+use builder::{config::Config, BuildFromCfg};
 use error_stack::{Result, ResultExt};
 use gui::{
     manager::{widget::Widget, Manager},

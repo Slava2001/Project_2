@@ -6,7 +6,7 @@ use crate::manager::{
     widget::{event::Event, Error, WRef, Widget},
     State,
 };
-use builder::{self, BuildFromCfg, Config};
+use builder::{self, config::Config, BuildFromCfg};
 use error_stack::{Result, ResultExt};
 use renderer::{color::Color, rect::Rect, vec2::Vec2f, Drawable, Renderer, TextTruncateMode};
 use resources::FontId;

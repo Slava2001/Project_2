@@ -5,7 +5,7 @@
 use std::{cell::RefCell, path::PathBuf, rc::Rc};
 
 use crate::widget::Builder;
-use builder::Config;
+use builder::config::Config;
 use error_stack::{Result, ResultExt};
 use renderer::{vec2::Vec2f, Drawable, Renderer};
 use resources::Manager as ResMngr;

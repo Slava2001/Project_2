@@ -14,7 +14,7 @@ use crate::manager::{
     widget::{event::Event, Error, WRef, Widget},
     State,
 };
-use builder::{self, BuildFromCfg, Config};
+use builder::{self, config::Config, BuildFromCfg};
 
 use super::Base;
 

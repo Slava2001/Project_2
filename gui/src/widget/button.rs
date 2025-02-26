@@ -13,7 +13,7 @@ use crate::manager::{
     },
     State,
 };
-use builder::{self, BuildFromCfg, Config};
+use builder::{self, config::Config, BuildFromCfg};
 use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
 use resources::TextureId;
 

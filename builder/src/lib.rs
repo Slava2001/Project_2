@@ -1,57 +1,56 @@
 //! Object builder.
 
-mod config;
+pub mod config;
 
-pub use config::Config;
+use config::Config;
 use error_stack::{bail, Result, ResultExt};
+use resources::Manager;
 use std::collections::HashMap;
 
-use resources::Manager;
-
-/// Builder error
+/// Builder error.
 #[derive(Debug, thiserror::Error)]
 #[error("{0}")]
 pub struct Error(String);
 impl Error {
-    /// Make error from message
+    /// Make error from message.
     pub fn msg<T: Into<String>>(msg: T) -> Self {
         Self(msg.into())
     }
 }
 
-/// It allow build object with [`Config`]
+/// It allow build object with [`Config`].
 pub trait BuildFromCfg<T> {
-    /// Build object with given config
+    /// Build object with given config.
     ///
     /// # Errors
-    /// Return error if config is not valid
+    /// Return error if config is not valid.
     fn build(cfg: Config, resources: &mut dyn Manager) -> Result<T, Error>;
 }
 
 /// Object builder function [`BuildFromCfg::build`]).
 type BuildFunc<T> = fn(Config, &mut dyn Manager) -> Result<T, Error>;
 
-/// Object builders map. key - object type, value - builder function ([`BuildFunc`])
+/// Object builders map. key - object type, value - builder function ([`BuildFunc`]).
 type BuildFuncsMap<T> = HashMap<String, BuildFunc<T>>;
 
-/// Object builder
+/// Object builder.
 pub struct Builder<T> {
-    /// Object builders map
+    /// Object builders map.
     builders_map: BuildFuncsMap<T>,
 }
 
 impl<T> Builder<T> {
-    /// Create empty object builder
+    /// Create empty object builder.
     #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
 
-    /// Build object with config. Field "type" used for find builder function
+    /// Build object with config. Field "type" used for find builder function.
     ///
     /// # Errors
     /// Return error if failed to find builder func (request unknown object type)
-    /// or if failed to build object (invalid config)
+    /// or if failed to build object (invalid config).
     pub fn build(&self, mut cfg: Config, res: &mut dyn Manager) -> Result<T, Error> {
         let object_type: String =
             cfg.take("type").change_context(Error::msg("Failed to get object type"))?;
@@ -62,7 +61,7 @@ impl<T> Builder<T> {
         builder(cfg, res)
     }
 
-    /// Register object builder function ([`BuildFromCfg::build`])
+    /// Register object builder function ([`BuildFromCfg::build`]).
     pub fn reg_builder<K: Into<String>>(&mut self, object_type: K, builder: BuildFunc<T>) {
         self.builders_map.insert(object_type.into(), builder);
     }

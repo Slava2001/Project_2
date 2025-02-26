@@ -4,7 +4,7 @@ pub mod event;
 
 pub use builder::Builder;
 
-use ::builder::Config;
+use ::builder::config::Config;
 use error_stack::Result;
 use renderer::Drawable;
 use resources::Manager as ResManger;

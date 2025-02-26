@@ -1,6 +1,7 @@
 //! Config.
 //! Allows you to load configuration files in different formats (json, yaml, etc.).
 //! In addition, it supports the inclusion of configuration files (format: "file!:<path/to/file>").
+//!
 //! Example:
 //! ```json
 //! {
@@ -9,22 +10,25 @@
 //! ```
 //!
 //! Also config autocomplete relative path.
-//! //! Example:
+//!
+//! Example:
+//!
 //! ```json
 //! ./assets/config.json:
 //! {
 //!     "path_to_img": "./textures/img.png"
 //! }
 //! ```
+//!
 //! ```no_run
 //! # use std::path::PathBuf;
-//! # use builder::Config;
+//! # use builder::config::Config;
 //! # let mut cfg = Config::from_json("").unwrap();
 //! let path = cfg.take::<PathBuf>("path_to_img").unwrap();
 //! assert!(path.to_string_lossy() == "./assets/textures/img.png");
 //! ```
 
-pub mod value;
+mod value;
 
 use config::{Config as Cfg, File, FileFormat};
 use error_stack::{Result, ResultExt};
@@ -68,7 +72,7 @@ impl Config {
             .change_context(Error::msg(format!("Failed to parse file {path} as config")))
     }
 
-    /// Creates new config from json5 str.
+    /// Creates new config from Json5 str.
     ///
     /// # Errors
     /// Return error if failed to parse provided config.
@@ -110,7 +114,7 @@ impl Config {
     /// if the required field is in the config, it is retrieved and returned.
     ///
     /// # Errors
-    /// Return error if required field dos not exist or exist, but has unexpected type.
+    /// Return error if required field does not exist or exist, but has unexpected type.
     pub fn take<T: ParseFormValue>(&mut self, key: &str) -> Result<T, Error> {
         Ok(self
             .take_opt(key)?
