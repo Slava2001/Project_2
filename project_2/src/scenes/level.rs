@@ -2,7 +2,7 @@
 
 use std::{cell::RefCell, rc::Rc};
 
-use builder::{BuildFromCfg, Config};
+use builder::{config::Config, BuildFromCfg};
 use error_stack::ResultExt;
 use gui::{
     manager::Manager as GuiManager,
@@ -49,8 +49,8 @@ impl Drawable for Level {
 
 impl BuildFromCfg<Box<dyn Scene>> for Level {
     fn build(
-        mut cfg: builder::Config,
-        res: &mut dyn resources::Manger,
+        mut cfg: Config,
+        res: &mut dyn resources::Manager,
     ) -> error_stack::Result<Box<dyn Scene>, builder::Error> {
         let gui_cfg = cfg
             .take::<Config>("gui")

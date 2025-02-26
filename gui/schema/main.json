@@ -7,7 +7,13 @@
                 "childs": {
                     "type": "array",
                     "items": {
-                        "$ref": "#"
+                        "oneOf": [
+                            {
+                                "$ref": "#"
+                            }, {
+                                "$ref": "./defines/include_str.json"
+                            }
+                        ]
                     },
                     "description": "Widget children"
                 },
@@ -141,5 +147,6 @@
                 }
             ]
         }
-    ]
+    ],
+    "unevaluatedProperties": false
 }

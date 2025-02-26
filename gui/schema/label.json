@@ -21,9 +21,13 @@
                 "color": {
                     "$ref": "./defines/color.json",
                     "description": "Text color"
+                },
+                "rect_color": {
+                    "$ref": "./defines/color.json",
+                    "description": "Text rect color"
                 }
             }
         }
     ],
-    "required": [ "text", "font_size", "font", "color" ]
+    "required": [ "text", "font_size", "font", "color", "rect_color"  ]
 }

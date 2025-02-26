@@ -13,7 +13,7 @@ use crate::manager::{
     },
     State,
 };
-use builder::{self, BuildFromCfg, Config};
+use builder::{self, config::Config, BuildFromCfg};
 use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
 use resources::TextureId;
 
@@ -177,7 +177,7 @@ impl Drawable for Button {
 }
 
 impl BuildFromCfg<WRef> for Button {
-    fn build(mut cfg: Config, res: &mut dyn resources::Manger) -> Result<WRef, builder::Error> {
+    fn build(mut cfg: Config, res: &mut dyn resources::Manager) -> Result<WRef, builder::Error> {
         let bg_name = cfg
             .take::<String>("background")
             .change_context(builder::Error::msg("Failed to init button background texture"))?;

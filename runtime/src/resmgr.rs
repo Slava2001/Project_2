@@ -2,7 +2,7 @@
 
 use error_stack::{bail, Result};
 use opengl_graphics::{GlyphCache, Texture, TextureSettings};
-use resources::{self, FontId, Manger, TextureId};
+use resources::{self, FontId, Manager, TextureId};
 use std::collections::HashMap;
 use std::path::Path;
 
@@ -29,8 +29,8 @@ impl ResMngr {
         }
     }
 }
-impl Manger for ResMngr {
-    fn load(&mut self, kind: &str, name: &str, path: &str) -> Result<(), resources::Error> {
+impl Manager for ResMngr {
+    fn load(&mut self, kind: &str, name: &str, path: &Path) -> Result<(), resources::Error> {
         match kind {
             "texture" => {
                 let id = TextureId(self.textures.len());
@@ -55,8 +55,10 @@ impl Manger for ResMngr {
                 Ok(())
             }
             _ => bail!(resources::Error::msg(format!(
-                "Failed to load recourse: unexpected resource \
-                type: \"{kind}\", name: \"{name}\", path: \"{path}\""
+                "Failed to load recourse: unexpected resource type: {:?}, name: {:?}, path: {:?}",
+                kind,
+                name,
+                path.display()
             ))),
         }
     }

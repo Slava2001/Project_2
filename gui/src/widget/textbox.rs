@@ -9,7 +9,7 @@ use crate::manager::{
     },
     State,
 };
-use builder::{self, BuildFromCfg, Config};
+use builder::{self, config::Config, BuildFromCfg};
 use error_stack::{Result, ResultExt};
 use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer, TextTruncateMode};
 use scene::event::KeyCode;
@@ -36,7 +36,7 @@ impl Textbox {
     ///
     /// # Errors
     /// Return error if the config is incorrect or the required resource is not found.
-    pub fn new(mut cfg: Config, res: &mut dyn resources::Manger) -> Result<Self, builder::Error> {
+    pub fn new(mut cfg: Config, res: &mut dyn resources::Manager) -> Result<Self, builder::Error> {
         let cursor = cfg
             .take_opt("cursor")
             .change_context(builder::Error::msg("Failed to init textbox cursor"))?
@@ -219,7 +219,7 @@ impl Drawable for Textbox {
 }
 
 impl BuildFromCfg<WRef> for Textbox {
-    fn build(cfg: Config, res: &mut dyn resources::Manger) -> Result<WRef, builder::Error> {
+    fn build(cfg: Config, res: &mut dyn resources::Manager) -> Result<WRef, builder::Error> {
         Ok(WRef::new(Self::new(cfg, res)?))
     }
 }

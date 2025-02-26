@@ -1,4 +1,4 @@
-use builder::Config;
+use builder::config::Config;
 
 #[test]
 fn single_value() {

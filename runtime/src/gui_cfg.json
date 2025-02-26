@@ -1,5 +1,4 @@
 {
-    "$schema": "../../gui/schema/main.json",
     "type": "base",
     "id": "root",
     "rect": [ 0, 0, 0, 0 ],

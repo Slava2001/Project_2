@@ -1,0 +1,5 @@
+{
+    "type": "string",
+    "pattern": "^file!:(\\.{0,2}\\/)?([A-Za-z0-9_-]+\\/)*[A-Za-z0-9_-]+\\.json$",
+    "default": "file!:"
+}
