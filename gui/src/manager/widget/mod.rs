@@ -21,7 +21,7 @@ pub struct Error;
 /// Implement it if you want to create a widget.
 /// You can use the composition with the [`Base`] widget to implement a new one.
 ///
-/// [`base`]: base::Base
+/// [`base`]: crate::widget::Base
 pub trait Widget: Drawable + Any {
     /// Handle input event.
     /// - `self_ref`: ref on self. Do not try borrow, use `self`.

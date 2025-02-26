@@ -30,5 +30,7 @@
                 }
             }
         }
-    ]
+    ],
+    "required": [ "background", "texture_rect_on", "texture_rect_off", "texture_rect_hovered_on",
+        "texture_rect_hovered_off", "state" ]
 }

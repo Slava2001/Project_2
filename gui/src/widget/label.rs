@@ -22,7 +22,7 @@ pub struct Label {
     /// Base widget.
     base: Base,
     /// Label text.
-    text: RefCell<String>,
+    text: RefCell<Vec<char>>,
     /// Font size.
     size: f64,
     /// Font identification.
@@ -46,7 +46,9 @@ impl Label {
         Ok(Self {
             text: RefCell::new(
                 cfg.take::<String>("text")
-                    .change_context(builder::Error::msg("Failed to init label text"))?,
+                    .change_context(builder::Error::msg("Failed to init label text"))?
+                    .chars()
+                    .collect(),
             ),
             size: cfg
                 .take::<f64>("font_size")
@@ -73,13 +75,23 @@ impl Label {
         })
     }
 
-    /// Get access to read label text.
-    pub fn text(&self) -> Ref<'_, String> {
+    /// Set label text.
+    pub fn set_text(&self, txt: &str) {
+        *self.text.borrow_mut() = txt.chars().collect();
+    }
+
+    /// Set label text.
+    pub fn get_text(&self) -> String {
+        self.text.borrow().iter().collect()
+    }
+
+    /// Get access to label chars.
+    pub fn chars(&self) -> Ref<'_, Vec<char>> {
         self.text.borrow()
     }
 
-    /// Get access to change label text.
-    pub fn text_mut(&self) -> RefMut<'_, String> {
+    /// Get access to label chars.
+    pub fn chars_mut(&self) -> RefMut<'_, Vec<char>> {
         self.text.borrow_mut()
     }
 
@@ -172,7 +184,7 @@ impl Widget for Label {
 impl Drawable for Label {
     fn draw(&self, renderer: &mut dyn Renderer) {
         let rc = renderer.draw_text(
-            &self.text.borrow(),
+            self.text.borrow().as_slice(),
             self.size,
             self.base.get_rect(),
             self.font,
@@ -185,7 +197,8 @@ impl Drawable for Label {
                     self.text.borrow_mut().drain(..rc);
                 }
                 TextTruncateMode::Back => {
-                    self.text.borrow_mut().drain(rc..);
+                    let showed_chars_cnt = self.text.borrow().len() - rc;
+                    self.text.borrow_mut().truncate(showed_chars_cnt);
                 }
             }
         }

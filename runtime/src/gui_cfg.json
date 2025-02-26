@@ -1,27 +1,34 @@
 {
+    "$schema": "../../gui/schema/main.json",
     "type": "base",
     "id": "root",
     "rect": [ 0, 0, 0, 0 ],
     "is_visible": false,
     "childs": [
         {
-            "type": "label",
-            "color": "#000000",
-            "rect_color": "#00000000",
-            "text": "",
-            "font_size": 20,
-            "font": "default",
-            "rect": [ 0, 0, 300, 25 ],
-            "id": "fps_label"
-        }, {
-            "id": "fps_graph",
-            "debug": false,
-            "type": "graph",
-            "rect": [ 0, 25, 200, 200 ],
-            "value_count": 100,
-            "value_max": 200,
-            "value_min": 0,
-            "color": "#FF0000"
+            "type": "base",
+            "rect": [ 0, 0, 0, 0 ],
+            "childs": [
+                {
+                    "type": "label",
+                    "color": "#000000",
+                    "rect_color": "#00000000",
+                    "text": "",
+                    "font_size": 20,
+                    "font": "default",
+                    "rect": [ 0, 0, 300, 25 ],
+                    "id": "fps_label"
+                }, {
+                    "id": "fps_graph",
+                    "debug": false,
+                    "type": "graph",
+                    "rect": [ 0, 0, 200, 200 ],
+                    "value_count": 100,
+                    "value_max": 200,
+                    "value_min": 0,
+                    "color": "#FF0000"
+                }
+            ]
         }
     ]
 }

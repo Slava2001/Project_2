@@ -1,6 +1,6 @@
 //! Config.
 //! Allows you to upload configuration files in different formats (json, yaml, etc.).
-//! In addition, it supports the inclusion of configuration files (format: "file!:<path>").
+//! In addition, it supports the inclusion of configuration files (format: "file!:<path/to/file>").
 //! Example:
 //! ```json
 //! {

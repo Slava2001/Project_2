@@ -19,7 +19,7 @@ impl Error {
     }
 }
 
-/// It allow build object with [`config`]
+/// It allow build object with [`Config`]
 pub trait BuildFromCfg<T> {
     /// Build object with given config
     ///

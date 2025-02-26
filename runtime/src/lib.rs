@@ -3,8 +3,6 @@
 mod renderer;
 mod resmgr;
 
-use std::time::{Duration, Instant};
-
 use ::renderer::Drawable;
 use builder::Config;
 use error_stack::{ensure, Result, ResultExt};
@@ -16,11 +14,12 @@ use opengl_graphics::{GlGraphics, GlyphCache, OpenGL, TextureSettings};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::RenderEvent;
 use piston::window::WindowSettings;
-use piston::{EventLoop, Motion};
+use piston::{Button, EventLoop, Key, Motion};
 use renderer::Renderer;
 use resmgr::ResMngr;
 use resources::FontId;
-use scene::event::{Event, MouseButton, Scancode};
+use scene::event::{Event, KeyCode, MouseButton};
+use std::time::{Duration, Instant};
 
 /// Runtime error.
 #[derive(Debug, thiserror::Error)]
@@ -121,52 +120,15 @@ impl Runtime {
                 if fps_timer.elapsed() >= Duration::from_secs_f32(0.1) {
                     let fps = f64::from(fps_counter) / fps_timer.elapsed().as_secs_f64();
                     fps_graph.borrow_mut().push(fps);
-                    *fps_label.borrow_mut().text_mut() = format!("fps: {}", fps.round());
+                    fps_label.borrow_mut().set_text(&format!("fps: {}", fps.round()));
                     fps_counter = 0;
                     fps_timer = Instant::now();
                 }
             }
 
-            let event = match e {
-                piston::Event::Input(input, _) => match input {
-                    piston::Input::Button(arg) => match arg.button {
-                        piston::Button::Keyboard(_) => arg.scancode.map(|k| match arg.state {
-                            piston::ButtonState::Press => Event::KeyPress(k),
-                            piston::ButtonState::Release => Event::KeyRelease(k),
-                        }),
-                        piston::Button::Mouse(mouse_button) => match (mouse_button, arg.state) {
-                            (piston::MouseButton::Left, piston::ButtonState::Press) => {
-                                Some(Event::MousePress(MouseButton::Left))
-                            }
-                            (piston::MouseButton::Right, piston::ButtonState::Press) => {
-                                Some(Event::MousePress(MouseButton::Right))
-                            }
-                            (piston::MouseButton::Middle, piston::ButtonState::Press) => {
-                                Some(Event::MousePress(MouseButton::Middle))
-                            }
-                            (piston::MouseButton::Left, piston::ButtonState::Release) => {
-                                Some(Event::MouseRelease(MouseButton::Left))
-                            }
-                            (piston::MouseButton::Right, piston::ButtonState::Release) => {
-                                Some(Event::MouseRelease(MouseButton::Right))
-                            }
-                            (piston::MouseButton::Middle, piston::ButtonState::Release) => {
-                                Some(Event::MouseRelease(MouseButton::Middle))
-                            }
-                            _ => None,
-                        },
-                        _ => None,
-                    },
-                    piston::Input::Move(Motion::MouseCursor([x, y])) => {
-                        Some(Event::MouseMove(x, y))
-                    }
-                    piston::Input::Text(txt) => Some(Event::TextInput(txt)),
-                    _ => None,
-                },
-                _ => None,
-            };
+            let event = convert_event(e);
             if let Some(e) = event {
-                if matches!(e, Event::KeyPress(Scancode::F1)) {
+                if matches!(e, Event::KeyPress(KeyCode::F1)) {
                     let is_visible = root.borrow().is_visible();
                     root.borrow_mut().set_visible_flag(!is_visible);
                 }
@@ -185,6 +147,61 @@ impl Runtime {
             }
         }
         Ok(())
+    }
+}
+
+/// Convert piston event to scene event.
+fn convert_event(event: piston::Event) -> Option<Event> {
+    match event {
+        piston::Event::Input(input, _) => match input {
+            piston::Input::Button(arg) => match arg.button {
+                piston::Button::Keyboard(_) => match arg.button {
+                    Button::Keyboard(Key::Escape) => Some(KeyCode::Escape),
+                    Button::Keyboard(Key::Backspace) => Some(KeyCode::Backspace),
+                    Button::Keyboard(Key::Tab) => Some(KeyCode::Tab),
+                    Button::Keyboard(Key::F1) => Some(KeyCode::F1),
+                    Button::Keyboard(Key::Return) => Some(KeyCode::Enter),
+                    Button::Keyboard(Key::Up) => Some(KeyCode::ArrowUp),
+                    Button::Keyboard(Key::Down) => Some(KeyCode::ArrowDown),
+                    Button::Keyboard(Key::Right) => Some(KeyCode::ArrowRight),
+                    Button::Keyboard(Key::Left) => Some(KeyCode::ArrowLeft),
+                    Button::Keyboard(Key::Home) => Some(KeyCode::Home),
+                    Button::Keyboard(Key::End) => Some(KeyCode::End),
+                    Button::Keyboard(Key::Delete) => Some(KeyCode::Delete),
+                    _ => None,
+                }
+                .map(|k| match arg.state {
+                    piston::ButtonState::Press => Event::KeyPress(k),
+                    piston::ButtonState::Release => Event::KeyRelease(k),
+                }),
+                piston::Button::Mouse(mouse_button) => match (mouse_button, arg.state) {
+                    (piston::MouseButton::Left, piston::ButtonState::Press) => {
+                        Some(Event::MousePress(MouseButton::Left))
+                    }
+                    (piston::MouseButton::Right, piston::ButtonState::Press) => {
+                        Some(Event::MousePress(MouseButton::Right))
+                    }
+                    (piston::MouseButton::Middle, piston::ButtonState::Press) => {
+                        Some(Event::MousePress(MouseButton::Middle))
+                    }
+                    (piston::MouseButton::Left, piston::ButtonState::Release) => {
+                        Some(Event::MouseRelease(MouseButton::Left))
+                    }
+                    (piston::MouseButton::Right, piston::ButtonState::Release) => {
+                        Some(Event::MouseRelease(MouseButton::Right))
+                    }
+                    (piston::MouseButton::Middle, piston::ButtonState::Release) => {
+                        Some(Event::MouseRelease(MouseButton::Middle))
+                    }
+                    _ => None,
+                },
+                _ => None,
+            },
+            piston::Input::Move(Motion::MouseCursor([x, y])) => Some(Event::MouseMove(x, y)),
+            piston::Input::Text(txt) => Some(Event::TextInput(txt)),
+            _ => None,
+        },
+        _ => None,
     }
 }
 
