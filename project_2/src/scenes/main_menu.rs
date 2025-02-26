@@ -58,7 +58,7 @@ impl Drawable for MainMenu {
 impl BuildFromCfg<Box<dyn Scene>> for MainMenu {
     fn build(
         mut cfg: builder::Config,
-        res: &mut dyn resources::Manger,
+        res: &mut dyn resources::Manager,
     ) -> error_stack::Result<Box<dyn Scene>, builder::Error> {
         let gui_cfg = cfg
             .take::<Config>("gui")

@@ -177,7 +177,7 @@ impl Drawable for Flag {
 }
 
 impl BuildFromCfg<WRef> for Flag {
-    fn build(mut cfg: Config, res: &mut dyn resources::Manger) -> Result<WRef, builder::Error> {
+    fn build(mut cfg: Config, res: &mut dyn resources::Manager) -> Result<WRef, builder::Error> {
         let bg_name = cfg
             .take::<String>("background")
             .change_context(builder::Error::msg("Failed to init flag background texture"))?;

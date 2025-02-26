@@ -3,6 +3,7 @@
 //! Resource Manager manages the resources needed for GUI operation (textures, sounds, etc.).
 
 use error_stack::Result;
+use std::path::Path;
 
 /// Resource manger error.
 #[derive(Debug, thiserror::Error)]
@@ -24,12 +25,12 @@ pub struct TextureId(pub usize);
 pub struct FontId(pub usize);
 
 /// Resource manager.
-pub trait Manger {
+pub trait Manager {
     /// Load specified resource.
     ///
     /// # Errors
-    /// Error is failed to load specified resource.
-    fn load(&mut self, kind: &str, name: &str, path: &str) -> Result<(), Error>;
+    /// Return error if failed to load specified resource.
+    fn load(&mut self, kind: &str, name: &str, path: &Path) -> Result<(), Error>;
 
     /// Get texture identifier by name.
     ///

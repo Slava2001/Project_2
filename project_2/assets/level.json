@@ -6,11 +6,11 @@
             {
                 "name": "button_tiles",
                 "type": "texture",
-                "path": "assets/button.png"
+                "path": "button.png"
             }, {
                 "name": "default",
                 "type": "font",
-                "path": "assets/unifont.otf"
+                "path": "unifont.otf"
             }
         ],
         "debug": false,

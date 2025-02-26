@@ -6,7 +6,7 @@ pub use config::Config;
 use error_stack::{bail, Result, ResultExt};
 use std::collections::HashMap;
 
-use resources::Manger;
+use resources::Manager;
 
 /// Builder error
 #[derive(Debug, thiserror::Error)]
@@ -25,11 +25,11 @@ pub trait BuildFromCfg<T> {
     ///
     /// # Errors
     /// Return error if config is not valid
-    fn build(cfg: Config, resources: &mut dyn Manger) -> Result<T, Error>;
+    fn build(cfg: Config, resources: &mut dyn Manager) -> Result<T, Error>;
 }
 
 /// Object builder function [`BuildFromCfg::build`]).
-type BuildFunc<T> = fn(Config, &mut dyn Manger) -> Result<T, Error>;
+type BuildFunc<T> = fn(Config, &mut dyn Manager) -> Result<T, Error>;
 
 /// Object builders map. key - object type, value - builder function ([`BuildFunc`])
 type BuildFuncsMap<T> = HashMap<String, BuildFunc<T>>;
@@ -52,7 +52,7 @@ impl<T> Builder<T> {
     /// # Errors
     /// Return error if failed to find builder func (request unknown object type)
     /// or if failed to build object (invalid config)
-    pub fn build(&self, mut cfg: Config, res: &mut dyn Manger) -> Result<T, Error> {
+    pub fn build(&self, mut cfg: Config, res: &mut dyn Manager) -> Result<T, Error> {
         let object_type: String =
             cfg.take("type").change_context(Error::msg("Failed to get object type"))?;
 

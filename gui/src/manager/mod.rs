@@ -2,13 +2,13 @@
 //!
 //! This module manages the life cycle of GUI elements.
 
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, path::PathBuf, rc::Rc};
 
 use crate::widget::Builder;
 use builder::Config;
 use error_stack::{Result, ResultExt};
 use renderer::{vec2::Vec2f, Drawable, Renderer};
-use resources::Manger;
+use resources::Manager as ResMngr;
 use scene::event::Event as SceneEvent;
 use widget::{event::Event, WRef};
 
@@ -41,7 +41,7 @@ impl Manager {
     ///
     /// # Errors
     /// Return error if config is not valid.
-    pub fn new(builder: &Builder, res: &mut dyn Manger, cfg: Config) -> Result<Self, Error> {
+    pub fn new(builder: &Builder, res: &mut dyn ResMngr, cfg: Config) -> Result<Self, Error> {
         let root = Self::make_gui_tree(builder, cfg, res)?;
         Ok(Self { state: State::new(root.clone()), root })
     }
@@ -50,7 +50,7 @@ impl Manager {
     fn make_gui_tree(
         builder: &Builder,
         mut cfg: Config,
-        res_mngr: &mut dyn Manger,
+        res_mngr: &mut dyn ResMngr,
     ) -> Result<WRef, Error> {
         if let Some(res_arr) = cfg
             .take_opt::<Vec<Config>>("recourses")
@@ -64,10 +64,13 @@ impl Manager {
                     .take::<String>("type")
                     .change_context(Error::msg("Failed to init resource"))?;
                 let path = res
-                    .take::<String>("path")
+                    .take::<PathBuf>("path")
                     .change_context(Error::msg("Failed to init resource"))?;
                 res_mngr.load(&kind, &name, &path).change_context(Error::msg(format!(
-                    "Failed to load resource: name: \"{name}\", type: \"{kind}\", path: \"{path}\""
+                    "Failed to load resource: name: {:?}, type: {:?}, path: {:?}",
+                    name,
+                    kind,
+                    path.display()
                 )))?;
             }
         }

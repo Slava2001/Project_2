@@ -221,7 +221,7 @@ impl scene::State for State {
         Ok(())
     }
 
-    fn get_resources_manager(&mut self) -> &dyn resources::Manger {
+    fn get_resources_manager(&mut self) -> &dyn resources::Manager {
         &mut self.res
     }
 }

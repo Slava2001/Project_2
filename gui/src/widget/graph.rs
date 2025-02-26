@@ -142,7 +142,7 @@ impl Drawable for Graph {
 }
 
 impl BuildFromCfg<WRef> for Graph {
-    fn build(mut cfg: Config, _res: &mut dyn resources::Manger) -> Result<WRef, builder::Error> {
+    fn build(mut cfg: Config, _res: &mut dyn resources::Manager) -> Result<WRef, builder::Error> {
         Ok(WRef::new(Self {
             value_count: cfg
                 .take("value_count")
