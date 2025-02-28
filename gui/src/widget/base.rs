@@ -7,13 +7,13 @@ use std::{
 };
 
 use renderer::{color, rect::Rect, vec2::Vec2f, Drawable, Renderer};
-use resources::Manger;
+use resources::Manager;
 
 use crate::manager::{
     widget::{event::Event, Error, WRef, Widget},
     State,
 };
-use builder::{self, BuildFromCfg, Config};
+use builder::{self, config::Config, BuildFromCfg};
 
 /// Base implementation of widget.
 pub struct Base {
@@ -193,7 +193,7 @@ impl Drawable for Base {
 }
 
 impl BuildFromCfg<WRef> for Base {
-    fn build(cfg: Config, _r: &mut dyn Manger) -> Result<WRef, builder::Error> {
+    fn build(cfg: Config, _r: &mut dyn Manager) -> Result<WRef, builder::Error> {
         Ok(WRef::new(Self::new(cfg)?))
     }
 }

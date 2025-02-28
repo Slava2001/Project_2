@@ -74,7 +74,7 @@ impl FromStr for Color {
             let Some(l) = l.to_digit(16) else {
                 return Err(fmt::Error);
             };
-            let Ok(color) = u8::try_from(h << 4 | l) else {
+            let Ok(color) = u8::try_from((h << 4) | l) else {
                 return Err(fmt::Error);
             };
             Ok(f32::from(color) / 255.0)

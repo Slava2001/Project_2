@@ -1,5 +1,4 @@
 {
-    "$schema": "../../gui/schema/main.json",
     "debug": false,
     "type": "base",
     "rect": [ 0, 0, 0, 0 ],
@@ -7,11 +6,11 @@
         {
             "name": "button_tiles",
             "type": "texture",
-            "path": "assets/button.png"
+            "path": "button.png"
         }, {
             "name": "default",
             "type": "font",
-            "path": "assets/unifont.otf"
+            "path": "unifont.otf"
         }
     ],
     "childs": [
@@ -27,9 +26,9 @@
             "childs": [
                 {
                     "type": "label",
-                    "rect_color": "#00000000",
                     "text": "Load level",
                     "font_size": 20,
+                    "rect_color": "#00000000",
                     "font": "default",
                     "rect": [ 30, 4, 240, 0 ],
                     "id": "cursor_pos",
@@ -60,15 +59,15 @@
                 {
                     "name": "default",
                     "type": "texture",
-                    "path": "assets/frame.png"
+                    "path": "frame.png"
                 }, {
                     "name": "flag_tiles",
                     "type": "texture",
-                    "path": "assets/flag.png"
+                    "path": "flag.png"
                 }, {
                     "name": "small_button_tiles",
                     "type": "texture",
-                    "path": "assets/small_button.png"
+                    "path": "small_button.png"
                 }
             ],
             "debug": false,

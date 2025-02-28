@@ -4,10 +4,10 @@ pub mod event;
 
 pub use builder::Builder;
 
-use ::builder::Config;
+use ::builder::config::Config;
 use error_stack::Result;
 use renderer::Drawable;
-use resources::Manger as ResManger;
+use resources::Manager as ResManger;
 
 /// Scene error.
 #[derive(Debug, thiserror::Error)]

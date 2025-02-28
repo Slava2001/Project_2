@@ -4,7 +4,7 @@ mod renderer;
 mod resmgr;
 
 use ::renderer::Drawable;
-use builder::Config;
+use builder::config::Config;
 use error_stack::{ensure, Result, ResultExt};
 use glutin_window::GlutinWindow as Window;
 use graphics::clear;
@@ -221,7 +221,7 @@ impl scene::State for State {
         Ok(())
     }
 
-    fn get_resources_manager(&mut self) -> &dyn resources::Manger {
+    fn get_resources_manager(&mut self) -> &dyn resources::Manager {
         &mut self.res
     }
 }
