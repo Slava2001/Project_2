@@ -6,6 +6,7 @@ mod flag;
 mod graph;
 mod label;
 mod panel;
+mod slider;
 mod textbox;
 
 use std::ops::{Deref, DerefMut};
@@ -16,6 +17,7 @@ pub use flag::Flag;
 pub use graph::Graph;
 pub use label::Label;
 pub use panel::Panel;
+pub use slider::Slider;
 pub use textbox::Textbox;
 
 use crate::manager::widget::WRef;
@@ -34,6 +36,7 @@ impl Default for Builder {
         builder.reg_builder("label", Label::build);
         builder.reg_builder("panel", Panel::build);
         builder.reg_builder("graph", Graph::build);
+        builder.reg_builder("slider", Slider::build);
         builder.reg_builder("textbox", Textbox::build);
         Self(builder)
     }

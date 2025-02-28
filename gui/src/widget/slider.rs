@@ -1,0 +1,232 @@
+//! Slider widget.
+
+use super::Base;
+use crate::manager::{
+    widget::{
+        event::{Event, MouseButton},
+        Error, WRef, Widget,
+    },
+    State,
+};
+use builder::{self, config::Config, BuildFromCfg};
+use error_stack::{Result, ResultExt};
+use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
+use resources::{Manager, TextureId};
+use core::f64;
+use std::{cell::RefCell, rc::Weak};
+
+/// Slider.
+pub struct Slider {
+    /// Base widget.
+    base: Base,
+    texture: TextureId,
+    texture_background_rect: Rect<f64>,
+    texture_cursor_rect: Rect<f64>,
+    cursor_rect: Rect<f64>,
+    value_min: f64,
+    value_max: f64,
+    value_step: f64,
+}
+
+impl Slider {
+    /// Create new slider.
+    ///
+    /// # Errors
+    /// Return error if config is not valid.
+    pub fn new(mut cfg: Config, res: &mut dyn Manager) -> Result<Self, builder::Error> {
+        let texture_name = cfg
+            .take::<String>("texture")
+            .change_context(builder::Error::msg("Failed to init slide texture"))?;
+        let texture = res
+            .get_texture(&texture_name)
+            .change_context(builder::Error::msg("Failed to find slider texture"))?;
+        let texture_background_rect = cfg
+            .take::<[f64; 4]>("texture_background_rect")
+            .change_context(builder::Error::msg("Failed to init slide texture_background_rect"))?
+            .into();
+        let texture_cursor_rect = cfg
+            .take::<[f64; 4]>("texture_cursor_rect")
+            .change_context(builder::Error::msg("Failed to init slide texture_cursor_rect"))?
+            .into();
+        let cursor_rect: Rect<f64> = cfg
+            .take::<[f64; 4]>("cursor_rect")
+            .change_context(builder::Error::msg("Failed to init slide cursor_rect"))?
+            .into();
+        let value_min = cfg
+            .take("value_min")
+            .change_context(builder::Error::msg("Failed to init slide value_min"))?;
+        let value_max = cfg
+            .take("value_max")
+            .change_context(builder::Error::msg("Failed to init slide value_max"))?;
+        let value = cfg
+            .take::<f64>("value")
+            .change_context(builder::Error::msg("Failed to init slide value"))?;
+        let step_number = cfg
+            .take::<f64>("step_number")
+            .change_context(builder::Error::msg("Failed to init slide value_step"))?;
+        let base = Base::new(cfg)
+            .change_context(builder::Error::msg("Failed to init base widget for slider"))?;
+
+        let value_step = if step_number == 0.0 {
+            0.0
+        } else {
+            (base.get_rect().w - cursor_rect.w) / step_number
+        };
+
+        let mut s = Self {
+            value_step,
+            base,
+            texture,
+            texture_background_rect,
+            texture_cursor_rect,
+            cursor_rect,
+            value_min,
+            value_max,
+        };
+        s.set_value(value);
+        Ok(s)
+    }
+
+    fn value_to_x(&self, value: f64) -> f64 {
+        (value - self.value_min) / (self.value_max - self.value_min) * (self.base.get_rect().w - self.cursor_rect.w)
+    }
+
+    fn update_cursor_pos(&mut self, x: f64) {
+        let mut x = x + self.cursor_rect.w / 2.0;
+        x = x.clamp(0.0, self.base.get_rect().w - self.cursor_rect.w);
+        if self.value_step != 0.0 {
+            x = (x / self.value_step).round() * self.value_step;
+        }
+        self.cursor_rect.x = x;
+        println!("x: {} v: {}", x, self.get_value());
+    }
+
+    pub fn get_value(&self) -> f64 {
+        self.value_min + (self.value_max - self.value_min) * (self.cursor_rect.x / (self.base.get_rect().w - self.cursor_rect.w))
+    }
+
+    pub fn set_value(&mut self, value: f64) {
+        self.update_cursor_pos(self.value_to_x(value));
+    }
+}
+
+impl Widget for Slider {
+    fn handle_event(
+        &mut self,
+        self_rc: WRef,
+        event: Event,
+        state: &mut State,
+    ) -> Result<(), Error> {
+        match event {
+            Event::MousePress(mouse_button) => {
+                if matches!(mouse_button, MouseButton::Left) && state.get_caught().is_none() {
+                    self.set_position(self.get_global_position());
+                    self.get_parent()
+                        .map(|p| p.upgrade().map(|p| p.borrow_mut().erase_widget(&self_rc)));
+                    state.catch_self(self, self_rc)?;
+                    self.update_cursor_pos(state.mouse.x - self.base.get_global_position().x);
+                }
+            }
+            Event::MouseRelease(mouse_button) => {
+                if matches!(mouse_button, MouseButton::Left) && state.is_caught(self_rc.clone()) {
+                    state.uncatch(self, self_rc.clone())?;
+                    self.get_parent().map(|p| {
+                        p.upgrade().map(|p| {
+                            p.clone().borrow_mut().add_widget(p.into(), self, self_rc);
+                        })
+                    });
+                    self.set_global_position(self.get_position());
+                }
+            }
+            Event::MouseMove => {
+                if state.is_caught(self_rc) {
+                    self.update_cursor_pos(state.mouse.x - self.base.get_global_position().x);
+                }
+            }
+            _ => {}
+        }
+        Ok(())
+    }
+
+    fn get_hovered(&self, pos: Vec2f) -> Option<WRef> {
+        self.base.get_hovered(pos)
+    }
+
+    fn check_bounds(&self, pos: Vec2f) -> bool {
+        self.base.check_bounds(pos)
+    }
+
+    fn add_widget(&mut self, self_ref: WRef, widget: &mut dyn Widget, widget_ref: WRef) {
+        self.base.add_widget(self_ref, widget, widget_ref);
+    }
+
+    fn set_parent(&mut self, parent: Option<Weak<RefCell<dyn Widget>>>) {
+        self.base.set_parent(parent);
+    }
+
+    fn get_parent(&mut self) -> Option<Weak<RefCell<dyn Widget>>> {
+        self.base.get_parent()
+    }
+
+    fn detach(&mut self, self_rc: &WRef) {
+        self.base.detach(self_rc);
+    }
+
+    fn erase_widget(&mut self, widget: &WRef) {
+        self.base.erase_widget(widget);
+    }
+
+    fn set_position(&mut self, pos: Vec2f) {
+        self.base.set_position(pos);
+    }
+
+    fn get_position(&self) -> Vec2f {
+        self.base.get_position()
+    }
+
+    fn set_global_position(&mut self, pos: Vec2f) {
+        self.base.set_global_position(pos);
+    }
+
+    fn get_global_position(&self) -> Vec2f {
+        self.base.get_global_position()
+    }
+
+    fn get_rect(&self) -> &Rect<f64> {
+        self.base.get_rect()
+    }
+
+    fn find(&self, id: &str) -> Option<WRef> {
+        self.base.find(id)
+    }
+
+    fn set_visible_flag(&mut self, is_visible: bool) {
+        self.base.set_visible_flag(is_visible);
+    }
+
+    fn get_id(&self) -> String {
+        self.base.get_id()
+    }
+
+    fn is_visible(&self) -> bool {
+        self.base.is_visible()
+    }
+}
+
+impl Drawable for Slider {
+    fn draw(&self, renderer: &mut dyn Renderer) {
+        let rect = self.base.get_rect();
+        renderer.draw_img(rect, self.texture, &self.texture_background_rect);
+        renderer.push_state();
+        renderer.translate(rect.x, rect.y);
+        renderer.draw_img(&self.cursor_rect, self.texture, &self.texture_cursor_rect);
+        renderer.pop_state();
+        self.base.draw(renderer);
+    }
+}
+
+impl BuildFromCfg<WRef> for Slider {
+    fn build(cfg: Config, res: &mut dyn Manager) -> Result<WRef, builder::Error> {
+        Ok(WRef::new(Self::new(cfg, res)?))
+    }
+}

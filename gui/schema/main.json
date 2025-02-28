@@ -52,6 +52,7 @@
                         "graph",
                         "label",
                         "panel",
+                        "slider",
                         "textbox"
                     ],
                     "description": "Widget type"
@@ -130,6 +131,18 @@
                             }
                         }, {
                             "$ref": "./panel.json"
+                        }
+                    ]
+                }, {
+                    "allOf": [
+                        {
+                            "properties": {
+                                "type": {
+                                    "const": "slider"
+                                }
+                            }
+                        }, {
+                            "$ref": "./slider.json"
                         }
                     ]
                 }, {

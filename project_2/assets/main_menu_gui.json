@@ -146,17 +146,25 @@
             "debug": false,
             "cursor": "\u035f"
         }, {
-            "type": "textbox",
-            "text": "",
-            "font_size": 20,
-            "font": "default",
-            "rect": [ 30, 230, 300, 25 ],
-            "id": "input_txt_2",
-            "color": "#000000",
-            "rect_color": "#000000",
-            "debug": false,
-            "cursor": "\u035f",
-            "is_visible": true
+            "recourses": [
+                {
+                    "name": "slider_texture",
+                    "type": "texture",
+                    "path": "slider.png"
+                }
+            ],
+            "type": "slider",
+            "rect": [ 30, 230, 300, 100 ],
+            "cursor_rect": [ 0, 0, 10, 100 ],
+            "background": "small_button_tiles",
+            "debug": true,
+            "texture": "slider_texture",
+            "texture_background_rect": [ 0, 0, 64, 16 ],
+            "texture_cursor_rect": [ 65, 0, 7, 16 ],
+            "value_min": -100,
+            "value_max": 100,
+            "value": 0,
+            "step_number": 10
         }
     ]
 }

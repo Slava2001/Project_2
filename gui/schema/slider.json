@@ -1,0 +1,51 @@
+{
+    "allOf": [
+        {
+            "$ref": "./base.json"
+        }, {
+            "properties": {
+                "texture": {
+                    "type": "string",
+                    "description": "Slider texture"
+                },
+                "texture_background_rect": {
+                    "$ref": "./defines/rect.json",
+                    "description": "Background texture rectangle"
+                },
+                "texture_cursor_rect": {
+                    "$ref": "./defines/rect.json",
+                    "description": "Cursor texture rectangle"
+                },
+                "cursor_rect": {
+                    "$ref": "./defines/rect.json",
+                    "description": "Cursor rectangle"
+                },
+                "value_min": {
+                    "type": "number",
+                    "default": 0,
+                    "description": "Slider minimum value"
+                },
+                "value_max": {
+                    "type": "number",
+                    "default": 100,
+                    "description": "Slider maximum value"
+                },
+                "value": {
+                    "type": "number",
+                    "default": 10,
+                    "minimum": 1,
+                    "maximum": 1,
+                    "description": "Slider value"
+                },
+                "step_number": {
+                    "type": "number",
+                    "minimum": 0,
+                    "default": 0,
+                    "description": "Slider number of steps"
+                }
+            }
+        }
+    ],
+    "required": [ "texture", "texture_background_rect", "texture_cursor_rect", "cursor_rect",
+        "value_min", "value_max", "value", "step_number" ]
+}
