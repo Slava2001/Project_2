@@ -14,8 +14,9 @@ use crate::manager::{
     State,
 };
 use builder::{self, config::Config, BuildFromCfg};
-use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
+use renderer::{Drawable, Renderer};
 use resources::TextureId;
+use utils::{rect::Rectf, vec2::Vec2f};
 
 /// Panel widget.
 pub struct Panel {
@@ -24,7 +25,7 @@ pub struct Panel {
     /// Background texture.
     texture: TextureId,
     /// Background texture rectangle.
-    texture_rect: Rect<f64>,
+    texture_rect: Rectf,
     /// Offset, used when widget cached.
     offset: Vec2f,
 }
@@ -113,7 +114,7 @@ impl Widget for Panel {
         self.base.get_global_position()
     }
 
-    fn get_rect(&self) -> &Rect<f64> {
+    fn get_rect(&self) -> &Rectf {
         self.base.get_rect()
     }
 
@@ -151,9 +152,8 @@ impl BuildFromCfg<WRef> for Panel {
         )))?;
 
         let texture_rect = cfg
-            .take::<[f64; 4]>("background_rect")
-            .change_context(builder::Error::msg("Failed to init button"))?
-            .into();
+            .take("background_rect")
+            .change_context(builder::Error::msg("Failed to init button"))?;
 
         Ok(WRef::new(Self {
             base: Base::new(cfg)?,

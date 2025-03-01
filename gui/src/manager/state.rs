@@ -1,7 +1,7 @@
 //! GUI manager state.
 use super::widget::{event::Event, Error, WRef, Widget};
 use error_stack::Result;
-use renderer::vec2::Vec2f;
+use utils::vec2::Vec2f;
 
 /// Manager state.
 pub struct State {

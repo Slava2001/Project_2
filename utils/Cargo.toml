@@ -1,10 +1,9 @@
 [package]
-name = "renderer"
+name = "utils"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+builder = { workspace = true }
 error-stack = { workspace = true }
 thiserror = { workspace = true }
-resources = { workspace = true }
-utils = { workspace = true }

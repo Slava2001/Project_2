@@ -1,8 +1,13 @@
 //! Rectangle with position.
+use builder::config::value::{Error as ParseError, ParseFormValue, Value};
+use error_stack::Result;
 use std::{
     fmt::{Debug, Display},
     ops::Add,
 };
+
+/// Rectangle with f64 fields.
+pub type Rectf = Rect<f64>;
 
 /// Rectangle
 #[derive(Clone, Copy, Debug)]
@@ -24,8 +29,15 @@ impl<T: Display + Debug + Copy + Add<Output = T> + PartialOrd<T>> Rect<T> {
     }
 }
 
-impl<T: Copy> From<[T; 4]> for Rect<T> {
-    fn from(v: [T; 4]) -> Self {
-        Self { x: v[0], y: v[1], w: v[2], h: v[3] }
+impl<T> From<[T; 4]> for Rect<T> {
+    fn from(value: [T; 4]) -> Self {
+        let [x, y, w, h] = value;
+        Self { x, y, w, h }
+    }
+}
+
+impl<T: ParseFormValue> ParseFormValue for Rect<T> {
+    fn parse_val(val: Value) -> Result<Self, ParseError> {
+        Ok(<[T; 4]>::parse_val(val)?.into())
     }
 }

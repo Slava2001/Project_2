@@ -1,13 +1,12 @@
 //! Simple graph.
 
 use error_stack::{Result, ResultExt};
+use renderer::{Drawable, Renderer};
 use std::{cell::RefCell, rc::Weak};
-
-use renderer::{
+use utils::{
     color::{self, Color},
-    rect::Rect,
+    rect::Rectf,
     vec2::Vec2f,
-    Drawable, Renderer,
 };
 
 use crate::manager::{
@@ -108,7 +107,7 @@ impl Widget for Graph {
         self.base.get_global_position()
     }
 
-    fn get_rect(&self) -> &Rect<f64> {
+    fn get_rect(&self) -> &Rectf {
         self.base.get_rect()
     }
 
@@ -154,11 +153,7 @@ impl BuildFromCfg<WRef> for Graph {
                 .take("value_max")
                 .change_context(builder::Error::msg("Failed to init value maximum"))?,
             points: Vec::new(),
-            color: cfg
-                .take::<String>("color")
-                .change_context(builder::Error::msg("Failed to init color"))?
-                .parse::<Color>()
-                .change_context(builder::Error::msg("Failed to parse color"))?,
+            color: cfg.take("color").change_context(builder::Error::msg("Failed to init color"))?,
             base: Base::new(cfg)?,
         }))
     }

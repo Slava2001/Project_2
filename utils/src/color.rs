@@ -1,5 +1,6 @@
 //! Color type.
-
+use builder::config::value::{Error as ParseError, ParseFormValue, Value};
+use error_stack::{Result, ResultExt};
 use std::{
     fmt,
     str::{self, FromStr},
@@ -62,12 +63,12 @@ impl<T: Copy + Into<f32>> From<[T; 3]> for Color {
 impl FromStr for Color {
     type Err = fmt::Error;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         // Color format: #RRGGBB or #RRGGBBAA
         // Example: #ff0000 - red
 
         // Parse 2 chars as Hex byte and map to 0..1 range
-        let char_to_color = |h: char, l: char| -> Result<f32, fmt::Error> {
+        let char_to_color = |h: char, l: char| -> std::result::Result<f32, fmt::Error> {
             let Some(h) = h.to_digit(16) else {
                 return Err(fmt::Error);
             };
@@ -94,6 +95,14 @@ impl FromStr for Color {
             }),
             _ => Err(fmt::Error),
         }
+    }
+}
+
+impl ParseFormValue for Color {
+    fn parse_val(val: Value) -> Result<Self, ParseError> {
+        let str = String::parse_val(val)?;
+        Self::from_str(&str)
+            .change_context(ParseError::msg(format!("Failed to parse {str:?} as color")))
     }
 }
 

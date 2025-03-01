@@ -8,12 +8,13 @@ use crate::manager::{
 };
 use builder::{self, config::Config, BuildFromCfg};
 use error_stack::{Result, ResultExt};
-use renderer::{color::Color, rect::Rect, vec2::Vec2f, Drawable, Renderer, TextTruncateMode};
+use renderer::{Drawable, Renderer, TextTruncateMode};
 use resources::FontId;
 use std::{
     cell::{Ref, RefCell, RefMut},
     rc::Weak,
 };
+use utils::{color::Color, rect::Rectf, vec2::Vec2f};
 
 use super::Base;
 
@@ -45,10 +46,8 @@ impl Label {
     pub fn new(mut cfg: Config, res: &mut dyn resources::Manager) -> Result<Self, builder::Error> {
         Ok(Self {
             text: RefCell::new(
-                cfg.take::<String>("text")
-                    .change_context(builder::Error::msg("Failed to init label text"))?
-                    .chars()
-                    .collect(),
+                cfg.take("text")
+                    .change_context(builder::Error::msg("Failed to init label text"))?,
             ),
             size: cfg
                 .take::<f64>("font_size")
@@ -59,16 +58,10 @@ impl Label {
                         .change_context(builder::Error::msg("Failed to init label font"))?,
                 )
                 .change_context(builder::Error::msg("Failed to find required font"))?,
-            color: cfg
-                .take::<String>("color")
-                .change_context(builder::Error::msg("Failed to init color"))?
-                .parse::<Color>()
-                .change_context(builder::Error::msg("Failed to parse color"))?,
+            color: cfg.take("color").change_context(builder::Error::msg("Failed to init color"))?,
             rect_color: cfg
-                .take::<String>("rect_color")
-                .change_context(builder::Error::msg("Failed to init Textbox border color"))?
-                .parse::<Color>()
-                .change_context(builder::Error::msg("Failed to parse border color"))?,
+                .take("rect_color")
+                .change_context(builder::Error::msg("Failed to init Textbox border color"))?,
             base: Base::new(cfg)?,
             draw_truncate: TextTruncateMode::Back,
             need_to_truncate_text: false,
@@ -160,7 +153,7 @@ impl Widget for Label {
         self.base.get_global_position()
     }
 
-    fn get_rect(&self) -> &Rect<f64> {
+    fn get_rect(&self) -> &Rectf {
         self.base.get_rect()
     }
 

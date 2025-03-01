@@ -14,8 +14,9 @@ use crate::manager::{
     State,
 };
 use builder::{self, config::Config, BuildFromCfg};
-use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
+use renderer::{Drawable, Renderer};
 use resources::TextureId;
+use utils::{rect::Rectf, vec2::Vec2f};
 
 /// Button click callback. Called then user click on button.
 type ButtonCb = dyn FnMut(&mut Button);
@@ -27,11 +28,11 @@ pub struct Button {
     /// Background texture.
     texture: TextureId,
     /// Background texture rectangle when button is preset.
-    texture_rect_pressed: Rect<f64>,
+    texture_rect_pressed: Rectf,
     /// Background texture rectangle when button is released.
-    texture_rect: Rect<f64>,
+    texture_rect: Rectf,
     /// Background texture rectangle when button is hovered and released.
-    texture_rect_hovered: Rect<f64>,
+    texture_rect_hovered: Rectf,
     /// Is widget hovered.
     hovered: bool,
     /// Button is pressed.
@@ -141,7 +142,7 @@ impl Widget for Button {
         self.base.get_global_position()
     }
 
-    fn get_rect(&self) -> &Rect<f64> {
+    fn get_rect(&self) -> &Rectf {
         self.base.get_rect()
     }
 
@@ -185,11 +186,8 @@ impl BuildFromCfg<WRef> for Button {
             "Failed to init button, texture: \"{bg_name}\" not found"
         )))?;
 
-        let mut get_rect = |name| -> Result<Rect<f64>, builder::Error> {
-            Ok(cfg
-                .take::<[f64; 4]>(name)
-                .change_context(builder::Error::msg("Failed to init button"))?
-                .into())
+        let mut get_rect = |name| -> Result<Rectf, builder::Error> {
+            cfg.take(name).change_context(builder::Error::msg("Failed to init button"))
         };
 
         Ok(WRef::new(Self {

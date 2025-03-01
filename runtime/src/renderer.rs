@@ -6,10 +6,9 @@ use graphics::{
     line, Character, CharacterCache, Context, DrawState, Image, Rectangle, Transformed,
 };
 use opengl_graphics::{GlGraphics, Texture};
-use renderer::vec2::Vec2f;
 use renderer::TextTruncateMode;
-use renderer::{color::Color, rect::Rect};
 use resources::FontId;
+use utils::{color::Color, rect::Rectf, vec2::Vec2f};
 
 /// Simple implementation of renderer
 pub struct Renderer<'a> {
@@ -22,7 +21,7 @@ pub struct Renderer<'a> {
 }
 
 impl renderer::Renderer for Renderer<'_> {
-    fn draw_rect(&mut self, rect: &Rect<f64>, color: &Color) {
+    fn draw_rect(&mut self, rect: &Rectf, color: &Color) {
         Rectangle::new([0.0; 4]).border(Border { color: color.into(), radius: 1.0 }).draw(
             [rect.x, rect.y, rect.w, rect.h],
             &DrawState::default(),
@@ -56,12 +55,7 @@ impl renderer::Renderer for Renderer<'_> {
         }
     }
 
-    fn draw_img(
-        &mut self,
-        rect: &Rect<f64>,
-        texture: resources::TextureId,
-        texture_rect: &Rect<f64>,
-    ) {
+    fn draw_img(&mut self, rect: &Rectf, texture: resources::TextureId, texture_rect: &Rectf) {
         Image::new()
             .rect([rect.x, rect.y, rect.w, rect.h])
             .src_rect(Into::<[f64; 4]>::into([
@@ -82,7 +76,7 @@ impl renderer::Renderer for Renderer<'_> {
         &mut self,
         txt: &[char],
         size: f64,
-        rect: &Rect<f64>,
+        rect: &Rectf,
         font: FontId,
         color: &Color,
         mode: TextTruncateMode,
