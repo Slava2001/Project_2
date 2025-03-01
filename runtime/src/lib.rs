@@ -14,11 +14,12 @@ use opengl_graphics::{GlGraphics, GlyphCache, OpenGL, TextureSettings};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::RenderEvent;
 use piston::window::WindowSettings;
-use piston::{Button, EventLoop, Key, Motion};
+use piston::{Button, EventLoop, Key, Motion, UpdateEvent};
 use renderer::Renderer;
 use resmgr::ResMngr;
 use resources::FontId;
-use scene::event::{Event, KeyCode, MouseButton};
+use scene::event::{self, Event, KeyCode, MouseButton};
+use scene::TimeTick;
 use std::time::{Duration, Instant};
 
 /// Runtime error.
@@ -98,7 +99,7 @@ impl Runtime {
         let mut events = Events::new(EventSettings::new());
         events.bench_mode(true);
         events.max_fps(100);
-        let mut state = State { next_scene: None, res: ResMngr::new() };
+        let mut state = State { next_scene: None, res: ResMngr::new(), delta_time: 0 };
         let mut scene = scene_builder
             .build(scene_cfg, &mut state.res)
             .change_context(Error::msg("Failed to create first scene"))?;
@@ -124,6 +125,13 @@ impl Runtime {
                     fps_counter = 0;
                     fps_timer = Instant::now();
                 }
+            }
+
+            if let Some(e) = e.update_args() {
+                let dt = (e.dt * 1000.0).round() as TimeTick;
+                scene
+                .handle_event(event::Event::TimeTick(dt), &mut state)
+                .change_context(Error::msg("Scene failed to handle update event"))?;
             }
 
             let event = convert_event(e);
@@ -209,9 +217,10 @@ fn convert_event(event: piston::Event) -> Option<Event> {
 struct State {
     /// Next scene config.
     next_scene: Option<Config>,
-
     /// Resource manager.
     res: ResMngr,
+    /// Delta time in [`TimeTick`].
+    delta_time: TimeTick
 }
 
 impl scene::State for State {

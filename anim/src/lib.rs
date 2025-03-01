@@ -1,4 +1,3 @@
+//! Animation.
 
-
-
-
+pub mod anim;

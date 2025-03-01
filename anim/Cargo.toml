@@ -7,5 +7,7 @@ edition = "2021"
 renderer = { workspace = true }
 resources = { workspace = true }
 builder = { workspace = true }
+utils = { workspace = true }
+scene = { workspace = true }
 error-stack = { workspace = true }
 thiserror = { workspace = true }

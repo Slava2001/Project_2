@@ -1,13 +1,13 @@
 {
     "type": "level",
     "next_scene_cfg": "file!:./main_menu.json",
+    "player_anim_texture": "./player.png",
     "player_anim": {
         "frames": [
-            [0,0,0,0],
-            [0,0,0,0],
-            [0,0,0,0],
-            [0,0,0,0],
-            [0,0,0,0]
+            [ 0, 108, 64, 108 ],
+            [ 64, 108, 64, 108 ],
+            [ 128, 108, 64, 108 ],
+            [ 192, 108, 64, 108 ]
         ],
         "frame_time": 100
     },

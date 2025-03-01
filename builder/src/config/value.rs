@@ -78,9 +78,13 @@ impl<T: ParseFormValue> ParseFormValue for Vec<T> {
             .try_deserialize::<Vec<config::Value>>()
             .change_context(Error::msg("Failed to parse value as Vec<_>"))?;
         let mut res = Self::new();
-        for val in v {
+        for (i, val) in v.into_iter().enumerate() {
             let val = Value { val, path: value.path.clone() };
-            res.push(T::parse_val(val).change_context(Error::msg("Failed to parse vector item"))?);
+            res.push(
+                T::parse_val(val).change_context(Error::msg(format!(
+                    "Failed to parse vector item. Index: {i}"
+                )))?,
+            );
         }
         Ok(res)
     }
