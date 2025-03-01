@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = [
+members = [ "anim",
     "builder",
     "gui",
     "project_2",
@@ -17,5 +17,6 @@ runtime = { path = "./runtime" }
 renderer = { path = "./renderer" }
 resources = { path = "./resources" }
 scene = { path = "./scene" }
+anim = { path = "./anim" }
 error-stack = "0.5.0"
 thiserror = "2.0.4"

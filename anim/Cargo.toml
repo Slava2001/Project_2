@@ -1,0 +1,11 @@
+[package]
+name = "anim"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+renderer = { workspace = true }
+resources = { workspace = true }
+builder = { workspace = true }
+error-stack = { workspace = true }
+thiserror = { workspace = true }
