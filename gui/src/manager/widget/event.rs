@@ -69,7 +69,9 @@ impl TryFrom<scene::event::Event> for Event {
             event::Event::TextInput(text) => Self::TextInput(text),
             event::Event::KeyPress(k) => Self::KeyPress(k),
             event::Event::KeyRelease(k) => Self::KeyRelease(k),
-            e => Err(Self::Error::msg(format!("Failed to convert scene event {e:?} to GUI event")))?
+            e @ event::Event::TimeTick(_) => {
+                Err(Self::Error::msg(format!("Failed to convert scene event {e:?} to GUI event")))?
+            }
         })
     }
 }
