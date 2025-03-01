@@ -9,23 +9,32 @@ use crate::manager::{
     State,
 };
 use builder::{self, config::Config, BuildFromCfg};
+use core::f64;
 use error_stack::{Result, ResultExt};
 use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
 use resources::{Manager, TextureId};
-use core::f64;
 use std::{cell::RefCell, rc::Weak};
 
 /// Slider.
 pub struct Slider {
     /// Base widget.
     base: Base,
+    /// Slider texture.
     texture: TextureId,
+    /// Slider background texture rectangle.
     texture_background_rect: Rect<f64>,
+    /// Slider cursor texture rectangle.
     texture_cursor_rect: Rect<f64>,
+    /// Slider cursor rectangle.
     cursor_rect: Rect<f64>,
+    /// Slider minimum value.
     value_min: f64,
+    /// Slider maximum value.
     value_max: f64,
+    /// Slider value step.
     value_step: f64,
+    /// Cursor maximum `x`.
+    max_x: f64,
 }
 
 impl Slider {
@@ -66,15 +75,10 @@ impl Slider {
             .change_context(builder::Error::msg("Failed to init slide value_step"))?;
         let base = Base::new(cfg)
             .change_context(builder::Error::msg("Failed to init base widget for slider"))?;
-
-        let value_step = if step_number == 0.0 {
-            0.0
-        } else {
-            (base.get_rect().w - cursor_rect.w) / step_number
-        };
+        let max_x = base.get_rect().w - cursor_rect.w;
+        let value_step = if step_number == 0.0 { 0.0 } else { max_x / step_number };
 
         let mut s = Self {
-            value_step,
             base,
             texture,
             texture_background_rect,
@@ -82,29 +86,38 @@ impl Slider {
             cursor_rect,
             value_min,
             value_max,
+            value_step,
+            max_x,
         };
+        s.cursor_rect.y = (s.base.get_rect().h - cursor_rect.h) / 2.0;
         s.set_value(value);
         Ok(s)
     }
 
+    /// Convert slider value to cursor `x` coordinate.
     fn value_to_x(&self, value: f64) -> f64 {
-        (value - self.value_min) / (self.value_max - self.value_min) * (self.base.get_rect().w - self.cursor_rect.w)
+        (value - self.value_min) / (self.value_max - self.value_min) * (self.max_x)
     }
 
+    /// Update cursor `x` coordinate.
+    /// `x` must be in the range 0..(slider width - (cursor width / 2)).
     fn update_cursor_pos(&mut self, x: f64) {
-        let mut x = x + self.cursor_rect.w / 2.0;
-        x = x.clamp(0.0, self.base.get_rect().w - self.cursor_rect.w);
+        let mut x = x - self.cursor_rect.w / 2.0;
+        x = x.clamp(0.0, self.max_x);
         if self.value_step != 0.0 {
             x = (x / self.value_step).round() * self.value_step;
         }
         self.cursor_rect.x = x;
-        println!("x: {} v: {}", x, self.get_value());
     }
 
+    /// Get slider value.
+    #[must_use]
     pub fn get_value(&self) -> f64 {
-        self.value_min + (self.value_max - self.value_min) * (self.cursor_rect.x / (self.base.get_rect().w - self.cursor_rect.w))
+        (self.value_max - self.value_min).mul_add(self.cursor_rect.x / self.max_x, self.value_min)
     }
 
+    /// Set slider value.
+    /// The value will be automatically clipped and sampled.
     pub fn set_value(&mut self, value: f64) {
         self.update_cursor_pos(self.value_to_x(value));
     }

@@ -154,17 +154,17 @@
                 }
             ],
             "type": "slider",
-            "rect": [ 30, 230, 300, 100 ],
-            "cursor_rect": [ 0, 0, 10, 100 ],
+            "rect": [ 30, 230, 300, 30 ],
+            "cursor_rect": [ 0, 0, 20, 30 ],
             "background": "small_button_tiles",
-            "debug": true,
+            "debug": false,
             "texture": "slider_texture",
             "texture_background_rect": [ 0, 0, 64, 16 ],
-            "texture_cursor_rect": [ 65, 0, 7, 16 ],
+            "texture_cursor_rect": [ 65, 1, 7, 14 ],
             "value_min": -100,
             "value_max": 100,
             "value": 0,
-            "step_number": 10
+            "step_number": 0
         }
     ]
 }
