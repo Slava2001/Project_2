@@ -11,9 +11,10 @@ use crate::manager::{
 };
 use builder::{self, config::Config, BuildFromCfg};
 use error_stack::{Result, ResultExt};
-use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
+use renderer::{Drawable, Renderer};
 use resources::TextureId;
 use std::{cell::RefCell, rc::Weak};
+use utils::{rect::Rectf, vec2::Vec2f};
 
 use super::Base;
 
@@ -27,13 +28,13 @@ pub struct Flag {
     /// Background texture.
     texture: TextureId,
     /// Background texture rectangle on on state.
-    texture_rect_on: Rect<f64>,
+    texture_rect_on: Rectf,
     /// Background texture rectangle on off state.
-    texture_rect_off: Rect<f64>,
+    texture_rect_off: Rectf,
     /// Background texture rectangle on hovered and on state.
-    texture_rect_hovered_on: Rect<f64>,
+    texture_rect_hovered_on: Rectf,
     /// Background texture rectangle on hovered and off state.
-    texture_rect_hovered_off: Rect<f64>,
+    texture_rect_hovered_off: Rectf,
     /// Is widget hovered.
     hovered: bool,
     /// Flag state.
@@ -142,7 +143,7 @@ impl Widget for Flag {
         self.base.get_global_position()
     }
 
-    fn get_rect(&self) -> &Rect<f64> {
+    fn get_rect(&self) -> &Rectf {
         self.base.get_rect()
     }
 
@@ -189,11 +190,8 @@ impl BuildFromCfg<WRef> for Flag {
             "Failed to init flag, texture: \"{bg_name}\" not found"
         )))?;
 
-        let mut get_rect = |name| -> Result<Rect<f64>, builder::Error> {
-            Ok(cfg
-                .take::<[f64; 4]>(name)
-                .change_context(builder::Error::msg("Failed to init flag"))?
-                .into())
+        let mut get_rect = |name| -> Result<Rectf, builder::Error> {
+            cfg.take(name).change_context(builder::Error::msg("Failed to init flag"))
         };
 
         Ok(WRef::new(Self {

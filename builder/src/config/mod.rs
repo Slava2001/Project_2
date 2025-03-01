@@ -28,7 +28,7 @@
 //! assert!(path.to_string_lossy() == "./assets/textures/img.png");
 //! ```
 
-mod value;
+pub mod value;
 
 use config::{Config as Cfg, File, FileFormat};
 use error_stack::{Result, ResultExt};
@@ -68,7 +68,7 @@ impl Config {
                 .change_context(Error::msg(format!("Failed to load config file: {path}")))?
                 .cache,
         };
-        Self::parse(val)
+        Self::parse_val(val)
             .change_context(Error::msg(format!("Failed to parse file {path} as config")))
     }
 
@@ -87,7 +87,7 @@ impl Config {
                 )))?
                 .cache,
         };
-        Self::parse(val)
+        Self::parse_val(val)
             .change_context(Error::msg(format!("Failed to parse json {json:?} as config")))
     }
 
@@ -102,7 +102,7 @@ impl Config {
             return Ok(None);
         };
         let val = Value { val, path: self.file.clone() };
-        let val = T::parse(val).change_context(Error::msg(format!(
+        let val = T::parse_val(val).change_context(Error::msg(format!(
             "Failed to parse field \"{}\" as {}",
             key,
             std::any::type_name::<T>()

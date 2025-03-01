@@ -7,9 +7,10 @@ use std::{cell::RefCell, path::PathBuf, rc::Rc};
 use crate::widget::Builder;
 use builder::config::Config;
 use error_stack::{Result, ResultExt};
-use renderer::{vec2::Vec2f, Drawable, Renderer};
+use renderer::{Drawable, Renderer};
 use resources::Manager as ResMngr;
 use scene::event::Event as SceneEvent;
+use utils::vec2::Vec2f;
 use widget::{event::Event, WRef};
 
 mod state;

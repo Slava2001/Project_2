@@ -8,7 +8,8 @@ mod wref;
 
 use super::State;
 use event::Event;
-use renderer::{rect::Rect, vec2::Vec2f, Drawable};
+use renderer::Drawable;
+use utils::{rect::Rectf, vec2::Vec2f};
 pub use wref::WRef;
 
 /// Widget error
@@ -81,7 +82,7 @@ pub trait Widget: Drawable + Any {
     fn check_bounds(&self, pos: Vec2f) -> bool;
 
     /// Get widget boundaries in local (relative to parent) coordinates.
-    fn get_rect(&self) -> &Rect<f64>;
+    fn get_rect(&self) -> &Rectf;
 
     /// Get widget identifier.
     fn get_id(&self) -> String;

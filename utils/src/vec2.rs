@@ -1,5 +1,7 @@
 //! 2D vector.
 
+use builder::config::value::{Error as ParseError, ParseFormValue, Value};
+use error_stack::Result;
 use std::ops::{Add, Sub};
 
 /// f64 vec2.
@@ -25,6 +27,13 @@ impl<T> Vec2<T> {
 impl<T> From<(T, T)> for Vec2<T> {
     fn from(value: (T, T)) -> Self {
         Self::new(value.0, value.1)
+    }
+}
+
+impl<T> From<[T; 2]> for Vec2<T> {
+    fn from(value: [T; 2]) -> Self {
+        let [x, y] = value;
+        Self::new(x, y)
     }
 }
 
@@ -57,5 +66,11 @@ impl<T: Sub<Output = T> + Copy> Sub for &Vec2<T> {
 
     fn sub(self, rhs: Self) -> Self::Output {
         Vec2::<T> { x: self.x - rhs.x, y: self.y - rhs.y }
+    }
+}
+
+impl<T: ParseFormValue> ParseFormValue for Vec2<T> {
+    fn parse_val(val: Value) -> Result<Self, ParseError> {
+        Ok(<[T; 2]>::parse_val(val)?.into())
     }
 }
