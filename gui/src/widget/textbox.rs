@@ -11,9 +11,10 @@ use crate::manager::{
 };
 use builder::{self, config::Config, BuildFromCfg};
 use error_stack::{Result, ResultExt};
-use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer, TextTruncateMode};
+use renderer::{Drawable, Renderer, TextTruncateMode};
 use scene::event::KeyCode;
 use std::{cell::RefCell, rc::Weak};
+use utils::{rect::Rectf, vec2::Vec2f};
 
 use super::Label;
 
@@ -191,7 +192,7 @@ impl Widget for Textbox {
         self.base.get_global_position()
     }
 
-    fn get_rect(&self) -> &Rect<f64> {
+    fn get_rect(&self) -> &Rectf {
         self.base.get_rect()
     }
 

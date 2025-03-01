@@ -1,19 +1,13 @@
 //! GUI renderer interface.
 
-pub mod color;
-pub mod rect;
-pub mod vec2;
-
 /// Objects that implement this trait can be rendered with [`Renderer`].
 pub trait Drawable {
     /// Draw object.
     fn draw(&self, renderer: &mut dyn Renderer);
 }
 
-use color::Color;
-use rect::Rect;
 use resources::{FontId, TextureId};
-use vec2::Vec2f;
+use utils::{color::Color, rect::Rectf, vec2::Vec2f};
 
 /// Text truncation mode.
 #[derive(Clone, Copy)]
@@ -34,18 +28,18 @@ pub trait Renderer {
     fn translate(&mut self, x: f64, y: f64);
 
     /// Draw specified rectangle with specified color.
-    fn draw_rect(&mut self, rect: &Rect<f64>, color: &Color);
+    fn draw_rect(&mut self, rect: &Rectf, color: &Color);
     /// Draw specified line with specified color.
     fn draw_line(&mut self, points: &[Vec2f], color: &Color);
     /// Draw specified part of texture in some area.
-    fn draw_img(&mut self, rect: &Rect<f64>, texture: TextureId, texture_rect: &Rect<f64>);
+    fn draw_img(&mut self, rect: &Rectf, texture: TextureId, texture_rect: &Rectf);
     /// Draw specified text.
     /// Returns number of truncated chars.
     fn draw_text(
         &mut self,
         text: &[char],
         size: f64,
-        rect: &Rect<f64>,
+        rect: &Rectf,
         font: FontId,
         color: &Color,
         mode: TextTruncateMode,

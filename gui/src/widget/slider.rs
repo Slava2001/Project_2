@@ -11,9 +11,10 @@ use crate::manager::{
 use builder::{self, config::Config, BuildFromCfg};
 use core::f64;
 use error_stack::{Result, ResultExt};
-use renderer::{rect::Rect, vec2::Vec2f, Drawable, Renderer};
+use renderer::{Drawable, Renderer};
 use resources::{Manager, TextureId};
 use std::{cell::RefCell, rc::Weak};
+use utils::{rect::Rectf, vec2::Vec2f};
 
 /// Slider.
 pub struct Slider {
@@ -22,11 +23,11 @@ pub struct Slider {
     /// Slider texture.
     texture: TextureId,
     /// Slider background texture rectangle.
-    texture_background_rect: Rect<f64>,
+    texture_background_rect: Rectf,
     /// Slider cursor texture rectangle.
-    texture_cursor_rect: Rect<f64>,
+    texture_cursor_rect: Rectf,
     /// Slider cursor rectangle.
-    cursor_rect: Rect<f64>,
+    cursor_rect: Rectf,
     /// Slider minimum value.
     value_min: f64,
     /// Slider maximum value.
@@ -50,17 +51,14 @@ impl Slider {
             .get_texture(&texture_name)
             .change_context(builder::Error::msg("Failed to find slider texture"))?;
         let texture_background_rect = cfg
-            .take::<[f64; 4]>("texture_background_rect")
-            .change_context(builder::Error::msg("Failed to init slide texture_background_rect"))?
-            .into();
+            .take("texture_background_rect")
+            .change_context(builder::Error::msg("Failed to init slide texture_background_rect"))?;
         let texture_cursor_rect = cfg
-            .take::<[f64; 4]>("texture_cursor_rect")
-            .change_context(builder::Error::msg("Failed to init slide texture_cursor_rect"))?
-            .into();
-        let cursor_rect: Rect<f64> = cfg
-            .take::<[f64; 4]>("cursor_rect")
-            .change_context(builder::Error::msg("Failed to init slide cursor_rect"))?
-            .into();
+            .take("texture_cursor_rect")
+            .change_context(builder::Error::msg("Failed to init slide texture_cursor_rect"))?;
+        let cursor_rect: Rectf = cfg
+            .take("cursor_rect")
+            .change_context(builder::Error::msg("Failed to init slide cursor_rect"))?;
         let value_min = cfg
             .take("value_min")
             .change_context(builder::Error::msg("Failed to init slide value_min"))?;
@@ -205,7 +203,7 @@ impl Widget for Slider {
         self.base.get_global_position()
     }
 
-    fn get_rect(&self) -> &Rect<f64> {
+    fn get_rect(&self) -> &Rectf {
         self.base.get_rect()
     }
 

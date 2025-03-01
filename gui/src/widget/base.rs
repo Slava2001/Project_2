@@ -6,8 +6,9 @@ use std::{
     rc::{Rc, Weak},
 };
 
-use renderer::{color, rect::Rect, vec2::Vec2f, Drawable, Renderer};
+use renderer::{Drawable, Renderer};
 use resources::Manager;
+use utils::{color, rect::Rectf, vec2::Vec2f};
 
 use crate::manager::{
     widget::{event::Event, Error, WRef, Widget},
@@ -18,7 +19,7 @@ use builder::{self, config::Config, BuildFromCfg};
 /// Base implementation of widget.
 pub struct Base {
     /// Widget bounds.
-    rect: Rect<f64>,
+    rect: Rectf,
     /// Widget childs.
     childs: Vec<WRef>,
     /// Reference on parent widget.
@@ -133,7 +134,7 @@ impl Widget for Base {
         pos
     }
 
-    fn get_rect(&self) -> &Rect<f64> {
+    fn get_rect(&self) -> &Rectf {
         &self.rect
     }
 

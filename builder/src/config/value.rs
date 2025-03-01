@@ -35,14 +35,14 @@ where
     ///
     /// # Errors
     /// Return error if failed to parse [`Value`] as Self.
-    fn parse(val: Value) -> Result<Self, Error>;
+    fn parse_val(val: Value) -> Result<Self, Error>;
 }
 
 /// Implement [`ParseFormValue`] for deserializable types.
 macro_rules! impl_parse_from_value {
     ($($t:ty),*) => {
         $(impl ParseFormValue for $t {
-            fn parse(val: Value) -> Result<Self, Error> {
+            fn parse_val(val: Value) -> Result<Self, Error> {
                 val.val.try_deserialize::<$t>()
                 .change_context(Error::msg(
                     format!("Failed parse value as {:?}", std::any::type_name::<$t>()))
@@ -57,7 +57,7 @@ impl_parse_from_value!(
 );
 
 impl ParseFormValue for PathBuf {
-    fn parse(value: Value) -> Result<Self, Error> {
+    fn parse_val(value: Value) -> Result<Self, Error> {
         let path = value
             .val
             .try_deserialize::<Self>()
@@ -72,7 +72,7 @@ impl ParseFormValue for PathBuf {
 }
 
 impl<T: ParseFormValue> ParseFormValue for Vec<T> {
-    fn parse(value: Value) -> Result<Self, Error> {
+    fn parse_val(value: Value) -> Result<Self, Error> {
         let v = value
             .val
             .try_deserialize::<Vec<config::Value>>()
@@ -80,14 +80,15 @@ impl<T: ParseFormValue> ParseFormValue for Vec<T> {
         let mut res = Self::new();
         for val in v {
             let val = Value { val, path: value.path.clone() };
-            res.push(T::parse(val).change_context(Error::msg("Failed to parse vector item"))?);
+            res.push(T::parse_val(val).change_context(Error::msg("Failed to parse vector item"))?);
         }
         Ok(res)
     }
 }
 
+#[allow(clippy::implicit_hasher)]
 impl<T: ParseFormValue> ParseFormValue for HashMap<String, T> {
-    fn parse(value: Value) -> Result<Self, Error> {
+    fn parse_val(value: Value) -> Result<Self, Error> {
         let v = value
             .val
             .try_deserialize::<HashMap<String, config::Value>>()
@@ -95,22 +96,25 @@ impl<T: ParseFormValue> ParseFormValue for HashMap<String, T> {
         let mut res = Self::new();
         for (k, val) in v {
             let val = Value { val, path: value.path.clone() };
-            res.insert(k, T::parse(val).change_context(Error::msg("Failed to parse vector item"))?);
+            res.insert(
+                k,
+                T::parse_val(val).change_context(Error::msg("Failed to parse vector item"))?,
+            );
         }
         Ok(res)
     }
 }
 
 impl<T: ParseFormValue, const L: usize> ParseFormValue for [T; L] {
-    fn parse(value: Value) -> Result<Self, Error> {
-        let res = Vec::<T>::parse(value)?;
+    fn parse_val(value: Value) -> Result<Self, Error> {
+        let res = Vec::<T>::parse_val(value)?;
         TryInto::<[T; L]>::try_into(res)
             .map_err(|_| report!(Error::msg("Failed to parse value as array")))
     }
 }
 
 impl ParseFormValue for Config {
-    fn parse(value: Value) -> Result<Self, Error> {
+    fn parse_val(value: Value) -> Result<Self, Error> {
         let mut file = value.path.clone();
         let mut val = value.val;
         if let config::ValueKind::String(ref path) = val.kind {

@@ -8,9 +8,10 @@ resources = { workspace = true }
 renderer = { workspace = true }
 scene = { workspace = true }
 builder = { workspace = true }
+gui = { workspace = true }
+utils = { workspace = true }
 error-stack = { workspace = true }
 thiserror = { workspace = true }
-gui = { workspace = true }
 
 piston = "1.0.0"
 piston2d-graphics = "0.44.0"
