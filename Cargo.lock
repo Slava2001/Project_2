@@ -1351,6 +1351,7 @@ dependencies = [
  "runtime",
  "scene",
  "thiserror 2.0.11",
+ "utils",
 ]
 
 [[package]]

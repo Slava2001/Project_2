@@ -1,15 +1,42 @@
 {
     "type": "level",
     "next_scene_cfg": "file!:./main_menu.json",
-    "player_anim_texture": "./player.png",
     "player_anim": {
-        "frames": [
-            [ 0, 108, 64, 108 ],
-            [ 64, 108, 64, 108 ],
-            [ 128, 108, 64, 108 ],
-            [ 192, 108, 64, 108 ]
-        ],
-        "frame_time": 100
+        "texture": "./player.png",
+        "anims": {
+            "idle_r": {
+                "frames": [
+                    [ 0, 0, 64, 108 ],
+                    [ 64, 0, 64, 108 ]
+                ],
+                "frame_time": 100
+            },
+            "idle_l": {
+                "frames": [
+                    [ 0, 64, -64, 108 ]
+                ],
+                "frame_time": 0
+            },
+            "walk_r": {
+                "frames": [
+                    [ 0, 108, 64, 108 ],
+                    [ 64, 108, 64, 108 ],
+                    [ 128, 108, 64, 108 ],
+                    [ 192, 108, 64, 108 ]
+                ],
+                "frame_time": 100
+            },
+            "walk_l": {
+                "frames": [
+                    [ 64, 108, -64, 108 ],
+                    [ 128, 108, -64, 108 ],
+                    [ 192, 108, -64, 108 ],
+                    [ 256, 108, -64, 108 ]
+                ],
+                "frame_time": 100
+            }
+        },
+        "rect": [ 100, 100, 100, 100 ]
     },
     "gui": {
         "recourses": [
@@ -17,10 +44,6 @@
                 "name": "button_tiles",
                 "type": "texture",
                 "path": "button.png"
-            }, {
-                "name": "default",
-                "type": "font",
-                "path": "unifont.otf"
             }
         ],
         "debug": false,

@@ -1,8 +1,8 @@
 //! Game level scene.
 
-use std::{cell::RefCell, path::PathBuf, rc::Rc};
+use std::{cell::RefCell, rc::Rc};
 
-use anim::anim::Anim;
+use anim::{make_animator_cfg, Animator};
 use builder::{config::Config, BuildFromCfg};
 use error_stack::ResultExt;
 use gui::{
@@ -10,8 +10,23 @@ use gui::{
     widget::{Builder as GuiBuilder, Button},
 };
 use renderer::Drawable;
-use resources::TextureId;
 use scene::{event::Event, Scene};
+
+#[derive(PartialEq, Eq, Debug, Hash, Clone, Copy)]
+enum PlayerState {
+    IdleR,
+    IdleL,
+    WalkR,
+    WalkL,
+}
+
+#[derive(PartialEq, Eq, Debug, Hash, Clone, Copy)]
+enum PlayerEvent {
+    WalkR,
+    WalkL,
+    Stop,
+    AnimFin,
+}
 
 /// Game level scene.
 pub struct Level {
@@ -21,10 +36,8 @@ pub struct Level {
     menu_scene: Rc<RefCell<bool>>,
     /// Main menu config.
     cfg: Config,
-    /// Player texture.
-    player_texture: TextureId,
     /// Player animation.
-    player_anim: Anim,
+    player_anim: Animator<PlayerState, PlayerEvent>,
 }
 
 impl Scene for Level {
@@ -34,7 +47,7 @@ impl Scene for Level {
         state: &mut dyn scene::State,
     ) -> error_stack::Result<(), scene::Error> {
         if let Event::TimeTick(dt) = e {
-            self.player_anim.update(dt);
+            self.player_anim.update(dt).change_context(scene::Error::msg("player_anim failed"))?;
         }
         self.gui.handle_event(e).change_context(scene::Error::msg("Gui failed"))?;
 
@@ -54,7 +67,7 @@ impl Scene for Level {
 impl Drawable for Level {
     fn draw(&self, renderer: &mut dyn renderer::Renderer) {
         self.gui.draw(renderer);
-        renderer.draw_img(&[100.0; 4].into(), self.player_texture, self.player_anim.get_rect());
+        self.player_anim.draw(renderer);
     }
 }
 
@@ -75,19 +88,36 @@ impl BuildFromCfg<Box<dyn Scene>> for Level {
             .borrow_mut()
             .click_cb(move |_| *menu_scene_clone.borrow_mut() = true);
 
-        let path = cfg
-            .take::<PathBuf>("player_anim_texture")
-            .change_context(builder::Error::msg("Failed to init player texture"))?;
-        res.load("texture", "player_anim_texture", &path)
-            .change_context(builder::Error::msg("Failed to load player texture"))?;
-        let player_texture = res
-            .get_texture("player_anim_texture")
-            .change_context(builder::Error::msg("Failed to find player texture"))?;
-        let player_anim_cfg = cfg
-            .take("player_anim")
-            .change_context(builder::Error::msg("Failed to init player animation config"))?;
-        let player_anim = Anim::new(player_anim_cfg)
-            .change_context(builder::Error::msg("Failed to build player animation"))?;
-        Ok(Box::new(Self { gui, menu_scene, cfg, player_texture, player_anim }))
+        let animator_cfg = make_animator_cfg!(
+            State_enum: PlayerState,
+            Event_enum: PlayerEvent,
+            Init_state: IdleR,
+            Anim_fin_event: AnimFin,
+            Anim_map:
+                IdleR: "idle_r",
+                IdleL: "idle_l",
+                WalkR: "walk_r",
+                WalkL: "walk_l"
+            Transient_map:
+                IdleR:
+                    WalkL => WalkL,
+                    WalkR => WalkR,
+                    AnimFin => IdleR;
+                IdleL:
+                    WalkR => WalkR,
+                    WalkL => WalkL;
+                WalkR:
+                    WalkL => WalkL,
+                    AnimFin => WalkL,
+                    Stop  => IdleR;
+                WalkL:
+                    WalkR => WalkR,
+                    AnimFin => WalkR,
+                    Stop  => IdleL
+        );
+        let anim_cfg = cfg.take("player_anim").change_context(builder::Error::msg(""))?;
+        let player_anim =
+            Animator::new(animator_cfg, anim_cfg, res).change_context(builder::Error::msg(""))?;
+        Ok(Box::new(Self { gui, menu_scene, cfg, player_anim }))
     }
 }
