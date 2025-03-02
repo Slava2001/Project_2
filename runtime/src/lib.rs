@@ -1,4 +1,6 @@
-//! Simple runtime implementation.
+//! This is a simple implementation of the runtime, it is only needed to test components
+//! dependent on it, in the future it will be rewritten using a low-level OpenGL API,
+//! so now it is full of crutches and questionable code.
 
 mod renderer;
 mod resmgr;
@@ -8,16 +10,16 @@ use builder::config::Config;
 use error_stack::{ensure, Result, ResultExt};
 use glutin_window::GlutinWindow as Window;
 use graphics::clear;
-use gui::widget::{Graph, Label};
+use gui::widget::{Graph, Label, Slider};
 use gui::{manager::Manager as GuiMngr, widget::Builder as GuiBuilder};
-use opengl_graphics::{GlGraphics, GlyphCache, OpenGL, TextureSettings};
+use opengl_graphics::{GlGraphics, GlyphCache, OpenGL, Texture, TextureSettings};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::RenderEvent;
 use piston::window::WindowSettings;
 use piston::{Button, EventLoop, Key, Motion, UpdateEvent};
 use renderer::Renderer;
 use resmgr::ResMngr;
-use resources::FontId;
+use resources::{FontId, TextureId};
 use scene::event::{self, Event, KeyCode, MouseButton};
 use scene::TimeTick;
 use std::time::{Duration, Instant};
@@ -57,9 +59,9 @@ impl Runtime {
             .map_err(|_| Error::msg("Failed to init window"))?;
         let gl = GlGraphics::new(OpenGL::V3_2);
         let mut gui_res = ResMngr::new();
-        let id = FontId(gui_res.fonts.len());
         {
             // load default font
+            let id = FontId(gui_res.fonts.len());
             let mut settings = TextureSettings::new();
             settings.set_filter(opengl_graphics::Filter::Nearest);
             let cache = GlyphCache::from_bytes(
@@ -70,6 +72,18 @@ impl Runtime {
             .map_err(|e| Error::msg(format!("Failed to load font: {e:?}")))?;
             gui_res.fonts.push(cache);
             gui_res.fonts_map.insert("default".into(), id);
+        }
+        {
+            // load slider texture
+            let id = TextureId(gui_res.textures.len());
+            let mut settings = TextureSettings::new();
+            settings.set_filter(opengl_graphics::Filter::Nearest);
+            gui_res.textures.push(
+                    Texture::from_bytes(include_bytes!("./slider.png"), &settings).map_err(|e| {
+                        Error::msg(format!("Failed to load texture: {e}"))
+                    })?,
+                );
+                gui_res.textures_map.insert("slider_texture".into(), id);
         }
         let cfg = Config::from_json(include_str!("./gui_cfg.json"))
             .change_context(Error::msg("Failed to create runtime gui config"))?;
@@ -95,6 +109,14 @@ impl Runtime {
             .gui
             .get_by_id_cast::<Label>("fps_label")
             .change_context(Error::msg("Failed to get runtime fps label"))?;
+        let tps_label = self
+            .gui
+            .get_by_id_cast::<Label>("tps_label")
+            .change_context(Error::msg("Failed to get runtime tps label"))?;
+        let tps_slider = self
+            .gui
+            .get_by_id_cast::<Slider>("tps_slider")
+            .change_context(Error::msg("Failed to get runtime tps slider"))?;
 
         let mut events = Events::new(EventSettings::new());
         events.bench_mode(true);
@@ -106,6 +128,7 @@ impl Runtime {
 
         let mut fps_counter = 0;
         let mut fps_timer = Instant::now();
+        let mut tick_per_sec = tps_slider.borrow().get_value();
 
         while let Some(e) = events.next(&mut self.window) {
             if let Some(args) = e.render_args() {
@@ -130,7 +153,7 @@ impl Runtime {
             if let Some(e) = e.update_args() {
                 #[allow(clippy::cast_possible_truncation)]
                 #[allow(clippy::cast_sign_loss)]
-                let dt = (e.dt * 1000.0).round() as TimeTick;
+                let dt = (e.dt * tick_per_sec).round() as TimeTick;
                 scene
                     .handle_event(event::Event::TimeTick(dt), &mut state)
                     .change_context(Error::msg("Scene failed to handle update event"))?;
@@ -148,6 +171,11 @@ impl Runtime {
                 self.gui
                     .handle_event(e)
                     .change_context(Error::msg("Failed to update runtime gui"))?;
+                let new_tps = tps_slider.borrow().get_value().round();
+                if new_tps != tick_per_sec {
+                    tps_label.borrow_mut().set_text(&format!("TPS: {}", new_tps));
+                    tick_per_sec = new_tps;
+                }
             }
 
             if let Some(cfg) = state.next_scene.take() {

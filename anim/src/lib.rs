@@ -7,7 +7,7 @@ use renderer::Drawable;
 use resources::TextureId;
 use scene::TimeTick;
 use std::{collections::HashMap, fmt::Debug, hash::Hash, path::PathBuf};
-use utils::rect::Rectf;
+use utils::{rect::Rectf, vec2::Vec2f};
 
 pub mod anim;
 
@@ -140,7 +140,6 @@ impl<S: Eq + Hash + Copy + Debug, E: Eq + Hash + Copy + Debug> Animator<S, E> {
 
     pub fn handle_event(&mut self, e: E) -> Result<(), Error> {
         if let Some(s) = self.transient_map.get(&self.state).and_then(|l| l.get(&e)) {
-            println!("{:?}=>{:?} by {:?}", self.state, *s, e);
             self.state = *s;
             self.anims
                 .get_mut(&self.state)
@@ -161,6 +160,11 @@ impl<S: Eq + Hash + Copy + Debug, E: Eq + Hash + Copy + Debug> Animator<S, E> {
             self.handle_event(self.timeout_event)?;
         }
         Ok(())
+    }
+
+    pub fn set_pos(&mut self, pos: Vec2f) {
+        self.rect.x = pos.x;
+        self.rect.y = pos.y;
     }
 }
 

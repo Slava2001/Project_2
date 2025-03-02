@@ -10,7 +10,10 @@ use gui::{
     widget::{Builder as GuiBuilder, Button},
 };
 use renderer::Drawable;
-use scene::{event::Event, Scene};
+use scene::{
+    event::{Event, KeyCode},
+    Scene,
+};
 
 #[derive(PartialEq, Eq, Debug, Hash, Clone, Copy)]
 enum PlayerState {
@@ -18,13 +21,20 @@ enum PlayerState {
     IdleL,
     WalkR,
     WalkL,
+    AttackR,
+    AttackL,
+    AttackWalkR,
+    AttackWalkL,
 }
 
 #[derive(PartialEq, Eq, Debug, Hash, Clone, Copy)]
 enum PlayerEvent {
     WalkR,
     WalkL,
-    Stop,
+    WalkREnd,
+    WalkLEnd,
+    Attack,
+    AttackEnd,
     AnimFin,
 }
 
@@ -40,6 +50,25 @@ pub struct Level {
     player_anim: Animator<PlayerState, PlayerEvent>,
 }
 
+/// Convert scene event to player event.
+fn to_player_event(e: Event) -> Option<PlayerEvent> {
+    match e {
+        Event::KeyPress(key_code) => match key_code {
+            KeyCode::ArrowRight => Some(PlayerEvent::WalkR),
+            KeyCode::ArrowLeft => Some(PlayerEvent::WalkL),
+            KeyCode::Tab => Some(PlayerEvent::Attack),
+            _ => None,
+        },
+        Event::KeyRelease(key_code) => match key_code {
+            KeyCode::ArrowRight => Some(PlayerEvent::WalkREnd),
+            KeyCode::ArrowLeft => Some(PlayerEvent::WalkLEnd),
+            KeyCode::Tab => Some(PlayerEvent::AttackEnd),
+            _ => None,
+        },
+        _ => None,
+    }
+}
+
 impl Scene for Level {
     fn handle_event(
         &mut self,
@@ -48,6 +77,11 @@ impl Scene for Level {
     ) -> error_stack::Result<(), scene::Error> {
         if let Event::TimeTick(dt) = e {
             self.player_anim.update(dt).change_context(scene::Error::msg("player_anim failed"))?;
+        }
+        if let Some(e) = to_player_event(e.clone()) {
+            self.player_anim
+                .handle_event(e)
+                .change_context(scene::Error::msg("Failed to handle animation event"))?;
         }
         self.gui.handle_event(e).change_context(scene::Error::msg("Gui failed"))?;
 
@@ -97,27 +131,59 @@ impl BuildFromCfg<Box<dyn Scene>> for Level {
                 IdleR: "idle_r",
                 IdleL: "idle_l",
                 WalkR: "walk_r",
-                WalkL: "walk_l"
+                WalkL: "walk_l",
+                AttackR: "attack_r",
+                AttackL: "attack_l",
+                AttackWalkR: "attack_walk_r",
+                AttackWalkL: "attack_walk_l"
             Transient_map:
                 IdleR:
-                    WalkL => WalkL,
-                    WalkR => WalkR,
-                    AnimFin => IdleR;
+                    WalkR     => WalkR,
+                    WalkL     => WalkL,
+                    Attack    => AttackR,
+                    AnimFin   => IdleR;
                 IdleL:
-                    WalkR => WalkR,
-                    WalkL => WalkL;
+                    WalkR     => WalkR,
+                    WalkL     => WalkL,
+                    Attack    => AttackL,
+                    AnimFin   => IdleL;
                 WalkR:
-                    WalkL => WalkL,
-                    AnimFin => WalkL,
-                    Stop  => IdleR;
+                    WalkL     => WalkL,
+                    WalkREnd  => IdleR,
+                    Attack    => AttackWalkR,
+                    AnimFin   => WalkR;
                 WalkL:
-                    WalkR => WalkR,
-                    AnimFin => WalkR,
-                    Stop  => IdleL
+                    WalkR     => WalkR,
+                    WalkLEnd  => IdleL,
+                    Attack    => AttackWalkL,
+                    AnimFin   => WalkL;
+                AttackR:
+                    WalkR     => AttackWalkR,
+                    WalkL     => AttackWalkL,
+                    AttackEnd => IdleR,
+                    AnimFin   => AttackR;
+                AttackL:
+                    WalkR     => AttackWalkR,
+                    WalkL     => AttackWalkL,
+                    AttackEnd => IdleL,
+                    AnimFin   => AttackL;
+                AttackWalkR:
+                    WalkL     => AttackWalkL,
+                    WalkREnd  => AttackR,
+                    AttackEnd => WalkR,
+                    AnimFin   => AttackWalkR;
+                AttackWalkL:
+                    WalkR     => AttackWalkR,
+                    WalkLEnd  => AttackL,
+                    AttackEnd => WalkL,
+                    AnimFin   => AttackWalkL
         );
-        let anim_cfg = cfg.take("player_anim").change_context(builder::Error::msg(""))?;
-        let player_anim =
-            Animator::new(animator_cfg, anim_cfg, res).change_context(builder::Error::msg(""))?;
+        let anim_cfg = cfg
+            .take("player_anim")
+            .change_context(builder::Error::msg("Failed to init player config"))?;
+        let player_anim = Animator::new(animator_cfg, anim_cfg, res)
+            .change_context(builder::Error::msg("Failed to create new player"))?;
+
         Ok(Box::new(Self { gui, menu_scene, cfg, player_anim }))
     }
 }
