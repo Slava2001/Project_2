@@ -142,41 +142,65 @@ impl BuildFromCfg<Box<dyn Scene>> for Level {
                 IdleR:
                     WalkR     => WalkR,
                     WalkL     => WalkL,
+                    WalkREnd  => None,
+                    WalkLEnd  => None,
                     Attack    => AttackR,
+                    AttackEnd => None,
                     AnimFin   => IdleR;
                 IdleL:
                     WalkR     => WalkR,
                     WalkL     => WalkL,
+                    WalkREnd  => None,
+                    WalkLEnd  => None,
                     Attack    => AttackL,
+                    AttackEnd => None,
                     AnimFin   => IdleL;
                 WalkR:
+                    WalkR     => None,
                     WalkL     => WalkL,
                     WalkREnd  => IdleR,
+                    WalkLEnd  => None,
                     Attack    => AttackWalkR,
+                    AttackEnd => None,
                     AnimFin   => WalkR;
                 WalkL:
                     WalkR     => WalkR,
+                    WalkL     => None,
+                    WalkREnd  => None,
                     WalkLEnd  => IdleL,
                     Attack    => AttackWalkL,
+                    AttackEnd => None,
                     AnimFin   => WalkL;
                 AttackR:
                     WalkR     => AttackWalkR,
                     WalkL     => AttackWalkL,
+                    WalkREnd  => None,
+                    WalkLEnd  => None,
+                    Attack    => None,
                     AttackEnd => IdleR,
                     AnimFin   => AttackR;
                 AttackL:
                     WalkR     => AttackWalkR,
                     WalkL     => AttackWalkL,
+                    WalkREnd  => None,
+                    WalkLEnd  => None,
+                    Attack    => None,
                     AttackEnd => IdleL,
                     AnimFin   => AttackL;
                 AttackWalkR:
+                    WalkR     => None,
                     WalkL     => AttackWalkL,
                     WalkREnd  => AttackR,
+                    WalkLEnd  => None,
+                    Attack    => None,
                     AttackEnd => WalkR,
                     AnimFin   => AttackWalkR;
                 AttackWalkL:
                     WalkR     => AttackWalkR,
+                    WalkL     => None,
+                    WalkREnd  => None,
                     WalkLEnd  => AttackL,
+                    Attack    => None,
                     AttackEnd => WalkL,
                     AnimFin   => AttackWalkL
         );

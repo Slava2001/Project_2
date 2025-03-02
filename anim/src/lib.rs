@@ -51,11 +51,20 @@ macro_rules! make_animator_cfg {
                 {
                     let mut line = ::std::collections::HashMap::new();
                     $(
-                        line.insert(<$event_enum>::$event, <$state_enum>::$new_state);
+                        make_animator_cfg!(
+                            @inner, line, $event_enum, $event, $state_enum, $new_state
+                        );
                     )*
                     transient_map.insert(<$state_enum>::$state, line);
+
+                    struct UniqueArgsChecker<$($event),*> {
+                        _phantom: ::std::marker::PhantomData<($($event,)*)>
+                    }
                 }
             )*
+            struct UniqueArgsChecker<$($state),*> {
+                _phantom: ::std::marker::PhantomData<($($state,)*)>
+            }
             match <$state_enum>::$init_state {
                 $(<$state_enum>::$state => {})*
             }
@@ -67,6 +76,12 @@ macro_rules! make_animator_cfg {
             }
         }
     };
+    (@inner, $map:ident, $key_enum:ty, $key:ident, $enum_ty:ty, None) => {
+        $map.insert(<$key_enum>::$key, None);
+    };
+    (@inner, $map:ident, $key_enum:ty, $key:ident, $enum_ty:ty, $val:ident) => {
+        $map.insert(<$key_enum>::$key, Some(<$enum_ty>::$val));
+    };
 }
 
 /// Animator static config, use [`make_animator_cfg`] for create it.
@@ -74,7 +89,7 @@ pub struct AnimatorCfg<S, E> {
     /// Init state.
     pub state: S,
     /// Transients map.
-    pub transient_map: HashMap<S, HashMap<E, S>>,
+    pub transient_map: HashMap<S, HashMap<E, Option<S>>>,
     /// Animations names for each state.
     pub anim_names: Vec<(&'static str, S)>,
     /// Anim end event.
@@ -86,7 +101,7 @@ pub struct Animator<S: Eq + Hash + Copy + Debug, E: Eq + Hash + Copy + Debug> {
     /// Init state.
     state: S,
     /// Transients map.
-    transient_map: HashMap<S, HashMap<E, S>>,
+    transient_map: HashMap<S, HashMap<E, Option<S>>>,
     /// List of animations.
     anims: HashMap<S, Anim>,
     /// Ent of animation event.
@@ -158,16 +173,22 @@ impl<S: Eq + Hash + Copy + Debug, E: Eq + Hash + Copy + Debug> Animator<S, E> {
     /// Handle event.
     ///
     /// # Errors
-    /// Return error if failed to handle event.
+    /// Return error if transient from current state by specified event not found.
     pub fn handle_event(&mut self, e: E) -> Result<(), Error> {
-        if let Some(s) = self.transient_map.get(&self.state).and_then(|l| l.get(&e)) {
-            self.state = *s;
+        let Some(next_state) = self.transient_map.get(&self.state).and_then(|l| l.get(&e)) else {
+            bail!(Error::msg(format!(
+                "Failed to get transient from state {:?} by event {:?}",
+                self.state, e
+            )));
+        };
+        if let Some(next_state) = next_state {
             self.anims
                 .get_mut(&self.state)
                 .ok_or_else(|| {
-                    Error::msg(format!("Failed to get animation for state: {:?}", self.state))
+                    Error::msg(format!("Failed to get animation for state: {next_state:?}"))
                 })?
                 .reset();
+            self.state = *next_state;
         }
         Ok(())
     }

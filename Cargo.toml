@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
-members = [ "anim",
+members = [
+    "anim",
     "builder",
     "gui",
     "project_2",

@@ -42,8 +42,9 @@ impl Anim {
         );
         Ok(Self { frames, current_frame: 0, frame_time, elapsed_time: 0 })
     }
+
     /// Update animation.
-    /// Returns true if the animation has ended.
+    /// Returns `true` if the animation has ended.
     pub fn update(&mut self, delta_time: TimeTick) -> bool {
         if self.frame_time == 0 {
             return false;
