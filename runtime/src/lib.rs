@@ -79,11 +79,10 @@ impl Runtime {
             let mut settings = TextureSettings::new();
             settings.set_filter(opengl_graphics::Filter::Nearest);
             gui_res.textures.push(
-                    Texture::from_bytes(include_bytes!("./slider.png"), &settings).map_err(|e| {
-                        Error::msg(format!("Failed to load texture: {e}"))
-                    })?,
-                );
-                gui_res.textures_map.insert("slider_texture".into(), id);
+                Texture::from_bytes(include_bytes!("./slider.png"), &settings)
+                    .map_err(|e| Error::msg(format!("Failed to load texture: {e}")))?,
+            );
+            gui_res.textures_map.insert("slider_texture".into(), id);
         }
         let cfg = Config::from_json(include_str!("./gui_cfg.json"))
             .change_context(Error::msg("Failed to create runtime gui config"))?;
@@ -171,11 +170,8 @@ impl Runtime {
                 self.gui
                     .handle_event(e)
                     .change_context(Error::msg("Failed to update runtime gui"))?;
-                let new_tps = tps_slider.borrow().get_value().round();
-                if new_tps != tick_per_sec {
-                    tps_label.borrow_mut().set_text(&format!("TPS: {}", new_tps));
-                    tick_per_sec = new_tps;
-                }
+                tick_per_sec = tps_slider.borrow().get_value().round();
+                tps_label.borrow_mut().set_text(&format!("TPS: {tick_per_sec}"));
             }
 
             if let Some(cfg) = state.next_scene.take() {

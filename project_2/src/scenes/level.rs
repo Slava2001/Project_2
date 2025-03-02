@@ -16,6 +16,7 @@ use scene::{
 };
 
 #[derive(PartialEq, Eq, Debug, Hash, Clone, Copy)]
+#[allow(clippy::missing_docs_in_private_items)]
 enum PlayerState {
     IdleR,
     IdleL,
@@ -28,6 +29,7 @@ enum PlayerState {
 }
 
 #[derive(PartialEq, Eq, Debug, Hash, Clone, Copy)]
+#[allow(clippy::missing_docs_in_private_items)]
 enum PlayerEvent {
     WalkR,
     WalkL,
@@ -51,7 +53,7 @@ pub struct Level {
 }
 
 /// Convert scene event to player event.
-fn to_player_event(e: Event) -> Option<PlayerEvent> {
+const fn to_player_event(e: &Event) -> Option<PlayerEvent> {
     match e {
         Event::KeyPress(key_code) => match key_code {
             KeyCode::ArrowRight => Some(PlayerEvent::WalkR),
@@ -78,7 +80,7 @@ impl Scene for Level {
         if let Event::TimeTick(dt) = e {
             self.player_anim.update(dt).change_context(scene::Error::msg("player_anim failed"))?;
         }
-        if let Some(e) = to_player_event(e.clone()) {
+        if let Some(e) = to_player_event(&e) {
             self.player_anim
                 .handle_event(e)
                 .change_context(scene::Error::msg("Failed to handle animation event"))?;

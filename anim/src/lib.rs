@@ -1,4 +1,5 @@
 //! Animation.
+//! State machine in which each state corresponds to an animation.
 
 use anim::Anim;
 use builder::config::Config;
@@ -22,6 +23,7 @@ impl Error {
     }
 }
 
+/// Animator static config declare helper. It used to configure animator FSM.
 #[macro_export]
 macro_rules! make_animator_cfg {
     (
@@ -67,20 +69,33 @@ macro_rules! make_animator_cfg {
     };
 }
 
+/// Animator static config, use [`make_animator_cfg`] for create it.
 pub struct AnimatorCfg<S, E> {
+    /// Init state.
     pub state: S,
+    /// Transients map.
     pub transient_map: HashMap<S, HashMap<E, S>>,
+    /// Animations names for each state.
     pub anim_names: Vec<(&'static str, S)>,
+    /// Anim end event.
     pub timeout_event: E,
 }
 
+/// Animator.
 pub struct Animator<S: Eq + Hash + Copy + Debug, E: Eq + Hash + Copy + Debug> {
+    /// Init state.
     state: S,
+    /// Transients map.
     transient_map: HashMap<S, HashMap<E, S>>,
+    /// List of animations.
     anims: HashMap<S, Anim>,
+    /// Ent of animation event.
     timeout_event: E,
+    /// Sprite sheet.
     texture: TextureId,
+    /// Animator draw rect.
     rect: Rectf,
+    /// Current texture rect.
     texture_rect: Rectf,
 }
 
@@ -113,7 +128,7 @@ impl<S: Eq + Hash + Copy + Debug, E: Eq + Hash + Copy + Debug> Animator<S, E> {
         for (k, v) in animator_cfg.anim_names {
             let a = anims_cfg
                 .remove(k)
-                .ok_or(builder::Error::msg(format!("Required anim {k:?} not found")))?;
+                .ok_or_else(|| builder::Error::msg(format!("Required anim {k:?} not found")))?;
             if anims.insert(v, a).is_some() {
                 bail!(builder::Error::msg(format!("State {v:?} duplicated in transients map")));
             }
@@ -121,10 +136,12 @@ impl<S: Eq + Hash + Copy + Debug, E: Eq + Hash + Copy + Debug> Animator<S, E> {
 
         let texture_rect = *anims
             .get(&animator_cfg.state)
-            .ok_or(report!(builder::Error::msg(format!(
-                "Failed to get animation for state: {:?}",
-                animator_cfg.state
-            ))))?
+            .ok_or_else(|| {
+                report!(builder::Error::msg(format!(
+                    "Failed to get animation for state: {:?}",
+                    animator_cfg.state
+                )))
+            })?
             .get_rect();
 
         Ok(Self {
@@ -138,22 +155,31 @@ impl<S: Eq + Hash + Copy + Debug, E: Eq + Hash + Copy + Debug> Animator<S, E> {
         })
     }
 
+    /// Handle event.
+    ///
+    /// # Errors
+    /// Return error if failed to handle event.
     pub fn handle_event(&mut self, e: E) -> Result<(), Error> {
         if let Some(s) = self.transient_map.get(&self.state).and_then(|l| l.get(&e)) {
             self.state = *s;
             self.anims
                 .get_mut(&self.state)
-                .ok_or(Error::msg(format!("Failed to get animation for state: {:?}", self.state)))?
+                .ok_or_else(|| {
+                    Error::msg(format!("Failed to get animation for state: {:?}", self.state))
+                })?
                 .reset();
         }
         Ok(())
     }
 
+    /// Update animator.
+    ///
+    /// # Errors
+    /// Return error if failed to update current animation.
     pub fn update(&mut self, dt: TimeTick) -> Result<(), Error> {
-        let anim = self
-            .anims
-            .get_mut(&self.state)
-            .ok_or(Error::msg(format!("Failed to get animation for state: {:?}", self.state)))?;
+        let anim = self.anims.get_mut(&self.state).ok_or_else(|| {
+            Error::msg(format!("Failed to get animation for state: {:?}", self.state))
+        })?;
         let new_cycle = anim.update(dt);
         self.texture_rect = *anim.get_rect();
         if new_cycle {
@@ -162,6 +188,7 @@ impl<S: Eq + Hash + Copy + Debug, E: Eq + Hash + Copy + Debug> Animator<S, E> {
         Ok(())
     }
 
+    /// Set animator position.
     pub fn set_pos(&mut self, pos: Vec2f) {
         self.rect.x = pos.x;
         self.rect.y = pos.y;
