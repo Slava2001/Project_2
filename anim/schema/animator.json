@@ -1,0 +1,25 @@
+{
+    "type": "object",
+    "description": "Animator description",
+    "properties": {
+        "texture": {
+            "type": "string",
+            "description": "Path to texture"
+        },
+        "anims": {
+            "type": "object",
+            "description": "All animations in format \"key\":{anim}",
+            "properties": {
+                "animation_name": {
+                    "$ref": "./anim.json"
+                }
+            }
+        },
+        "rect": {
+            "$ref": "./defines/rect.json",
+            "description": "Animator drawing rect"
+        }
+    },
+    "required": [ "texture", "anims", "rect" ],
+    "unevaluatedProperties": false
+}

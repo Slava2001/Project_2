@@ -1,0 +1,20 @@
+{
+    "type": "object",
+    "description": "Animation description",
+    "properties": {
+        "frames": {
+            "type": "array",
+            "items": {
+                "$ref": "./defines/rect.json"
+            },
+            "description": "Animation frames"
+        },
+        "frame_time": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Frame duration in ticks"
+        }
+    },
+    "required": [ "frames", "frame_time" ],
+    "unevaluatedProperties": false
+}

@@ -46,8 +46,10 @@ impl Label {
     pub fn new(mut cfg: Config, res: &mut dyn resources::Manager) -> Result<Self, builder::Error> {
         Ok(Self {
             text: RefCell::new(
-                cfg.take("text")
-                    .change_context(builder::Error::msg("Failed to init label text"))?,
+                cfg.take::<String>("text")
+                    .change_context(builder::Error::msg("Failed to init label text"))?
+                    .chars()
+                    .collect(),
             ),
             size: cfg
                 .take::<f64>("font_size")

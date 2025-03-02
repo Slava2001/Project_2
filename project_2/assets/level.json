@@ -1,37 +1,106 @@
 {
     "type": "level",
     "next_scene_cfg": "file!:./main_menu.json",
-    "gui": {
-        "recourses": [
-            {
-                "name": "button_tiles",
-                "type": "texture",
-                "path": "button.png"
-            }, {
-                "name": "default",
-                "type": "font",
-                "path": "unifont.otf"
+    "player_anim": {
+        "texture": "./player.png",
+        "anims": {
+            "idle_r": {
+                "frames": [
+                    [ 0, 0, 64, 108 ]
+                ],
+                "frame_time": 0
+            },
+            "idle_l": {
+                "frames": [
+                    [ 64, 0, -64, 108 ]
+                ],
+                "frame_time": 0
+            },
+            "walk_r": {
+                "frames": [
+                    [ 0, 108, 64, 108 ],
+                    [ 64, 108, 64, 108 ],
+                    [ 128, 108, 64, 108 ],
+                    [ 192, 108, 64, 108 ]
+                ],
+                "frame_time": 100
+            },
+            "walk_l": {
+                "frames": [
+                    [ 64, 108, -64, 108 ],
+                    [ 128, 108, -64, 108 ],
+                    [ 192, 108, -64, 108 ],
+                    [ 256, 108, -64, 108 ]
+                ],
+                "frame_time": 100
+            },
+            "attack_r": {
+                "frames": [
+                    [ 0, 0, 64, 108 ],
+                    [ 64, 0, 64, 108 ]
+                ],
+                "frame_time": 100
+            },
+            "attack_l": {
+                "frames": [
+                    [ 64, 0, -64, 108 ],
+                    [ 128, 0, -64, 108 ]
+                ],
+                "frame_time": 100
+            },
+            "attack_walk_r": {
+                "frames": [
+                    [ 0, 108, 64, 108 ],
+                    [ 64, 0, 64, 108 ],
+                    [ 128, 108, 64, 108 ],
+                    [ 192, 108, 64, 108 ]
+                ],
+                "frame_time": 100
+            },
+            "attack_walk_l": {
+                "frames": [
+                    [ 64, 108, -64, 108 ],
+                    [ 128, 0, -64, 108 ],
+                    [ 192, 108, -64, 108 ],
+                    [ 256, 108, -64, 108 ]
+                ],
+                "frame_time": 100
             }
-        ],
-        "debug": false,
-        "type": "button",
-        "rect": [ 30, 50, 300, 30 ],
-        "id": "change_scene",
-        "background": "button_tiles",
-        "texture_rect": [ 0, 0, 160, 16 ],
-        "texture_rect_hovered": [ 0, 16, 160, 16 ],
-        "texture_rect_pressed": [ 0, 32, 160, 16 ],
-        "childs": [
-            {
-                "type": "label",
-                "rect_color": "#00000000",
-                "text": "Return to menu",
-                "font_size": 20,
-                "font": "default",
-                "rect": [ 30, 4, 240, 0 ],
-                "id": "cursor_pos",
-                "color": "#FFFFFF",
-                "debug": false
+        },
+        "rect": [ 100, 100, 100, 100 ]
+    },
+    "gui": {
+        "type": "base",
+        "rect": [ 0, 0, 0, 0 ],
+        "childs": [ {
+                "recourses": [
+                    {
+                        "name": "button_tiles",
+                        "type": "texture",
+                        "path": "button.png"
+                    }
+                ],
+                "debug": false,
+                "type": "button",
+                "rect": [ 30, 50, 300, 30 ],
+                "id": "change_scene",
+                "background": "button_tiles",
+                "texture_rect": [ 0, 0, 160, 16 ],
+                "texture_rect_hovered": [ 0, 16, 160, 16 ],
+                "texture_rect_pressed": [ 0, 32, 160, 16 ],
+                "childs": [
+                    {
+                        "type": "label",
+                        "rect_color": "#00000000",
+                        "text": "Return to menu",
+                        "font_size": 20,
+                        "font": "default",
+                        "rect": [ 30, 4, 240, 0 ],
+                        "id": "cursor_pos",
+                        "color": "#FFFFFF",
+                        "debug": false
+                    }
+                ]
             }
         ]
     }

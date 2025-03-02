@@ -1,17 +1,13 @@
 [package]
-name = "project_2"
+name = "anim"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 renderer = { workspace = true }
 resources = { workspace = true }
-scene = { workspace = true }
-gui = { workspace = true }
-runtime = { workspace = true }
 builder = { workspace = true }
-anim = { workspace = true }
 utils = { workspace = true }
+scene = { workspace = true }
 error-stack = { workspace = true }
 thiserror = { workspace = true }
-rand = "0.9.0"

@@ -20,6 +20,9 @@ impl Error {
     }
 }
 
+/// Time unit.
+pub type TimeTick = usize;
+
 /// Scene state.
 pub trait State {
     /// Request load next scene by config.

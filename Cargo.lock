@@ -61,6 +61,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc7eb209b1518d6bb87b283c20095f5228ecda460da70b44f0802523dea6da04"
 
 [[package]]
+name = "anim"
+version = "0.1.0"
+dependencies = [
+ "builder",
+ "error-stack",
+ "renderer",
+ "resources",
+ "scene",
+ "thiserror 2.0.11",
+ "utils",
+]
+
+[[package]]
 name = "anyhow"
 version = "1.0.95"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1328,6 +1341,7 @@ dependencies = [
 name = "project_2"
 version = "0.1.0"
 dependencies = [
+ "anim",
  "builder",
  "error-stack",
  "gui",
@@ -1337,6 +1351,7 @@ dependencies = [
  "runtime",
  "scene",
  "thiserror 2.0.11",
+ "utils",
 ]
 
 [[package]]

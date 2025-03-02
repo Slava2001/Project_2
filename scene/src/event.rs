@@ -1,7 +1,9 @@
 //! Scene events.
 
+use crate::TimeTick;
+
 /// Mouse buttons.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum MouseButton {
     /// Mouse left button.
     Left,
@@ -12,7 +14,7 @@ pub enum MouseButton {
 }
 
 /// Scene events.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Event {
     /// Mouse press button event.
     MousePress(MouseButton),
@@ -26,6 +28,8 @@ pub enum Event {
     KeyPress(KeyCode),
     /// Keyboard key release event, arg: [`KeyCode`].
     KeyRelease(KeyCode),
+    /// Time tick. Used for update time depended object.
+    TimeTick(TimeTick),
 }
 
 /// Keyboard button codes.
