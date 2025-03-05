@@ -100,8 +100,7 @@ impl Slider {
     /// Update cursor `x` coordinate.
     /// `x` must be in the range 0..(slider width - (cursor width / 2)).
     fn update_cursor_pos(&mut self, x: f64) {
-        let mut x = x - self.cursor_rect.w / 2.0;
-        x = x.clamp(0.0, self.max_x);
+        let mut x = x.clamp(0.0, self.max_x);
         if self.value_step != 0.0 {
             x = (x / self.value_step).round() * self.value_step;
         }
@@ -135,7 +134,11 @@ impl Widget for Slider {
                     self.get_parent()
                         .map(|p| p.upgrade().map(|p| p.borrow_mut().erase_widget(&self_rc)));
                     state.catch_self(self, self_rc)?;
-                    self.update_cursor_pos(state.mouse.x - self.base.get_global_position().x);
+                    self.update_cursor_pos(
+                        state.mouse.x
+                            - self.base.get_global_position().x
+                            - self.cursor_rect.w / 2.0,
+                    );
                 }
             }
             Event::MouseRelease(mouse_button) => {
@@ -151,7 +154,11 @@ impl Widget for Slider {
             }
             Event::MouseMove => {
                 if state.is_caught(self_rc) {
-                    self.update_cursor_pos(state.mouse.x - self.base.get_global_position().x);
+                    self.update_cursor_pos(
+                        state.mouse.x
+                            - self.base.get_global_position().x
+                            - self.cursor_rect.w / 2.0,
+                    );
                 }
             }
             _ => {}

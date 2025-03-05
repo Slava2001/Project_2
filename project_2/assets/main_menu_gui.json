@@ -156,7 +156,6 @@
             "type": "slider",
             "rect": [ 30, 230, 300, 30 ],
             "cursor_rect": [ 0, 0, 20, 30 ],
-            "background": "small_button_tiles",
             "debug": false,
             "texture": "slider_texture",
             "texture_background_rect": [ 0, 0, 64, 16 ],

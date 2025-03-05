@@ -26,6 +26,28 @@
                     "value_max": 200,
                     "value_min": 0,
                     "color": "#FF0000"
+                }, {
+                    "type": "slider",
+                    "rect": [ 0, 200, 200, 30 ],
+                    "cursor_rect": [ 0, 0, 20, 30 ],
+                    "debug": false,
+                    "texture": "slider_texture",
+                    "texture_background_rect": [ 0, 0, 64, 16 ],
+                    "texture_cursor_rect": [ 65, 1, 7, 14 ],
+                    "value_min": 1,
+                    "value_max": 3000,
+                    "value": 1000,
+                    "step_number": 0,
+                    "id": "tps_slider"
+                }, {
+                    "type": "label",
+                    "color": "#000000",
+                    "rect_color": "#00000000",
+                    "text": "TPS: 1000",
+                    "font_size": 20,
+                    "font": "default",
+                    "rect": [ 200, 200, 150, 30 ],
+                    "id": "tps_label"
                 }
             ]
         }
