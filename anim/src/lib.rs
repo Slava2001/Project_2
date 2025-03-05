@@ -221,3 +221,24 @@ impl<S: Eq + Hash + Copy + Debug, E: Eq + Hash + Copy + Debug> Drawable for Anim
         renderer.draw_img(&self.rect, self.texture, &self.texture_rect);
     }
 }
+
+impl<S: Eq + Hash + Copy + Debug, E: Eq + Hash + Copy + Debug> Debug for Animator<S, E> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Animator: ")?;
+        write!(f, "digraph Anim {{")?;
+        write!(f, "{:?} [color = green];", self.state)?;
+        for (from_state, transients) in &self.transient_map {
+            for (by_event, to_state) in transients {
+                if let Some(to_state) = to_state {
+                    write!(f, "{from_state:?} -> {to_state:?} [label=\"{by_event:?}  \"];")?;
+                } else {
+                    write!(
+                        f,
+                        "{from_state:?} -> {from_state:?} [label=\"{by_event:?}  \" style=dotted];"
+                    )?;
+                }
+            }
+        }
+        writeln!(f, "}}")
+    }
+}
