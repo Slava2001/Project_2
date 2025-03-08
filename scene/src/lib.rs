@@ -32,6 +32,9 @@ pub trait State {
     /// Return errors if loading scene already requested (two request on one frame).
     fn load_next_scene(&mut self, cfg: Config) -> Result<(), Error>;
 
+    /// Request program termination.
+    fn exit(&mut self);
+
     /// Get resource manager.
     fn get_resources_manager(&mut self) -> &dyn ResManger;
 }

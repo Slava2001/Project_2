@@ -120,7 +120,7 @@ impl Runtime {
         let mut events = Events::new(EventSettings::new());
         events.bench_mode(true);
         events.max_fps(100);
-        let mut state = State { next_scene: None, res: ResMngr::new() };
+        let mut state = State { next_scene: None, res: ResMngr::new(), exit: false };
         let mut scene = scene_builder
             .build(scene_cfg, &mut state.res)
             .change_context(Error::msg("Failed to create first scene"))?;
@@ -179,6 +179,10 @@ impl Runtime {
                     .build(cfg, &mut state.res)
                     .change_context(Error::msg("Failed to load next scene"))?;
             }
+
+            if state.exit {
+                break;
+            }
         }
         Ok(())
     }
@@ -231,8 +235,11 @@ fn convert_event(event: piston::Event) -> Option<Event> {
                 },
                 _ => None,
             },
-            piston::Input::Move(Motion::MouseCursor([x, y])) => Some(Event::MouseMove(x, y)),
+            piston::Input::Move(Motion::MouseCursor(pos)) => Some(Event::MouseMove(pos.into())),
             piston::Input::Text(txt) => Some(Event::TextInput(txt)),
+            piston::Input::Resize(arg) => Some(Event::Resize(
+                (f64::from(arg.draw_size[0]), f64::from(arg.draw_size[1])).into(),
+            )),
             _ => None,
         },
         _ => None,
@@ -245,6 +252,8 @@ struct State {
     next_scene: Option<Config>,
     /// Resource manager.
     res: ResMngr,
+    /// Terminate request.
+    exit: bool,
 }
 
 impl scene::State for State {
@@ -256,5 +265,9 @@ impl scene::State for State {
 
     fn get_resources_manager(&mut self) -> &dyn resources::Manager {
         &mut self.res
+    }
+
+    fn exit(&mut self) {
+        self.exit = true;
     }
 }

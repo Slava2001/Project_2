@@ -1,6 +1,5 @@
 //! Color type.
-use builder::config::value::{Error as ParseError, ParseFormValue, Value};
-use error_stack::{Result, ResultExt};
+use builder::config::value::{Error as ParseError, Value};
 use std::{
     fmt,
     str::{self, FromStr},
@@ -98,11 +97,12 @@ impl FromStr for Color {
     }
 }
 
-impl ParseFormValue for Color {
-    fn parse_val(val: Value) -> Result<Self, ParseError> {
-        let str = String::parse_val(val)?;
+impl TryFrom<Value> for Color {
+    type Error = ParseError;
+    fn try_from(value: Value) -> std::result::Result<Self, Self::Error> {
+        let str = String::try_from(value)?;
         Self::from_str(&str)
-            .change_context(ParseError::msg(format!("Failed to parse {str:?} as color")))
+            .map_err(|e| ParseError::msg(format!("Failed to parse {str:?} as color, error: {e}")))
     }
 }
 

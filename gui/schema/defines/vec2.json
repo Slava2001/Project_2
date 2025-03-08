@@ -3,7 +3,5 @@
     "items": [ {
             "type": "number"
         } ],
-    "default": [ 0, 0, 0, 0 ],
-    "minItems": 4,
-    "maxItems": 4
+    "default": [ 0, 0 ]
 }

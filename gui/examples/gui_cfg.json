@@ -11,7 +11,7 @@
     ],
     "childs": [
         {
-            "debug": true,
+            "debug": false,
             "type": "label",
             "color": "#000000",
             "rect_color": "#00000000",
@@ -21,7 +21,7 @@
             "rect": [ 0, 0, 300, 25 ],
             "id": "cursor_pos"
         }, {
-            "debug": true,
+            "debug": false,
             "type": "label",
             "color": "#000000",
             "rect_color": "#00000000",
@@ -31,7 +31,7 @@
             "rect": [ 0, 25, 300, 25 ],
             "id": "cursor_pos"
         }, {
-            "debug": true,
+            "debug": false,
             "type": "label",
             "color": "#000000",
             "rect_color": "#00000000",
@@ -56,7 +56,7 @@
                     "path": "./button.png"
                 }
             ],
-            "debug": true,
+            "debug": false,
             "type": "panel",
             "background": "default",
             "background_rect": [ 0, 0, 25, 25 ],
@@ -125,7 +125,7 @@
                         }
                     ]
                 }, {
-                    "debug": true,
+                    "debug": false,
                     "type": "panel",
                     "background": "default",
                     "background_rect": [ 0, 0, 25, 25 ],

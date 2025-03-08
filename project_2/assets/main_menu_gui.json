@@ -1,7 +1,7 @@
 {
     "debug": false,
     "type": "base",
-    "rect": [ 0, 0, 0, 0 ],
+    "rect": [ 0, 0, 800, 450 ],
     "recourses": [
         {
             "name": "button_tiles",
@@ -15,155 +15,237 @@
     ],
     "childs": [
         {
-            "debug": false,
-            "type": "button",
-            "rect": [ 30, 50, 300, 30 ],
-            "id": "change_scene",
-            "background": "button_tiles",
-            "texture_rect": [ 0, 0, 160, 16 ],
-            "texture_rect_hovered": [ 0, 16, 160, 16 ],
-            "texture_rect_pressed": [ 0, 32, 160, 16 ],
-            "childs": [
-                {
-                    "type": "label",
-                    "text": "Load level",
-                    "font_size": 20,
-                    "rect_color": "#00000000",
-                    "font": "default",
-                    "rect": [ 30, 4, 240, 0 ],
-                    "id": "cursor_pos",
-                    "color": "#FFFFFF",
-                    "debug": false
-                }
-            ]
-        }, {
-            "debug": false,
-            "type": "graph",
-            "rect": [ 500, 100, 200, 200 ],
-            "id": "cursor_x",
-            "value_count": 100,
-            "value_max": 800,
-            "value_min": 0,
-            "color": "#FF0000"
-        }, {
-            "debug": false,
-            "type": "graph",
-            "rect": [ 500, 100, 200, 200 ],
-            "id": "cursor_y",
-            "value_count": 100,
-            "value_max": 450,
-            "value_min": 0,
-            "color": "#00FF00"
-        }, {
-            "recourses": [
-                {
-                    "name": "default",
-                    "type": "texture",
-                    "path": "frame.png"
-                }, {
-                    "name": "flag_tiles",
-                    "type": "texture",
-                    "path": "flag.png"
-                }, {
-                    "name": "small_button_tiles",
-                    "type": "texture",
-                    "path": "small_button.png"
-                }
-            ],
-            "debug": false,
-            "type": "panel",
-            "background": "default",
-            "background_rect": [ 0, 0, 25, 25 ],
-            "rect": [ 100, 100, 190, 60 ],
+            "is_visible": true,
+            "type": "base",
+            "id": "main_menu",
+            "anchor": [ 0.5, 0.5 ],
             "childs": [
                 {
                     "debug": false,
-                    "type": "panel",
-                    "background": "default",
-                    "background_rect": [ 0, 0, 25, 25 ],
-                    "rect": [ 10, 5, 50, 50 ],
+                    "type": "button",
+                    "rect": [ -150, -75, 300, 30 ],
+                    "id": "create_server",
+                    "background": "button_tiles",
+                    "texture_rect": [ 0, 0, 160, 16 ],
+                    "texture_rect_hovered": [ 0, 16, 160, 16 ],
+                    "texture_rect_pressed": [ 0, 32, 160, 16 ],
                     "childs": [
                         {
-                            "debug": false,
-                            "type": "flag",
-                            "id": "hello_flag",
-                            "background": "flag_tiles",
-                            "texture_rect_off": [ 0, 0, 32, 32 ],
-                            "texture_rect_on": [ 0, 32, 32, 32 ],
-                            "texture_rect_hovered_off": [ 0, 64, 32, 32 ],
-                            "texture_rect_hovered_on": [ 0, 96, 32, 32 ],
-                            "rect": [ 10, 10, 30, 30 ],
-                            "state": true
-                        }
-                    ]
-                }, {
-                    "debug": false,
-                    "type": "panel",
-                    "background": "default",
-                    "background_rect": [ 0, 0, 25, 25 ],
-                    "rect": [ 70, 5, 50, 50 ],
-                    "childs": [
-                        {
-                            "debug": false,
                             "type": "label",
+                            "text": "Создать сервер",
+                            "font_size": 20,
                             "rect_color": "#00000000",
-                            "text": "A",
-                            "color": "#000000",
-                            "font_size": 45,
                             "font": "default",
-                            "rect": [ 8, 0, 0, 0 ]
+                            "rect": [ 50, 4, 240, 0 ],
+                            "color": "#FFFFFF"
                         }
                     ]
                 }, {
                     "debug": false,
-                    "type": "panel",
-                    "background": "default",
-                    "background_rect": [ 0, 0, 25, 25 ],
-                    "rect": [ 130, 5, 50, 50 ],
+                    "type": "button",
+                    "rect": [ -150, -35, 300, 30 ],
+                    "id": "connect_to_server",
+                    "background": "button_tiles",
+                    "texture_rect": [ 0, 0, 160, 16 ],
+                    "texture_rect_hovered": [ 0, 16, 160, 16 ],
+                    "texture_rect_pressed": [ 0, 32, 160, 16 ],
                     "childs": [
                         {
-                            "debug": false,
-                            "type": "button",
-                            "background": "small_button_tiles",
-                            "rect": [ 10, 10, 30, 30 ],
-                            "id": "hello_button",
-                            "texture_rect": [ 0, 0, 32, 32 ],
-                            "texture_rect_hovered": [ 0, 32, 32, 32 ],
-                            "texture_rect_pressed": [ 0, 64, 32, 32 ]
+                            "type": "label",
+                            "text": "Подключиться",
+                            "font_size": 20,
+                            "rect_color": "#00000000",
+                            "font": "default",
+                            "rect": [ 65, 4, 240, 0 ],
+                            "color": "#FFFFFF"
+                        }
+                    ]
+                }, {
+                    "debug": false,
+                    "type": "button",
+                    "rect": [ -150, 5, 300, 30 ],
+                    "id": "settings",
+                    "background": "button_tiles",
+                    "texture_rect": [ 0, 0, 160, 16 ],
+                    "texture_rect_hovered": [ 0, 16, 160, 16 ],
+                    "texture_rect_pressed": [ 0, 32, 160, 16 ],
+                    "childs": [
+                        {
+                            "type": "label",
+                            "text": "Настройки",
+                            "font_size": 20,
+                            "rect_color": "#00000000",
+                            "font": "default",
+                            "rect": [ 85, 4, 130, 0 ],
+                            "color": "#FFFFFF"
+                        }
+                    ]
+                }, {
+                    "debug": false,
+                    "type": "button",
+                    "rect": [ -150, 45, 300, 30 ],
+                    "id": "exit",
+                    "background": "button_tiles",
+                    "texture_rect": [ 0, 0, 160, 16 ],
+                    "texture_rect_hovered": [ 0, 16, 160, 16 ],
+                    "texture_rect_pressed": [ 0, 32, 160, 16 ],
+                    "childs": [
+                        {
+                            "type": "label",
+                            "text": "Выход",
+                            "font_size": 20,
+                            "rect_color": "#00000000",
+                            "font": "default",
+                            "rect": [ 115, 4, 70, 0 ],
+                            "color": "#FFFFFF"
                         }
                     ]
                 }
             ]
         }, {
-            "type": "textbox",
-            "text": "",
-            "font_size": 20,
-            "font": "default",
-            "rect": [ 30, 200, 300, 25 ],
-            "id": "input_txt_1",
-            "color": "#000000",
-            "rect_color": "#000000",
-            "debug": false,
-            "cursor": "\u035f"
-        }, {
-            "recourses": [
+            "is_visible": false,
+            "type": "base",
+            "id": "create_server_menu",
+            "anchor": [ 0.5, 0.5 ],
+            "childs": [
                 {
-                    "name": "slider_texture",
-                    "type": "texture",
-                    "path": "slider.png"
+                    "type": "textbox",
+                    "rect": [ -150, -35, 300, 30 ],
+                    "id": "server_address",
+                    "text": "127.0.0.1:12345",
+                    "font": "default",
+                    "font_size": 20,
+                    "color": "#000000",
+                    "rect_color": "#000000",
+                    "cursor": "\u035f"
+                }, {
+                    "type": "button",
+                    "rect": [ -150, 5, 300, 30 ],
+                    "id": "create",
+                    "background": "button_tiles",
+                    "texture_rect": [ 0, 0, 160, 16 ],
+                    "texture_rect_hovered": [ 0, 16, 160, 16 ],
+                    "texture_rect_pressed": [ 0, 32, 160, 16 ],
+                    "childs": [
+                        {
+                            "type": "label",
+                            "text": "Создать",
+                            "font_size": 20,
+                            "rect_color": "#00000000",
+                            "font": "default",
+                            "rect": [ 100, 4, 100, 0 ],
+                            "color": "#FFFFFF"
+                        }
+                    ]
+                }, {
+                    "debug": false,
+                    "type": "button",
+                    "rect": [ -150, 45, 300, 30 ],
+                    "id": "create_server_menu_back",
+                    "background": "button_tiles",
+                    "texture_rect": [ 0, 0, 160, 16 ],
+                    "texture_rect_hovered": [ 0, 16, 160, 16 ],
+                    "texture_rect_pressed": [ 0, 32, 160, 16 ],
+                    "childs": [
+                        {
+                            "type": "label",
+                            "text": "Назад",
+                            "font_size": 20,
+                            "rect_color": "#00000000",
+                            "font": "default",
+                            "rect": [ 115, 4, 70, 0 ],
+                            "color": "#FFFFFF"
+                        }
+                    ]
                 }
-            ],
-            "type": "slider",
-            "rect": [ 30, 230, 300, 30 ],
-            "cursor_rect": [ 0, 0, 20, 30 ],
-            "debug": false,
-            "texture": "slider_texture",
-            "texture_background_rect": [ 0, 0, 64, 16 ],
-            "texture_cursor_rect": [ 65, 1, 7, 14 ],
-            "value_min": -100,
-            "value_max": 100,
-            "value": 0,
-            "step_number": 0
+            ]
+        }, {
+            "is_visible": false,
+            "type": "base",
+            "id": "connect_server_menu",
+            "anchor": [ 0.5, 0.5 ],
+            "childs": [
+                {
+                    "debug": false,
+                    "type": "textbox",
+                    "rect": [ -150, -35, 300, 30 ],
+                    "id": "connect_address",
+                    "text": "127.0.0.1:12345",
+                    "font": "default",
+                    "font_size": 20,
+                    "color": "#000000",
+                    "rect_color": "#000000",
+                    "cursor": "\u035f"
+                }, {
+                    "debug": false,
+                    "type": "button",
+                    "rect": [ -150, 5, 300, 30 ],
+                    "id": "connect",
+                    "background": "button_tiles",
+                    "texture_rect": [ 0, 0, 160, 16 ],
+                    "texture_rect_hovered": [ 0, 16, 160, 16 ],
+                    "texture_rect_pressed": [ 0, 32, 160, 16 ],
+                    "childs": [
+                        {
+                            "type": "label",
+                            "text": "Подключиться",
+                            "font_size": 20,
+                            "rect_color": "#00000000",
+                            "font": "default",
+                            "rect": [ 65, 4, 170, 0 ],
+                            "color": "#FFFFFF"
+                        }
+                    ]
+                }, {
+                    "debug": false,
+                    "type": "button",
+                    "rect": [ -150, 45, 300, 30 ],
+                    "id": "connect_server_menu_back",
+                    "background": "button_tiles",
+                    "texture_rect": [ 0, 0, 160, 16 ],
+                    "texture_rect_hovered": [ 0, 16, 160, 16 ],
+                    "texture_rect_pressed": [ 0, 32, 160, 16 ],
+                    "childs": [
+                        {
+                            "type": "label",
+                            "text": "Назад",
+                            "font_size": 20,
+                            "rect_color": "#00000000",
+                            "font": "default",
+                            "rect": [ 115, 4, 70, 0 ],
+                            "color": "#FFFFFF"
+                        }
+                    ]
+                }
+            ]
+        }, {
+            "is_visible": false,
+            "type": "base",
+            "id": "settings_menu",
+            "anchor": [ 0.5, 0.5 ],
+            "childs": [
+                {
+                    "debug": false,
+                    "type": "button",
+                    "rect": [ -150, 45, 300, 30 ],
+                    "id": "settings_menu_back",
+                    "background": "button_tiles",
+                    "texture_rect": [ 0, 0, 160, 16 ],
+                    "texture_rect_hovered": [ 0, 16, 160, 16 ],
+                    "texture_rect_pressed": [ 0, 32, 160, 16 ],
+                    "childs": [
+                        {
+                            "type": "label",
+                            "text": "Назад",
+                            "font_size": 20,
+                            "rect_color": "#00000000",
+                            "font": "default",
+                            "rect": [ 115, 4, 70, 0 ],
+                            "color": "#FFFFFF"
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }

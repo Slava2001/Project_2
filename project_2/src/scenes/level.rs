@@ -7,13 +7,14 @@ use builder::{config::Config, BuildFromCfg};
 use error_stack::ResultExt;
 use gui::{
     manager::Manager as GuiManager,
-    widget::{Builder as GuiBuilder, Button},
+    widget::{Builder as GuiBuilder, Button, Label},
 };
 use renderer::Drawable;
 use scene::{
     event::{Event, KeyCode},
     Scene,
 };
+use utils::vec2::Vec2f;
 
 #[derive(PartialEq, Eq, Debug, Hash, Clone, Copy)]
 #[allow(clippy::missing_docs_in_private_items)]
@@ -49,7 +50,7 @@ pub struct Level {
     /// Main menu config.
     cfg: Config,
     /// Player animation.
-    player_anim: Animator<PlayerState, PlayerEvent>,
+    player_anims: Vec<Animator<PlayerState, PlayerEvent>>,
 }
 
 /// Convert scene event to player event.
@@ -78,12 +79,15 @@ impl Scene for Level {
         state: &mut dyn scene::State,
     ) -> error_stack::Result<(), scene::Error> {
         if let Event::TimeTick(dt) = e {
-            self.player_anim.update(dt).change_context(scene::Error::msg("player_anim failed"))?;
+            for a in &mut self.player_anims {
+                a.update(dt).change_context(scene::Error::msg("player_anim failed"))?;
+            }
         }
         if let Some(e) = to_player_event(&e) {
-            self.player_anim
-                .handle_event(e)
-                .change_context(scene::Error::msg("Failed to handle animation event"))?;
+            for a in &mut self.player_anims {
+                a.handle_event(e)
+                    .change_context(scene::Error::msg("Failed to handle animation event"))?;
+            }
         }
         self.gui.handle_event(e).change_context(scene::Error::msg("Gui failed"))?;
 
@@ -103,7 +107,9 @@ impl Scene for Level {
 impl Drawable for Level {
     fn draw(&self, renderer: &mut dyn renderer::Renderer) {
         self.gui.draw(renderer);
-        self.player_anim.draw(renderer);
+        for a in &self.player_anims {
+            a.draw(renderer);
+        }
     }
 }
 
@@ -123,6 +129,13 @@ impl BuildFromCfg<Box<dyn Scene>> for Level {
             .change_context(builder::Error::msg("Failed to find change scene button"))?
             .borrow_mut()
             .click_cb(move |_| *menu_scene_clone.borrow_mut() = true);
+        let addr = cfg
+            .take::<String>("server_addr")
+            .change_context(builder::Error::msg("Failed to get server address"))?;
+        gui.get_by_id_cast::<Label>("server_address")
+            .change_context(builder::Error::msg("Failed to find change server address label"))?
+            .borrow_mut()
+            .set_text(&addr);
 
         let animator_cfg = make_animator_cfg!(
             State_enum: PlayerState,
@@ -204,12 +217,19 @@ impl BuildFromCfg<Box<dyn Scene>> for Level {
                     AttackEnd => WalkL,
                     AnimFin   => AttackWalkL
         );
-        let anim_cfg = cfg
-            .take("player_anim")
-            .change_context(builder::Error::msg("Failed to init player config"))?;
-        let player_anim = Animator::new(animator_cfg, anim_cfg, res)
-            .change_context(builder::Error::msg("Failed to create new player"))?;
+        let mut player_anims = Vec::new();
+        for y in 0..20 {
+            for x in 0..50 {
+                let anim_cfg = cfg
+                    .get("player_anim")
+                    .change_context(builder::Error::msg("Failed to init player config"))?;
+                let mut player_anim = Animator::new(animator_cfg.clone(), anim_cfg, res)
+                    .change_context(builder::Error::msg("Failed to create new player"))?;
+                player_anim.set_pos(Vec2f::new(20.0 * x as f64, 100.0 + 30.0 * y as f64));
+                player_anims.push(player_anim);
+            }
+        }
 
-        Ok(Box::new(Self { gui, menu_scene, cfg, player_anim }))
+        Ok(Box::new(Self { gui, menu_scene, cfg, player_anims }))
     }
 }
