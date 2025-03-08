@@ -27,6 +27,7 @@ pub struct Value {
 }
 
 /// Parsable from config [`Value`] types.
+#[allow(clippy::module_name_repetitions)]
 pub trait ParseFormValue
 where
     Self: Sized,

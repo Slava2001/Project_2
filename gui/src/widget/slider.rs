@@ -43,7 +43,7 @@ impl Slider {
     ///
     /// # Errors
     /// Return error if config is not valid.
-    pub fn new(mut cfg: Config, res: &mut dyn Manager) -> Result<Self, builder::Error> {
+    pub fn new(mut cfg: Config, res: &dyn Manager) -> Result<Self, builder::Error> {
         let texture_name = cfg
             .take::<String>("texture")
             .change_context(builder::Error::msg("Failed to init slide texture"))?;

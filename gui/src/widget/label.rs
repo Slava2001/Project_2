@@ -43,7 +43,7 @@ impl Label {
     ///
     /// # Errors
     /// Return error if the config is incorrect or the required resource is not found.
-    pub fn new(mut cfg: Config, res: &mut dyn resources::Manager) -> Result<Self, builder::Error> {
+    pub fn new(mut cfg: Config, res: &dyn resources::Manager) -> Result<Self, builder::Error> {
         Ok(Self {
             text: RefCell::new(
                 cfg.take::<String>("text")

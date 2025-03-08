@@ -253,7 +253,7 @@ struct State {
     /// Resource manager.
     res: ResMngr,
     /// Terminate request.
-    exit: bool
+    exit: bool,
 }
 
 impl scene::State for State {

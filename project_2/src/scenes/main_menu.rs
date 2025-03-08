@@ -15,7 +15,7 @@ pub struct MainMenu {
     /// Main menu GUI.
     gui: GuiManager,
     /// Request exit flag.
-    request_exit_flag: Rc<RefCell<bool>>
+    request_exit_flag: Rc<RefCell<bool>>,
 }
 
 impl Scene for MainMenu {
@@ -24,7 +24,7 @@ impl Scene for MainMenu {
         e: scene::event::Event,
         state: &mut dyn scene::State,
     ) -> error_stack::Result<(), scene::Error> {
-        self.gui.handle_event(e.clone()).change_context(scene::Error::msg("Gui failed"))?;
+        self.gui.handle_event(e).change_context(scene::Error::msg("Gui failed"))?;
         if *self.request_exit_flag.borrow() {
             state.exit();
         }
@@ -143,7 +143,7 @@ impl BuildFromCfg<Box<dyn Scene>> for MainMenu {
             main_menuc.borrow_mut().set_visible_flag(false);
             settings_menuc.borrow_mut().set_visible_flag(true);
         });
-        let main_menuc = main_menu.clone();
+        let main_menuc = main_menu;
         settings_menu_back.borrow_mut().click_cb(move |_| {
             main_menuc.borrow_mut().set_visible_flag(true);
             settings_menu.borrow_mut().set_visible_flag(false);

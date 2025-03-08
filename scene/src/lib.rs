@@ -37,7 +37,6 @@ pub trait State {
 
     /// Get resource manager.
     fn get_resources_manager(&mut self) -> &dyn ResManger;
-
 }
 
 /// Scene interface.
