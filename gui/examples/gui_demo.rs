@@ -11,6 +11,7 @@ use gui::{
 use renderer::Drawable;
 use runtime::Runtime;
 use scene::{event::Event, Scene, State};
+use utils::vec2::Vec2f;
 
 /// Window scale
 const WINDOW_SCALE: u32 = 50;
@@ -59,7 +60,7 @@ impl Scene for MainScene {
         e: scene::event::Event,
         _state: &mut dyn State,
     ) -> Result<(), scene::Error> {
-        if let Event::MouseMove(x, y) = e {
+        if let Event::MouseMove(Vec2f { x, y }) = e {
             self.cursor_pos_label.borrow_mut().set_text(&format!("Cursor pos: ({x}, {y})"));
         }
         self.gui.handle_event(e).change_context(scene::Error::msg("Failed to update gui"))?;

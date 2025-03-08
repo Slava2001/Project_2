@@ -9,7 +9,7 @@ use builder::config::Config;
 use error_stack::{Result, ResultExt};
 use renderer::{Drawable, Renderer};
 use resources::Manager as ResMngr;
-use scene::event::Event as SceneEvent;
+use scene::event::{self, Event as SceneEvent};
 use utils::vec2::Vec2f;
 use widget::{event::Event, WRef};
 
@@ -101,8 +101,13 @@ impl Manager {
     /// # Errors
     /// Return error if widget failed to handle event.
     pub fn handle_event(&mut self, event: SceneEvent) -> Result<(), Error> {
-        if let SceneEvent::MouseMove(x, y) = event {
-            self.state.mouse = (x, y).into();
+        if let SceneEvent::MouseMove(pos) = event {
+            self.state.mouse = pos;
+        }
+
+        if let event::Event::Resize(size) = event {
+            self.root.borrow_mut().set_size(size);
+            return Ok(());
         }
 
         let Ok(event) = TryInto::<widget::event::Event>::try_into(event) else {

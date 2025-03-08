@@ -70,8 +70,9 @@
         "rect": [ 100, 100, 100, 100 ]
     },
     "gui": {
+        "debug": false,
         "type": "base",
-        "rect": [ 0, 0, 0, 0 ],
+        "rect": [ 0, 0, 800, 450 ],
         "childs": [ {
                 "recourses": [
                     {

@@ -30,6 +30,8 @@ pub struct Base {
     id: String,
     /// Is visibility flag.
     is_visible: bool,
+    /// Widget anchor.
+    anchor: Option<Vec2f>,
 }
 
 impl Base {
@@ -49,13 +51,16 @@ impl Base {
             .unwrap_or(false);
         let id = cfg
             .take_opt::<String>("id")
-            .change_context(builder::Error::msg("Failed to widget id"))?
+            .change_context(builder::Error::msg("Failed to init widget id"))?
             .unwrap_or_default();
         let is_visible = cfg
             .take_opt::<bool>("is_visible")
-            .change_context(builder::Error::msg("Failed to widget is visible flag"))?
+            .change_context(builder::Error::msg("Failed to init widget is visible flag"))?
             .unwrap_or(true);
-        Ok(Self { rect, childs: Vec::new(), parent: None, debug, id, is_visible })
+        let anchor = cfg
+            .take_opt::<Vec2f>("anchor")
+            .change_context(builder::Error::msg("Failed to init widget anchor"))?;
+        Ok(Self { rect, childs: Vec::new(), parent: None, debug, id, is_visible, anchor })
     }
 }
 
@@ -134,6 +139,21 @@ impl Widget for Base {
         pos
     }
 
+    fn set_size(&mut self, size: Vec2f) {
+        self.rect.w = size.x;
+        self.rect.h = size.y;
+        for c in &self.childs {
+            c.borrow_mut().handle_parent_resize(size);
+        }
+    }
+
+    fn handle_parent_resize(&mut self, size: Vec2f) {
+        if let Some(ref offset) = self.anchor {
+            self.rect.x = size.x * offset.x;
+            self.rect.y = size.y * offset.y;
+        }
+    }
+
     fn get_rect(&self) -> &Rectf {
         &self.rect
     }
@@ -144,6 +164,7 @@ impl Widget for Base {
 
     fn add_widget(&mut self, self_ref: WRef, widget: &mut dyn Widget, widget_ref: WRef) {
         widget.set_parent(Some(Rc::downgrade(&self_ref)));
+        widget.handle_parent_resize((self.rect.w, self.rect.h).into());
         self.childs.push(widget_ref);
     }
 
@@ -179,6 +200,10 @@ impl Drawable for Base {
             renderer.draw_rect(&self.rect, &color::RED);
         }
         renderer.translate(self.rect.x, self.rect.y);
+        if self.debug && self.anchor.is_some() {
+            renderer.draw_rect(&[-1.0, -5.0, 2.0, 10.0].into(), &color::RED);
+            renderer.draw_rect(&[-5.0, -1.0, 10.0, 2.0].into(), &color::RED);
+        }
         for c in &self.childs {
             if !c.borrow().is_visible() {
                 continue;

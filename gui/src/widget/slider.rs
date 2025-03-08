@@ -166,68 +166,27 @@ impl Widget for Slider {
         Ok(())
     }
 
-    fn get_hovered(&self, pos: Vec2f) -> Option<WRef> {
-        self.base.get_hovered(pos)
-    }
-
-    fn check_bounds(&self, pos: Vec2f) -> bool {
-        self.base.check_bounds(pos)
-    }
-
-    fn add_widget(&mut self, self_ref: WRef, widget: &mut dyn Widget, widget_ref: WRef) {
-        self.base.add_widget(self_ref, widget, widget_ref);
-    }
-
-    fn set_parent(&mut self, parent: Option<Weak<RefCell<dyn Widget>>>) {
-        self.base.set_parent(parent);
-    }
-
-    fn get_parent(&mut self) -> Option<Weak<RefCell<dyn Widget>>> {
-        self.base.get_parent()
-    }
-
-    fn detach(&mut self, self_rc: &WRef) {
-        self.base.detach(self_rc);
-    }
-
-    fn erase_widget(&mut self, widget: &WRef) {
-        self.base.erase_widget(widget);
-    }
-
-    fn set_position(&mut self, pos: Vec2f) {
-        self.base.set_position(pos);
-    }
-
-    fn get_position(&self) -> Vec2f {
-        self.base.get_position()
-    }
-
-    fn set_global_position(&mut self, pos: Vec2f) {
-        self.base.set_global_position(pos);
-    }
-
-    fn get_global_position(&self) -> Vec2f {
-        self.base.get_global_position()
-    }
-
-    fn get_rect(&self) -> &Rectf {
-        self.base.get_rect()
-    }
-
-    fn find(&self, id: &str) -> Option<WRef> {
-        self.base.find(id)
-    }
-
-    fn set_visible_flag(&mut self, is_visible: bool) {
-        self.base.set_visible_flag(is_visible);
-    }
-
-    fn get_id(&self) -> String {
-        self.base.get_id()
-    }
-
-    fn is_visible(&self) -> bool {
-        self.base.is_visible()
+    delegate::delegate! {
+        to self.base {
+            fn get_hovered(&self, pos: Vec2f) -> Option<WRef>;
+            fn check_bounds(&self, pos: Vec2f) -> bool;
+            fn add_widget(&mut self, self_ref: WRef, widget: &mut dyn Widget, widget_ref: WRef);
+            fn set_parent(&mut self, parent: Option<Weak<RefCell<dyn Widget>>>);
+            fn get_parent(&mut self) -> Option<Weak<RefCell<dyn Widget>>>;
+            fn detach(&mut self, self_rc: &WRef);
+            fn erase_widget(&mut self, widget: &WRef);
+            fn set_position(&mut self, pos: Vec2f);
+            fn get_position(&self) -> Vec2f;
+            fn set_global_position(&mut self, pos: Vec2f);
+            fn get_global_position(&self) -> Vec2f;
+            fn set_size(&mut self, size: Vec2f);
+            fn handle_parent_resize(&mut self, size: Vec2f);
+            fn get_rect(&self) -> &Rectf;
+            fn find(&self, id: &str) -> Option<WRef>;
+            fn get_id(&self) -> String;
+            fn set_visible_flag(&mut self, is_visible: bool);
+            fn is_visible(&self) -> bool;
+        }
     }
 }
 

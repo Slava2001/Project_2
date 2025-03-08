@@ -1,6 +1,7 @@
 //! Scene events.
 
 use crate::TimeTick;
+use utils::vec2::Vec2f;
 
 /// Mouse buttons.
 #[derive(Clone, Debug)]
@@ -21,7 +22,7 @@ pub enum Event {
     /// Mouse release button event.
     MouseRelease(MouseButton),
     /// Mouse move event.
-    MouseMove(f64, f64),
+    MouseMove(Vec2f),
     /// Text input event
     TextInput(String),
     /// Keyboard key press event, arg: [`KeyCode`].
@@ -30,6 +31,8 @@ pub enum Event {
     KeyRelease(KeyCode),
     /// Time tick. Used for update time depended object.
     TimeTick(TimeTick),
+    /// Window resize.
+    Resize(Vec2f),
 }
 
 /// Keyboard button codes.

@@ -17,7 +17,10 @@
             "type": "boolean",
             "default": true,
             "description": "Is widget visible flag"
+        },
+        "anchor": {
+            "$ref": "./defines/vec2.json",
+            "description": "Is anchor offset, if this parameter is set, the widget position will be calculated relative to the parent size."
         }
-    },
-    "required": [ "rect" ]
+    }
 }

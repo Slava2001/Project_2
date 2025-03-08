@@ -32,16 +32,14 @@
                 },
                 "value": {
                     "type": "number",
-                    "default": 10,
-                    "minimum": 1,
-                    "maximum": 1,
+                    "default": 0,
                     "description": "Slider value"
                 },
                 "step_number": {
                     "type": "number",
                     "minimum": 0,
                     "default": 0,
-                    "description": "Slider number of steps"
+                    "description": "Slider number of steps (0 - infinity step count)"
                 }
             }
         }

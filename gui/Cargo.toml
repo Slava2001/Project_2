@@ -11,6 +11,7 @@ resources = { workspace = true }
 utils = { workspace = true }
 error-stack = { workspace = true }
 thiserror = { workspace = true }
+delegate = "0.13.2"
 
 [dev-dependencies]
 runtime = { workspace = true }

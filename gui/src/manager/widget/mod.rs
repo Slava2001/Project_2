@@ -77,6 +77,14 @@ pub trait Widget: Drawable + Any {
     /// Get widget global (relative to root widget) position.
     fn get_global_position(&self) -> Vec2f;
 
+    /// Set widget size.
+    /// - `size`: new widget size.
+    fn set_size(&mut self, size: Vec2f);
+
+    /// Handling resizing of the parent.
+    /// - `size`: new parent widget size.
+    fn handle_parent_resize(&mut self, size: Vec2f);
+
     /// Check that the point is within the widget boundaries.
     /// - `pos`: position of the point in local (relative to parent) coordinates.
     fn check_bounds(&self, pos: Vec2f) -> bool;
