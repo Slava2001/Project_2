@@ -67,7 +67,7 @@
                 "frame_time": 100
             }
         },
-        "rect": [ 100, 100, 100, 100 ]
+        "rect": [ 100, 100, 20, 20 ]
     },
     "gui": {
         "debug": false,
@@ -102,6 +102,16 @@
                         "debug": false
                     }
                 ]
+            },{
+                "type": "label",
+                "rect_color": "#00000000",
+                "text": "",
+                "font_size": 20,
+                "font": "default",
+                "rect": [ 340, 50, 300, 0 ],
+                "id": "server_address",
+                "color": "#000000",
+                "debug": false
             }
         ]
     }

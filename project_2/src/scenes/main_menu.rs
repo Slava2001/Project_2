@@ -16,6 +16,12 @@ pub struct MainMenu {
     gui: GuiManager,
     /// Request exit flag.
     request_exit_flag: Rc<RefCell<bool>>,
+    /// Is need to load next scene.
+    req_next_scene: Rc<RefCell<bool>>,
+    /// Next scene config.
+    next_scene_cfg: Config,
+    /// Server address.
+    server_addr: Rc<RefCell<String>>,
 }
 
 impl Scene for MainMenu {
@@ -27,6 +33,20 @@ impl Scene for MainMenu {
         self.gui.handle_event(e).change_context(scene::Error::msg("Gui failed"))?;
         if *self.request_exit_flag.borrow() {
             state.exit();
+        }
+        if *self.req_next_scene.borrow() {
+            let mut next_scene_cfg = self
+                .next_scene_cfg
+                .take::<Config>("next_scene_cfg")
+                .change_context(scene::Error::msg("Failed to get next scene config"))?;
+            next_scene_cfg
+                .insert("server_addr", self.server_addr.borrow().clone())
+                .change_context(scene::Error::msg(
+                    "Failed to insert server address in next scene config",
+                ))?;
+            state.load_next_scene(next_scene_cfg).change_context(scene::Error::msg(
+                "Failed to request loading next scene",
+            ))?;
         }
         Ok(())
     }
@@ -46,6 +66,7 @@ impl BuildFromCfg<Box<dyn Scene>> for MainMenu {
         let gui_cfg = cfg
             .take::<Config>("gui")
             .change_context(builder::Error::msg("Failed to build scene GUI"))?;
+
         let gui = GuiManager::new(&GuiBuilder::default(), res, gui_cfg)
             .change_context(builder::Error::msg("Failed to init GUI manager"))?;
 
@@ -85,8 +106,14 @@ impl BuildFromCfg<Box<dyn Scene>> for MainMenu {
             .get_by_id_cast::<Button>("create_server_menu_back")
             .change_context(builder::Error::msg("Widget \"create\" not found"))?;
 
+        let req_next_scene = Rc::new(RefCell::new(false));
+        let server_addr = Rc::new(RefCell::new(String::new()));
+
+        let req_next_scenec = req_next_scene.clone();
+        let server_addrc = server_addr.clone();
         create.borrow_mut().click_cb(move |_| {
-            println!("Server created with addres: {}", server_address.borrow().get_text());
+            *req_next_scenec.borrow_mut() = true;
+            *server_addrc.borrow_mut() = server_address.borrow().get_text();
         });
 
         let connect_server_menu = gui
@@ -102,8 +129,11 @@ impl BuildFromCfg<Box<dyn Scene>> for MainMenu {
             .get_by_id_cast::<Button>("connect_server_menu_back")
             .change_context(builder::Error::msg("Widget \"connect_server_menu\" not found"))?;
 
+        let req_next_scenec = req_next_scene.clone();
+        let server_addrc = server_addr.clone();
         connect.borrow_mut().click_cb(move |_| {
-            println!("Client connected to addres: {}", connect_address.borrow().get_text());
+            *req_next_scenec.borrow_mut() = true;
+            *server_addrc.borrow_mut() = connect_address.borrow().get_text();
         });
 
         let settings_menu = gui
@@ -149,6 +179,12 @@ impl BuildFromCfg<Box<dyn Scene>> for MainMenu {
             settings_menu.borrow_mut().set_visible_flag(false);
         });
 
-        Ok(Box::new(Self { gui, request_exit_flag }))
+        Ok(Box::new(Self {
+            gui,
+            request_exit_flag,
+            req_next_scene,
+            server_addr,
+            next_scene_cfg: cfg,
+        }))
     }
 }

@@ -1,7 +1,7 @@
 //! Single animation. Used to manage frame sequence.
 
 use builder::config::{
-    value::{self, ParseFormValue, Value},
+    value::{Error as ParseError, Value},
     Config,
 };
 use error_stack::{ensure, Result, ResultExt};
@@ -75,9 +75,10 @@ impl Anim {
     }
 }
 
-impl ParseFormValue for Anim {
-    fn parse_val(val: Value) -> Result<Self, value::Error> {
-        let cfg = Config::parse_val(val)?;
-        Self::new(cfg).change_context(value::Error::msg("Failed to build animation"))
+impl TryFrom<Value> for Anim {
+    type Error = ParseError;
+    fn try_from(value: Value) -> std::result::Result<Self, Self::Error> {
+        let cfg = Config::try_from(value)?;
+        Self::new(cfg).map_err(|e| Self::Error::msg(format!("Failed to build animation: {e}")))
     }
 }

@@ -5,7 +5,7 @@ use std::{
 };
 
 use super::Config;
-use error_stack::{bail, ensure, report, Result, ResultExt};
+use error_stack::{bail, ensure, Result};
 
 /// Parse error.
 #[derive(Debug, thiserror::Error)]
@@ -26,116 +26,117 @@ pub struct Value {
     pub(super) path: String,
 }
 
-/// Parsable from config [`Value`] types.
-#[allow(clippy::module_name_repetitions)]
-pub trait ParseFormValue
-where
-    Self: Sized,
-{
-    /// Parse Self from config [`Value`].
-    ///
-    /// # Errors
-    /// Return error if failed to parse [`Value`] as Self.
-    fn parse_val(val: Value) -> Result<Self, Error>;
-}
-
-/// Implement [`ParseFormValue`] for deserializable types.
-macro_rules! impl_parse_from_value {
+/// Implement `TryFrom<Value>` for deserializable types.
+macro_rules! impl_try_from_value {
     ($($t:ty),*) => {
-        $(impl ParseFormValue for $t {
-            fn parse_val(val: Value) -> Result<Self, Error> {
-                val.val.try_deserialize::<$t>()
-                .change_context(Error::msg(
-                    format!("Failed parse value as {:?}", std::any::type_name::<$t>()))
+        $(impl TryFrom<Value> for $t {
+            type Error = Error;
+            fn try_from(val: Value) -> std::result::Result<Self, Self::Error> {
+                val.val.try_deserialize::<$t>().map_err(|e|
+                    Error::msg(format!(
+                        "Failed parse value as {:?}, error: {}",
+                        std::any::type_name::<$t>(),
+                        e
+                    ))
                 )
             }
         })*
     };
 }
 
-impl_parse_from_value!(
+impl_try_from_value!(
     i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize, f32, f64, bool, char, String
 );
 
-impl ParseFormValue for PathBuf {
-    fn parse_val(value: Value) -> Result<Self, Error> {
+impl TryFrom<Value> for PathBuf {
+    type Error = Error;
+    fn try_from(value: Value) -> std::result::Result<Self, Self::Error> {
         let path = value
             .val
             .try_deserialize::<Self>()
-            .change_context(Error::msg("Failed to parse value as path"))?;
+            .map_err(|e| Error::msg(format!("Failed to parse value as path, error: {e}")))?;
         let file = Self::from(value.path);
         let parent = file.parent().ok_or_else(|| {
-            report!(Error::msg(format!("Failed to get path parent: path: {}", file.display())))
+            Error::msg(format!("Failed to get path parent: path: {}", file.display()))
         })?;
         let path = parent.join(path);
         Ok(path)
     }
 }
 
-impl<T: ParseFormValue> ParseFormValue for Vec<T> {
-    fn parse_val(value: Value) -> Result<Self, Error> {
+impl<E: std::error::Error, T: TryFrom<Value, Error = E>> TryFrom<Value> for Vec<T> {
+    type Error = Error;
+    fn try_from(value: Value) -> std::result::Result<Self, Self::Error> {
         let v = value
             .val
             .try_deserialize::<Vec<config::Value>>()
-            .change_context(Error::msg("Failed to parse value as Vec<_>"))?;
+            .map_err(|e| Error::msg(format!("Failed to parse value as Vec<_>, errorL {e}")))?;
         let mut res = Self::new();
         for (i, val) in v.into_iter().enumerate() {
             let val = Value { val, path: value.path.clone() };
-            res.push(
-                T::parse_val(val).change_context(Error::msg(format!(
-                    "Failed to parse vector item. Index: {i}"
-                )))?,
-            );
+            res.push(T::try_from(val).map_err(|e| {
+                Error::msg(format!("Failed to parse vector item. Index: {i}, error: {e}"))
+            })?);
         }
         Ok(res)
     }
 }
 
 #[allow(clippy::implicit_hasher)]
-impl<T: ParseFormValue> ParseFormValue for HashMap<String, T> {
-    fn parse_val(value: Value) -> Result<Self, Error> {
-        let v = value
-            .val
-            .try_deserialize::<HashMap<String, config::Value>>()
-            .change_context(Error::msg("Failed to parse value as HashMap<String, _>"))?;
+impl<E: std::error::Error, T: TryFrom<Value, Error = E>> TryFrom<Value> for HashMap<String, T> {
+    type Error = Error;
+    fn try_from(value: Value) -> std::result::Result<Self, Self::Error> {
+        let v = value.val.try_deserialize::<HashMap<String, config::Value>>().map_err(|e| {
+            Error::msg(format!("Failed to parse value as HashMap<String, _>, error: {e}"))
+        })?;
         let mut res = Self::new();
         for (k, val) in v {
             let val = Value { val, path: value.path.clone() };
             res.insert(
                 k,
-                T::parse_val(val).change_context(Error::msg("Failed to parse vector item"))?,
+                T::try_from(val).map_err(|e| {
+                    Error::msg(format!("Failed to parse vector item: error: {e:?}"))
+                })?,
             );
         }
         Ok(res)
     }
 }
 
-impl<T: ParseFormValue, const L: usize> ParseFormValue for [T; L] {
-    fn parse_val(value: Value) -> Result<Self, Error> {
-        let res = Vec::<T>::parse_val(value)?;
-        TryInto::<[T; L]>::try_into(res)
-            .map_err(|_| report!(Error::msg("Failed to parse value as array")))
+impl<E: std::error::Error, T: TryFrom<Value, Error = E>, const L: usize> TryFrom<Value> for [T; L] {
+    type Error = Error;
+    fn try_from(value: Value) -> std::result::Result<Self, Self::Error> {
+        let res = Vec::<T>::try_from(value)?;
+        TryInto::<[T; L]>::try_into(res).map_err(|_| Error::msg("Failed to parse value as array"))
     }
 }
 
-impl ParseFormValue for Config {
-    fn parse_val(value: Value) -> Result<Self, Error> {
+impl TryFrom<Value> for Config {
+    type Error = Error;
+    fn try_from(value: Value) -> std::result::Result<Self, Self::Error> {
         let mut file = value.path.clone();
         let mut val = value.val;
         if let config::ValueKind::String(ref path) = val.kind {
             if let Some(path) = path.strip_prefix("file!:") {
-                file = calc_path(&file, path).change_context(Error::msg(format!(
-                    "Failed to calculate path to include config: file: {:?} to file: {:?}",
-                    file, value.path
-                )))?;
+                file = calc_path(&file, path).map_err(|e| {
+                    Error::msg(format!(
+                        "Failed to calculate path to include config: \
+                     file: {:?} to file: {:?}, error: {}",
+                        file, value.path, e
+                    ))
+                })?;
                 val = config::Config::builder()
                     .add_source(config::File::with_name(&file))
                     .build()
-                    .change_context(Error::msg(format!("Failed to include config file: {file:?}")))?
+                    .map_err(|e| {
+                        Error::msg(format!("Failed to include config file: {file:?}, error: {e}"))
+                    })?
                     .cache;
             }
         }
-        let cfg = val.into_table().change_context(Error::msg("Failed to parse value as table"))?;
+        let cfg = val
+            .into_table()
+            .map_err(|e| Error::msg(format!("Failed to parse value as table, error: {e}")))?;
         Ok(Self { file, cfg })
     }
 }
@@ -160,6 +161,49 @@ fn calc_path(root_file: &str, include_file: &str) -> Result<String, Error> {
         bail!(Error::msg(format!("Failed to find path \"{}\" parent", root.display())));
     };
     Ok(parent.join(include).display().to_string())
+}
+
+/// Implement `From<T> for Value` for deserializable types.
+macro_rules! impl_into_value {
+    ($($t:ty),*) => {
+        $(impl From<$t> for Value {
+            fn from(value: $t) -> Self {
+                Self { val: config::Value::new(None, value), path: String::new() }
+            }
+        })*
+    };
+}
+
+impl_into_value!(i8, i16, i32, i64, i128, u8, u16, u32, u64, u128, f64, bool, String);
+
+impl<T: Into<Self>> From<Vec<T>> for Value {
+    fn from(value: Vec<T>) -> Self {
+        let val = value.into_iter().map(|v| Into::<Self>::into(v).val).collect::<Vec<_>>();
+        Self { val: config::Value::from(val), path: String::new() }
+    }
+}
+
+impl<T: Into<Self>> From<HashMap<String, T>> for Value {
+    fn from(value: HashMap<String, T>) -> Self {
+        let val = value
+            .into_iter()
+            .map(|(k, v)| (k, Into::<Self>::into(v).val))
+            .collect::<HashMap<String, _>>();
+        Self { val: config::Value::from(val), path: String::new() }
+    }
+}
+
+impl<T: Into<Self>, const L: usize> From<[T; L]> for Value {
+    fn from(value: [T; L]) -> Self {
+        let val = value.into_iter().map(|v| Into::<Self>::into(v).val).collect::<Vec<_>>();
+        Self { val: config::Value::from(val), path: String::new() }
+    }
+}
+
+impl From<Config> for Value {
+    fn from(value: Config) -> Self {
+        Self { val: config::Value::from(value.cfg), path: String::new() }
+    }
 }
 
 #[cfg(test)]

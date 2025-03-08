@@ -1,6 +1,5 @@
 //! Rectangle with position.
-use builder::config::value::{Error as ParseError, ParseFormValue, Value};
-use error_stack::Result;
+use builder::config::value::{Error as ParseError, Value};
 use std::{
     fmt::{Debug, Display},
     ops::Add,
@@ -36,8 +35,9 @@ impl<T> From<[T; 4]> for Rect<T> {
     }
 }
 
-impl<T: ParseFormValue> ParseFormValue for Rect<T> {
-    fn parse_val(val: Value) -> Result<Self, ParseError> {
-        Ok(<[T; 4]>::parse_val(val)?.into())
+impl<E: std::error::Error, T: TryFrom<Value, Error = E>> TryFrom<Value> for Rect<T> {
+    type Error = ParseError;
+    fn try_from(value: Value) -> std::result::Result<Self, Self::Error> {
+        Ok(<[T; 4]>::try_from(value)?.into())
     }
 }

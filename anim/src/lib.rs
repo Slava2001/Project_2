@@ -85,6 +85,7 @@ macro_rules! make_animator_cfg {
 }
 
 /// Animator static config, use [`make_animator_cfg`] for create it.
+#[derive(Clone)]
 pub struct AnimatorCfg<S, E> {
     /// Init state.
     pub state: S,
